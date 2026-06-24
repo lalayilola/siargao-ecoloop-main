@@ -1,0 +1,2 @@
+ALTER TABLE public.purchase_requests
+ADD COLUMN IF NOT EXISTS quantity_kg INTEGER NOT NULL DEFAULT 1;
