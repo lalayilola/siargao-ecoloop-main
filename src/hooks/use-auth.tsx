@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
-export type AppRole = "farmer" | "restaurant" | "resident" | "lgu_admin";
+export type AppRole = "farmer" | "hotel_restaurant" | "resident" | "lgu_admin";
 
 export type Profile = {
   id: string;
@@ -39,12 +40,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoles([]);
       return;
     }
-    const [{ data: prof }, { data: rs }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", u.id).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", u.id),
-    ]);
-    setProfile((prof as Profile) ?? null);
-    setRoles(((rs as { role: AppRole }[]) ?? []).map((r) => r.role));
+
+    try {
+      const [{ data: prof }, { data: rs }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", u.id).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", u.id),
+      ]);
+      setProfile((prof as Profile | null) ?? null);
+      setRoles(((rs as { role: AppRole }[]) ?? []).map((r) => r.role));
+    } catch (error) {
+      console.error("Unable to load auth profile:", getSupabaseErrorMessage(error));
+      setProfile(null);
+      setRoles([]);
+    }
   };
 
   useEffect(() => {
@@ -53,22 +61,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // defer DB calls to avoid deadlock in listener
       setTimeout(() => load(session?.user ?? null), 0);
     });
-    supabase.auth.getSession().then(async ({ data }) => {
-      setUser(data.session?.user ?? null);
-      await load(data.session?.user ?? null);
-      setLoading(false);
-    });
+
+    const initializeAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setUser(data.session?.user ?? null);
+        await load(data.session?.user ?? null);
+      } catch (error) {
+        console.error("Unable to initialize auth session:", getSupabaseErrorMessage(error));
+        setUser(null);
+        setProfile(null);
+        setRoles([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
     return () => sub.subscription.unsubscribe();
   }, []);
 
   const refresh = async () => {
-    const { data } = await supabase.auth.getUser();
-    setUser(data.user);
-    await load(data.user);
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      setUser(data.user);
+      await load(data.user);
+    } catch (error) {
+      console.error("Unable to refresh auth state:", getSupabaseErrorMessage(error));
+      setUser(null);
+      setProfile(null);
+      setRoles([]);
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Unable to sign out:", getSupabaseErrorMessage(error));
+    }
   };
 
   return (

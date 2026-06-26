@@ -7,14 +7,20 @@ import {
   Package,
   TrendingUp,
   Bell,
+  Leaf,
+  Award,
+  ShoppingCart,
+  ShoppingCart as OrdersIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { CircularEconomyWorkflow } from "@/components/CircularEconomyWorkflow";
 
 type MarketplaceListing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
 type Trade = Database["public"]["Tables"]["trades"]["Row"];
+type PurchaseRequest = Database["public"]["Tables"]["purchase_requests"]["Row"];
 
 export function FarmerDashboard() {
   const { user, profile } = useAuth();
@@ -22,6 +28,8 @@ export function FarmerDashboard() {
     totalListings: 0,
     activeListings: 0,
     completedOrders: 0,
+    totalSales: 0,
+    sustainabilityScore: 85,
   });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
@@ -30,12 +38,18 @@ export function FarmerDashboard() {
 
     const loadDashboardData = async () => {
       try {
-        const [{ data: listings, error: listingsError }, { data: trades, error: tradesError }] = await Promise.all([
+        const [{ data: listings, error: listingsError }, { data: trades, error: tradesError }, { data: purchaseRequests, error: purchaseError }] = await Promise.all([
           supabase.from("marketplace_listings").select("*").eq("user_id", user.id),
           supabase
             .from("trades")
             .select("*")
             .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+            .order("created_at", { ascending: false })
+            .limit(5),
+          supabase
+            .from("purchase_requests")
+            .select("*")
+            .eq("buyer_user_id", user.id)
             .order("created_at", { ascending: false })
             .limit(5),
         ]);
@@ -46,17 +60,34 @@ export function FarmerDashboard() {
         if (tradesError) {
           console.error("Error loading trades:", tradesError);
         }
+        if (purchaseError) {
+          console.error("Error loading purchase requests:", purchaseError);
+        }
 
-        const listingList = listings ?? [];
-        const activeListings = listingList.filter((l) => l.status === "available");
-        const completedOrders = listingList.filter((l) => l.status === "sold");
+        const listingList = (listings ?? []) as MarketplaceListing[];
+        const activeListings = listingList.filter((l) => l.kind === "produce");
+        const completedTrades = (trades ?? []) as Trade[];
+        const completedOrders = completedTrades.filter((t) => t.status === "completed");
+        
+        // Calculate total sales from completed trades
+        const totalSales = completedOrders.reduce((sum, trade) => {
+          const price = parseFloat(trade.from_gives.replace(/[^0-9.]/g, "")) || 0;
+          return sum + price;
+        }, 0);
+
+        // Calculate sustainability score based on activity
+        const sustainabilityScore = Math.min(100, 
+          50 + (activeListings.length * 5) + (completedOrders.length * 3)
+        );
 
         setStats({
           totalListings: listingList.length,
           activeListings: activeListings.length,
           completedOrders: completedOrders.length,
+          totalSales,
+          sustainabilityScore,
         });
-        setRecentActivity(trades ?? []);
+        setRecentActivity(completedTrades);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
         toast.error("Could not load farmer dashboard data.");
@@ -68,34 +99,20 @@ export function FarmerDashboard() {
 
   const statCards = [
     {
-      title: "Active Listings",
-      value: stats.activeListings,
-      icon: Sprout,
-      color: "text-green-600",
-      bgColor: "bg-green-500/10",
-      link: "/inventory",
-    },
-    {
-      title: "Completed Sales",
+      title: "Produce Orders",
       value: stats.completedOrders,
-      icon: TrendingUp,
-      color: "text-purple-600",
-      bgColor: "bg-purple-500/10",
+      icon: ShoppingCart,
+      color: "text-blue-600",
+      bgColor: "bg-blue-500/10",
       link: "/trades",
     },
   ];
 
   const quickActions = [
     {
-      title: "List Produce",
-      description: "Add new produce to the marketplace",
-      icon: Sprout,
-      link: "/inventory",
-    },
-    {
-      title: "View Activity",
-      description: "Review recent trades and updates",
-      icon: Package,
+      title: "View Orders",
+      description: "Track orders from hotels and restaurants",
+      icon: OrdersIcon,
       link: "/trades",
     },
   ];
@@ -119,6 +136,11 @@ export function FarmerDashboard() {
           Welcome, {profile.full_name}
         </h1>
         <p className="text-slate-600">Manage your produce listings and recent community activity.</p>
+      </div>
+
+      {/* Circular Economy Workflow */}
+      <div className="mb-8">
+        <CircularEconomyWorkflow />
       </div>
 
       {/* Stats Grid */}

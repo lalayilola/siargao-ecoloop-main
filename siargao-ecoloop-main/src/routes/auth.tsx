@@ -35,6 +35,29 @@ const signupSchema = z.object({
   role: z.enum(["farmer", "restaurant", "resident", "lgu_admin"]),
 });
 
+const AUTH_RATE_LIMIT_COOLDOWN_MS = 3 * 60 * 1000;
+const AUTH_RATE_LIMIT_STORAGE_KEY = "ecoloop.auth.rate-limit-until";
+
+function readStoredAuthCooldown() {
+  if (typeof window === "undefined") return null;
+  const value = window.localStorage.getItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return parsed > Date.now() ? parsed : null;
+}
+
+function activateAuthCooldown() {
+  const until = Date.now() + AUTH_RATE_LIMIT_COOLDOWN_MS;
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(AUTH_RATE_LIMIT_STORAGE_KEY, String(until));
+  }
+  return until;
+}
+
+function isRateLimitMessage(message: string) {
+  return /rate limit|too many requests|email rate limit|rate limit exceeded|429/i.test(message);
+}
+
 function AuthPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -92,10 +115,49 @@ function GoogleButton() {
   );
 }
 
+async function signInOrCreateAccount(email: string, password: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const signInResult = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+  if (!signInResult.error) {
+    return { ok: true, createdAccount: false, error: null as null, reason: "signed_in" as const };
+  }
+
+  const message = signInResult.error.message || "";
+  const isInvalidCredentials = /invalid login credentials|invalid_credentials|invalid_grant|auth\/invalid-credentials/i.test(message);
+  const isRateLimit = isRateLimitMessage(message);
+
+  if (!isInvalidCredentials) {
+    return { ok: false, createdAccount: false, error: signInResult.error, reason: "auth_error" as const };
+  }
+
+  if (isRateLimit) {
+    return { ok: false, createdAccount: false, error: signInResult.error, reason: "rate_limit" as const };
+  }
+
+  return { ok: false, createdAccount: false, error: signInResult.error, reason: "invalid_credentials" as const };
+}
+
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
+  const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    if (cooldownUntil <= Date.now()) {
+      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      setCooldownUntil(null);
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      setCooldownUntil(null);
+    }, cooldownUntil - Date.now());
+    return () => window.clearTimeout(timeout);
+  }, [cooldownUntil]);
 
   return (
     <form
@@ -103,11 +165,28 @@ function LoginForm() {
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
-        const normalizedEmail = email.trim().toLowerCase();
-        const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
-        setBusy(false);
-        if (error) toast.error(`${error.message}${error.code ? ` (${error.code})` : ""}`);
-        else toast.success("Welcome back!");
+        try {
+          const normalizedEmail = email.trim().toLowerCase();
+          const result = await signInOrCreateAccount(normalizedEmail, password);
+          if (!result.ok) {
+            if (result.reason === "rate_limit") {
+              toast.error("Too many sign-in attempts. Please wait a moment and try again.");
+            } else if (result.reason === "invalid_credentials") {
+              toast.error("Incorrect email or password. If you do not have an account yet, please use Create account.");
+            } else {
+              const details = result.error?.code ? ` (${result.error.code})` : "";
+              toast.error(`Unable to sign in${details}. Please check your email and password, or try again shortly.`);
+            }
+            console.error("Sign-in failed", result.error);
+          } else {
+            toast.success("Welcome back!");
+          }
+        } catch (err) {
+          console.error("Sign-in error", err);
+          toast.error("Unable to connect to EcoLoop right now. Please try again shortly.");
+        } finally {
+          setBusy(false);
+        }
       }}
     >
       <div className="space-y-1.5">
@@ -118,8 +197,8 @@ function LoginForm() {
         <Label htmlFor="li-pw">Password</Label>
         <Input id="li-pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
-      <Button type="submit" className="w-full" disabled={busy}>
-        {busy ? "Signing in…" : "Sign in"}
+      <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
+        {busy ? "Signing in…" : isCooldownActive ? "Please wait…" : "Sign in"}
       </Button>
       <p className="text-center text-xs text-muted-foreground">
         <Link to="/reset-password" className="underline">Forgot password?</Link>
@@ -139,14 +218,36 @@ function SignupForm() {
     role: "resident" as "farmer" | "restaurant" | "resident" | "lgu_admin",
   });
   const [busy, setBusy] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
+  const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    if (cooldownUntil <= Date.now()) {
+      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      setCooldownUntil(null);
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      setCooldownUntil(null);
+    }, cooldownUntil - Date.now());
+    return () => window.clearTimeout(timeout);
+  }, [cooldownUntil]);
 
   return (
     <form
       className="space-y-3 pt-4"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (busy || isCooldownActive) {
+          if (isCooldownActive) {
+            toast.error("Too many requests. Please wait a few minutes and try again.");
+          }
+          return;
+        }
         const parsed = signupSchema.safeParse(form);
         if (!parsed.success) {
           toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
@@ -154,79 +255,88 @@ function SignupForm() {
         }
         setBusy(true);
         const normalizedEmail = parsed.data.email.toLowerCase();
-        const { data, error: signupError } = await supabase.auth.signUp({
-          email: normalizedEmail,
-          password: parsed.data.password,
-          options: {
-            data: {
-              full_name: parsed.data.full_name,
-              phone: parsed.data.phone,
-              barangay: parsed.data.barangay,
-              address: parsed.data.address,
-              role: parsed.data.role,
-            },
-          },
-        });
-
-        if (signupError) {
-          toast.error(`${signupError.message}${signupError.code ? ` (${signupError.code})` : ""}`);
-          setBusy(false);
-          return;
-        }
-
-        if (data?.session) {
-          setBusy(false);
-          if (parsed.data.role === "lgu_admin") {
-            toast.success("LGU account created. An EcoLoop admin will review and approve access.");
-          } else {
-            toast.success("Account created! You're signed in.");
-          }
-          return;
-        }
-
-        if (data?.user) {
-          try {
-            await confirmUserEmail({ data: { userId: data.user.id } });
-          } catch (err) {
-            toast.error(`Unable to auto-confirm email: ${err instanceof Error ? err.message : "Unknown error"}`);
-            setBusy(false);
-            return;
-          }
-
-          const { error: loginError } = await supabase.auth.signInWithPassword({
+        try {
+          const { data, error: signupError } = await supabase.auth.signUp({
             email: normalizedEmail,
             password: parsed.data.password,
+            options: {
+              data: {
+                full_name: parsed.data.full_name,
+                phone: parsed.data.phone,
+                barangay: parsed.data.barangay,
+                address: parsed.data.address,
+                role: parsed.data.role,
+              },
+            },
           });
-          if (loginError) {
-            toast.error(`${loginError.message}${loginError.code ? ` (${loginError.code})` : ""}`);
+
+          if (signupError) {
+            const details = signupError.code ? ` (${signupError.code})` : "";
+            const message = signupError.message || "";
+            const isRateLimit = isRateLimitMessage(message);
+            if (isRateLimit) {
+              const until = activateAuthCooldown();
+              setCooldownUntil(until);
+              toast.error("Too many sign-up attempts. Please wait a few minutes and try again.");
+            } else {
+              toast.error(`Account creation failed${details}. ${message}`);
+            }
+            console.error("Sign-up failed", signupError);
             setBusy(false);
             return;
           }
 
-          setBusy(false);
-          if (parsed.data.role === "lgu_admin") {
-            toast.success("LGU account created. An EcoLoop admin will review and approve access.");
-          } else {
-            toast.success("Account created! You're signed in.");
+          if (data?.session) {
+            setBusy(false);
+            if (parsed.data.role === "lgu_admin") {
+              toast.success("LGU account created. An EcoLoop admin will review and approve access.");
+            } else {
+              toast.success("Account created! You're signed in.");
+            }
+            return;
           }
-          return;
-        }
 
-        const { error: loginError } = await supabase.auth.signInWithPassword({
-          email: normalizedEmail,
-          password: parsed.data.password,
-        });
-        if (loginError) {
-          toast.error(`${loginError.message}${loginError.code ? ` (${loginError.code})` : ""}`);
+          if (data?.user) {
+            try {
+              await confirmUserEmail({ data: { userId: data.user.id } });
+            } catch (err) {
+              toast.error(`Unable to verify the new account: ${err instanceof Error ? err.message : "Unknown error"}`);
+              setBusy(false);
+              return;
+            }
+
+            const { error: loginError } = await supabase.auth.signInWithPassword({
+              email: normalizedEmail,
+              password: parsed.data.password,
+            });
+            if (loginError) {
+              const message = loginError.message || "";
+              if (isRateLimitMessage(message)) {
+                const until = activateAuthCooldown();
+                setCooldownUntil(until);
+                toast.error("Too many requests. Please wait a few minutes and try again.");
+              } else {
+                toast.error(`Account created, but sign-in could not be completed. ${message}`);
+              }
+              setBusy(false);
+              return;
+            }
+
+            setBusy(false);
+            if (parsed.data.role === "lgu_admin") {
+              toast.success("LGU account created. An EcoLoop admin will review and approve access.");
+            } else {
+              toast.success("Account created! You're signed in.");
+            }
+            return;
+          }
+
+          toast.error("Account creation did not complete. Please try again shortly.");
+        } catch (err) {
+          console.error("Sign-up error", err);
+          toast.error("Unable to connect to EcoLoop right now. Please try again shortly.");
+        } finally {
           setBusy(false);
-          return;
-        }
-
-        setBusy(false);
-        if (parsed.data.role === "lgu_admin") {
-          toast.success("LGU account created. An EcoLoop admin will review and approve access.");
-        } else {
-          toast.success("Account created! You're signed in.");
         }
       }}
     >
@@ -268,8 +378,8 @@ function SignupForm() {
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit" className="w-full" disabled={busy}>
-        {busy ? "Creating account…" : "Create account"}
+      <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
+        {busy ? "Creating account…" : isCooldownActive ? "Please wait…" : "Create account"}
       </Button>
     </form>
   );

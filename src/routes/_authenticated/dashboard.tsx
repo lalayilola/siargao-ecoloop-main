@@ -4,7 +4,7 @@ import { Container, PageHero } from "@/components/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Recycle, Leaf, Users, Handshake, TrendingUp, ShieldAlert, Megaphone, FileText, UserCheck, BarChart3, Store } from "lucide-react";
+import { Recycle, Leaf, Users, Handshake, TrendingUp, ShieldAlert, Megaphone, FileText, UserCheck, BarChart3, Store, Truck, Package, Calendar, Globe } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,14 +42,26 @@ function DashboardPage() {
   const { isLguAdmin, profile, user } = useAuth();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [recentMessages, setRecentMessages] = useState<Database["public"]["Tables"]["notifications"]["Row"][]>([]);
-  const [realStats, setRealStats] = useState({
+  const [realStats, setRealStats] = useState<{
+    totalUsers: number;
+    farmers: number;
+    hotels: number;
+    localUsers: number;
+    lguAdmins: number;
+    totalListings: number;
+    totalTrades: number;
+    wasteCollected: number;
+    pendingCollections: number;
+  }>({
     totalUsers: 0,
     farmers: 0,
-    restaurants: 0,
+    hotels: 0,
     localUsers: 0,
     lguAdmins: 0,
     totalListings: 0,
     totalTrades: 0,
+    wasteCollected: 0,
+    pendingCollections: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -70,31 +82,46 @@ function DashboardPage() {
         return;
       }
 
-      const messages = data ?? [];
+      const messages: Database["public"]["Tables"]["notifications"]["Row"][] = data ?? [];
       setRecentMessages(messages);
       setUnreadMessages(messages.filter((n) => !n.read_at).length);
     };
 
     const loadRealStats = async () => {
       try {
-        const [usersResult, listingsResult, tradesResult] = await Promise.all([
+        const [usersResult, listingsResult, tradesResult, wasteResult, collectionsResult] = await Promise.all([
           supabase.from("profiles").select("*"),
           supabase.from("marketplace_listings").select("*"),
           supabase.from("trades").select("*"),
+          supabase.from("food_waste_reports").select("*"),
+          supabase.from("waste_collections").select("*"),
         ]);
 
         const users = usersResult.data || [];
         const listings = listingsResult.data || [];
         const trades = tradesResult.data || [];
+        const wasteReports = wasteResult.data || [] as Database["public"]["Tables"]["food_waste_reports"]["Row"][];
+        const wasteCollections = collectionsResult.data || [] as Database["public"]["Tables"]["waste_collections"]["Row"][];
+
+        const wasteCollected = wasteCollections
+          .filter((c) => c.status === "completed")
+          .reduce((sum: number, c) => {
+            const report = wasteReports.find((w) => w.id === c.waste_report_id);
+            return sum + (report?.quantity_kg || 0);
+          }, 0);
+
+        const pendingCollections = wasteCollections.filter((c) => c.status === "scheduled").length;
 
         setRealStats({
           totalUsers: users.length,
-          farmers: users.filter(u => u.primary_role === "farmer").length,
-          restaurants: users.filter(u => u.primary_role === "restaurant").length,
-          localUsers: users.filter(u => u.primary_role === "resident").length,
-          lguAdmins: users.filter(u => u.primary_role === "lgu_admin").length,
+          farmers: users.filter((u: any) => u.primary_role === "farmer").length,
+          hotels: users.filter((u: any) => u.primary_role === "hotel_restaurant").length,
+          localUsers: users.filter((u: any) => u.primary_role === "resident").length,
+          lguAdmins: users.filter((u: any) => u.primary_role === "lgu_admin").length,
           totalListings: listings.length,
           totalTrades: trades.length,
+          wasteCollected,
+          pendingCollections,
         });
       } catch (error) {
         console.error("Error loading real stats:", error);
@@ -187,9 +214,15 @@ function DashboardPage() {
         {/* KPI Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat icon={Users} label="Total Users" value={realStats.totalUsers.toLocaleString()} />
-          <Stat icon={Recycle} label="Farmers" value={realStats.farmers.toLocaleString()} />
-          <Stat icon={Store} label="Restaurants" value={realStats.restaurants.toLocaleString()} />
+          <Stat icon={Leaf} label="Farmers" value={realStats.farmers.toLocaleString()} />
+          <Stat icon={Store} label="Hotels" value={realStats.hotels.toLocaleString()} />
           <Stat icon={Handshake} label="Total Trades" value={realStats.totalTrades.toLocaleString()} />
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat icon={Truck} label="Waste Collected" value={`${realStats.wasteCollected.toLocaleString()} kg`} />
+          <Stat icon={Calendar} label="Pending Collections" value={realStats.pendingCollections.toLocaleString()} />
+          <Stat icon={Globe} label="Environmental Impact" value="High" sub="Active" />
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
@@ -204,7 +237,7 @@ function DashboardPage() {
                   <Pie 
                     data={[
                       { name: "Farmers", value: realStats.farmers },
-                      { name: "Restaurants", value: realStats.restaurants },
+                      { name: "Hotels", value: realStats.hotels },
                       { name: "Local Users", value: realStats.localUsers },
                       { name: "LGU Admins", value: realStats.lguAdmins },
                     ]} 

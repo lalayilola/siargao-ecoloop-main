@@ -26,15 +26,6 @@ const BADGE_TYPES: BadgeData[] = [
     iconColor: "text-amber-600",
   },
   {
-    id: "compost-champion",
-    name: "Compost Champion",
-    description: "Purchase compost 5 times",
-    icon: Leaf,
-    color: "bg-green-100",
-    requirement: 5,
-    iconColor: "text-green-600",
-  },
-  {
     id: "eco-enthusiast",
     name: "Eco Enthusiast",
     description: "Earn 500 eco points",
@@ -57,8 +48,6 @@ const BADGE_TYPES: BadgeData[] = [
 const POINT_SYSTEM = {
   waste_report_submitted: 25,
   waste_collection_scheduled: 10,
-  compost_purchased: 50,
-  compost_requested: 15,
   produce_listed: 20,
   produce_sold: 30,
   community_post: 10,
@@ -90,15 +79,6 @@ export function EcoPointsView() {
 
         points += (wasteReports?.length || 0) * POINT_SYSTEM.waste_report_submitted;
 
-        // Get compost purchases (from purchase_requests)
-        const { data: purchases } = await supabase
-          .from("purchase_requests")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("status", "completed");
-
-        points += (purchases?.length || 0) * POINT_SYSTEM.compost_purchased;
-
         // Get listings (for farmers)
         if (profile?.primary_role === "farmer") {
           const { data: listings } = await supabase
@@ -122,7 +102,6 @@ export function EcoPointsView() {
         // Calculate breakdown
         const breakdown: Record<string, number> = {
           "Waste Reports": (wasteReports?.length || 0) * POINT_SYSTEM.waste_report_submitted,
-          "Compost Purchases": (purchases?.length || 0) * POINT_SYSTEM.compost_purchased,
           "Community Posts": (posts?.length || 0) * POINT_SYSTEM.community_post,
         };
 
@@ -139,9 +118,8 @@ export function EcoPointsView() {
         // Unlock badges based on points and activities
         const badges = [];
         if ((wasteReports?.length || 0) >= 10) badges.push(BADGE_TYPES[0]);
-        if ((purchases?.length || 0) >= 5) badges.push(BADGE_TYPES[1]);
-        if (points >= 500) badges.push(BADGE_TYPES[2]);
-        if ((posts?.length || 0) >= 5) badges.push(BADGE_TYPES[3]);
+        if (points >= 500) badges.push(BADGE_TYPES[1]);
+        if ((posts?.length || 0) >= 5) badges.push(BADGE_TYPES[2]);
 
         setUnlockedBadges(badges);
         setLoading(false);
@@ -228,7 +206,6 @@ export function EcoPointsView() {
           <h3 className="font-semibold text-slate-900 mb-3">💡 How to Earn More Points</h3>
           <ul className="space-y-2 text-sm text-slate-700">
             <li>• Submit food waste reports: +{POINT_SYSTEM.waste_report_submitted} points each</li>
-            <li>• Purchase compost: +{POINT_SYSTEM.compost_purchased} points each</li>
             <li>• Create community posts: +{POINT_SYSTEM.community_post} points each</li>
             {profile?.primary_role === "farmer" && (
               <li>• List produce: +{POINT_SYSTEM.produce_listed} points each</li>

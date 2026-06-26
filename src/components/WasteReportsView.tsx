@@ -27,7 +27,7 @@ export function WasteReportsView() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!user || profile?.primary_role !== "restaurant") {
+    if (!user || profile?.primary_role !== "hotel_restaurant") {
       setIsLoading(false);
       return;
     }
@@ -97,13 +97,13 @@ export function WasteReportsView() {
     toast.success("Waste report submitted. Collection team will follow up soon.");
   };
 
-  if (!profile || profile.primary_role !== "restaurant") {
+  if (!profile || profile.primary_role !== "hotel_restaurant") {
     return (
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <Trash2 className="mx-auto h-12 w-12 text-accent mb-4" />
           <h2 className="text-2xl font-semibold text-primary">Waste Reports</h2>
-          <p className="text-slate-600 mt-2">Restaurant accounts can log food waste so collection teams can schedule pickup.</p>
+          <p className="text-slate-600 mt-2">Hotel/Restaurant accounts can log food waste so collection teams can schedule pickup.</p>
         </Card>
       </Container>
     );

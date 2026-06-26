@@ -36,10 +36,9 @@ import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardDiversionRouteImport } from './routes/_authenticated/dashboard-diversion'
 import { Route as AuthenticatedDashboardAnnouncementsRouteImport } from './routes/_authenticated/dashboard-announcements'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedCompostMarketplaceRouteImport } from './routes/_authenticated/compost-marketplace'
-import { Route as AuthenticatedCompostHistoryRouteImport } from './routes/_authenticated/compost-history'
 import { Route as AuthenticatedAnnouncementsRouteImport } from './routes/_authenticated/announcements'
 import { Route as AuthenticatedDashboardRestaurantRouteImport } from './routes/_authenticated/dashboard/restaurant'
+import { Route as AuthenticatedDashboardHotelRouteImport } from './routes/_authenticated/dashboard/hotel'
 import { Route as AuthenticatedDashboardFarmerRouteImport } from './routes/_authenticated/dashboard/farmer'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -185,18 +184,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedCompostMarketplaceRoute =
-  AuthenticatedCompostMarketplaceRouteImport.update({
-    id: '/compost-marketplace',
-    path: '/compost-marketplace',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCompostHistoryRoute =
-  AuthenticatedCompostHistoryRouteImport.update({
-    id: '/compost-history',
-    path: '/compost-history',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAnnouncementsRoute =
   AuthenticatedAnnouncementsRouteImport.update({
     id: '/announcements',
@@ -207,6 +194,12 @@ const AuthenticatedDashboardRestaurantRoute =
   AuthenticatedDashboardRestaurantRouteImport.update({
     id: '/restaurant',
     path: '/restaurant',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardHotelRoute =
+  AuthenticatedDashboardHotelRouteImport.update({
+    id: '/hotel',
+    path: '/hotel',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardFarmerRoute =
@@ -225,8 +218,6 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
-  '/compost-history': typeof AuthenticatedCompostHistoryRoute
-  '/compost-marketplace': typeof AuthenticatedCompostMarketplaceRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
@@ -247,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/waste-reports': typeof AuthenticatedWasteReportsRoute
   '/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
+  '/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
 }
 export interface FileRoutesByTo {
@@ -258,8 +250,6 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
-  '/compost-history': typeof AuthenticatedCompostHistoryRoute
-  '/compost-marketplace': typeof AuthenticatedCompostMarketplaceRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
@@ -280,6 +270,7 @@ export interface FileRoutesByTo {
   '/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/waste-reports': typeof AuthenticatedWasteReportsRoute
   '/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
+  '/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
 }
 export interface FileRoutesById {
@@ -293,8 +284,6 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/announcements': typeof AuthenticatedAnnouncementsRoute
-  '/_authenticated/compost-history': typeof AuthenticatedCompostHistoryRoute
-  '/_authenticated/compost-marketplace': typeof AuthenticatedCompostMarketplaceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/_authenticated/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
@@ -315,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/_authenticated/waste-reports': typeof AuthenticatedWasteReportsRoute
   '/_authenticated/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
+  '/_authenticated/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/_authenticated/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
 }
 export interface FileRouteTypes {
@@ -328,8 +318,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/reset-password'
     | '/announcements'
-    | '/compost-history'
-    | '/compost-marketplace'
     | '/dashboard'
     | '/dashboard-announcements'
     | '/dashboard-diversion'
@@ -350,6 +338,7 @@ export interface FileRouteTypes {
     | '/waste-collection'
     | '/waste-reports'
     | '/dashboard/farmer'
+    | '/dashboard/hotel'
     | '/dashboard/restaurant'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -361,8 +350,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/reset-password'
     | '/announcements'
-    | '/compost-history'
-    | '/compost-marketplace'
     | '/dashboard'
     | '/dashboard-announcements'
     | '/dashboard-diversion'
@@ -383,6 +370,7 @@ export interface FileRouteTypes {
     | '/waste-collection'
     | '/waste-reports'
     | '/dashboard/farmer'
+    | '/dashboard/hotel'
     | '/dashboard/restaurant'
   id:
     | '__root__'
@@ -395,8 +383,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/reset-password'
     | '/_authenticated/announcements'
-    | '/_authenticated/compost-history'
-    | '/_authenticated/compost-marketplace'
     | '/_authenticated/dashboard'
     | '/_authenticated/dashboard-announcements'
     | '/_authenticated/dashboard-diversion'
@@ -417,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/waste-collection'
     | '/_authenticated/waste-reports'
     | '/_authenticated/dashboard/farmer'
+    | '/_authenticated/dashboard/hotel'
     | '/_authenticated/dashboard/restaurant'
   fileRoutesById: FileRoutesById
 }
@@ -622,20 +609,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/compost-marketplace': {
-      id: '/_authenticated/compost-marketplace'
-      path: '/compost-marketplace'
-      fullPath: '/compost-marketplace'
-      preLoaderRoute: typeof AuthenticatedCompostMarketplaceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/compost-history': {
-      id: '/_authenticated/compost-history'
-      path: '/compost-history'
-      fullPath: '/compost-history'
-      preLoaderRoute: typeof AuthenticatedCompostHistoryRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/announcements': {
       id: '/_authenticated/announcements'
       path: '/announcements'
@@ -650,6 +623,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRestaurantRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/hotel': {
+      id: '/_authenticated/dashboard/hotel'
+      path: '/hotel'
+      fullPath: '/dashboard/hotel'
+      preLoaderRoute: typeof AuthenticatedDashboardHotelRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/farmer': {
       id: '/_authenticated/dashboard/farmer'
       path: '/farmer'
@@ -662,12 +642,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardFarmerRoute: typeof AuthenticatedDashboardFarmerRoute
+  AuthenticatedDashboardHotelRoute: typeof AuthenticatedDashboardHotelRoute
   AuthenticatedDashboardRestaurantRoute: typeof AuthenticatedDashboardRestaurantRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardFarmerRoute: AuthenticatedDashboardFarmerRoute,
+    AuthenticatedDashboardHotelRoute: AuthenticatedDashboardHotelRoute,
     AuthenticatedDashboardRestaurantRoute:
       AuthenticatedDashboardRestaurantRoute,
   }
@@ -679,8 +661,6 @@ const AuthenticatedDashboardRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnnouncementsRoute: typeof AuthenticatedAnnouncementsRoute
-  AuthenticatedCompostHistoryRoute: typeof AuthenticatedCompostHistoryRoute
-  AuthenticatedCompostMarketplaceRoute: typeof AuthenticatedCompostMarketplaceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedDashboardAnnouncementsRoute: typeof AuthenticatedDashboardAnnouncementsRoute
   AuthenticatedDashboardDiversionRoute: typeof AuthenticatedDashboardDiversionRoute
@@ -704,8 +684,6 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnnouncementsRoute: AuthenticatedAnnouncementsRoute,
-  AuthenticatedCompostHistoryRoute: AuthenticatedCompostHistoryRoute,
-  AuthenticatedCompostMarketplaceRoute: AuthenticatedCompostMarketplaceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedDashboardAnnouncementsRoute:
     AuthenticatedDashboardAnnouncementsRoute,

@@ -50,16 +50,27 @@ export function ListingCard({
   const { user } = useAuth();
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const isOwner = user?.id === item.user_id;
   const meta = roleMeta[item.role];
-  let img: string | undefined;
-  if (item.image) {
-    if (typeof item.image === "string" && (item.image.startsWith("http") || item.image.startsWith("/"))) {
-      img = item.image;
+  
+  // Get all images from the listing
+  const allImages = (item as any).images && Array.isArray((item as any).images) && (item as any).images.length > 0 
+    ? (item as any).images 
+    : item.image 
+      ? [item.image] 
+      : [];
+  
+  // Process images to get proper URLs
+  const processedImages = allImages.map((img: any) => {
+    if (typeof img === "string" && (img.startsWith("http") || img.startsWith("/"))) {
+      return img;
     } else {
-      img = mediaSrc(item.image as MediaKey | undefined);
+      return mediaSrc(img as MediaKey | undefined);
     }
-  }
+  }).filter(Boolean);
+  
+  const currentImage = processedImages[currentImageIndex] || processedImages[0];
 
   const getTransactionTypeLabel = (type: string) => {
     switch (type) {
@@ -87,7 +98,43 @@ export function ListingCard({
 
   return (
     <Card className="overflow-hidden p-0 border-2 border-primary/20 bg-white/95 hover:border-primary/60 hover:shadow-lg transition-all group">
-      <img src={img} alt="" loading="lazy" className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+      <div className="relative h-44 w-full">
+        {currentImage ? (
+          <img 
+            src={currentImage} 
+            alt="" 
+            loading="lazy" 
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" 
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+            <span className="text-primary/60 text-sm font-medium">No image</span>
+          </div>
+        )}
+        {processedImages.length > 1 && (
+          <>
+            <button
+              onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? processedImages.length - 1 : prev - 1))}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setCurrentImageIndex((prev) => (prev === processedImages.length - 1 ? 0 : prev + 1))}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+              {currentImageIndex + 1} / {processedImages.length}
+            </div>
+          </>
+        )}
+      </div>
       <div className="space-y-3 p-5 bg-gradient-to-b from-white to-sand/10">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-display text-lg font-semibold text-slate-900">{item.title}</h3>

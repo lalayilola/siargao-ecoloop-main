@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Container } from "@/components/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Trash2, FolderOpen, Clock } from "lucide-react";
+import { MapPin, Calendar, Trash2, FolderOpen, Clock, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ export function WasteCollectionView() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || profile?.primary_role !== "restaurant") {
+    if (!user || profile?.primary_role !== "hotel_restaurant") {
       setIsLoading(false);
       return;
     }
@@ -42,28 +42,28 @@ export function WasteCollectionView() {
         return;
       }
 
-      const reportsResult = reportData ?? [];
+      const reportsResult = (reportData ?? []) as WasteReport[];
       setReports(reportsResult);
 
       const reportIds = reportsResult.map((report) => report.id);
       if (reportIds.length === 0) {
-        setCollections({});
+        setCollections({} as Record<string, WasteCollection>);
         setIsLoading(false);
         return;
       }
 
-      const { data: collectionData, error: collectionError } = await supabase
-        .from("waste_collections")
+      const { data: collectionData, error: collectionError } = await (supabase
+        .from("waste_collections") as any)
         .select("*")
         .in("waste_report_id", reportIds);
 
       if (collectionError) {
         console.error("Error loading waste collections:", collectionError);
         toast.error("Unable to load waste collections.");
-        setCollections({});
+        setCollections({} as Record<string, WasteCollection>);
       } else {
-        const collectionMap: Record<number, WasteCollection> = {};
-        (collectionData ?? []).forEach((collection) => {
+        const collectionMap: Record<string, WasteCollection> = {};
+        ((collectionData ?? []) as WasteCollection[]).forEach((collection) => {
           collectionMap[collection.waste_report_id] = collection;
         });
         setCollections(collectionMap);
@@ -89,13 +89,13 @@ export function WasteCollectionView() {
     }
   };
 
-  if (!profile || profile.primary_role !== "restaurant") {
+  if (!profile || profile.primary_role !== "hotel_restaurant") {
     return (
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <FolderOpen className="mx-auto h-12 w-12 text-accent mb-4" />
           <h2 className="text-2xl font-semibold text-accent">Collection Requests</h2>
-          <p className="text-slate-600 mt-2">This page is for restaurants and hotels to track waste pickup requests.</p>
+          <p className="text-slate-600 mt-2">This page is for hotels and restaurants to track waste pickup requests.</p>
         </Card>
       </Container>
     );

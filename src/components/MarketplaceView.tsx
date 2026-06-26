@@ -34,6 +34,7 @@ import { LocationPicker } from "@/components/LocationPicker";
 
 type Listing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
 type Trade = Database["public"]["Tables"]["trades"]["Row"];
+type TradeRequest = Database["public"]["Tables"]["trade_requests"]["Row"];
 type PurchaseRequest = Database["public"]["Tables"]["purchase_requests"]["Row"];
 
 const canViewListing = (listing: Listing, role: AppRole | null | undefined, currentUserId?: string) => {
@@ -44,27 +45,16 @@ const canViewListing = (listing: Listing, role: AppRole | null | undefined, curr
   }
 
   if (role === "farmer") {
-    return (listing.kind === "produce" && currentUserId && listing.user_id === currentUserId) ||
-      (listing.kind === "waste" && listing.role === "lgu_admin");
+    return listing.kind === "produce" && currentUserId && listing.user_id === currentUserId;
   }
 
   if (role === "lgu_admin") {
-    return (listing.kind === "waste" && listing.role === "restaurant") ||
+    return (listing.kind === "waste" && listing.role === "hotel_restaurant") ||
       (listing.kind === "waste" && listing.user_id === currentUserId);
   }
 
-  if (listing.kind === "produce") {
-    return role === "restaurant" || role === "resident";
-  }
-
-  if (listing.kind === "waste") {
-    if (listing.role === "lgu_admin") {
-      return role === "farmer";
-    }
-
-    if (listing.role === "restaurant") {
-      return role === "lgu_admin";
-    }
+  if (role === "hotel_restaurant" || role === "resident") {
+    return listing.kind === "produce";
   }
 
   return false;
@@ -77,12 +67,12 @@ const canCreateListing = (role: AppRole | null | undefined, kind: Listing["kind"
     return kind === "produce";
   }
 
-  if (role === "restaurant") {
+  if (role === "hotel_restaurant") {
     return kind === "waste";
   }
 
   if (role === "lgu_admin") {
-    return kind === "waste";
+    return false;
   }
 
   return false;
@@ -92,12 +82,11 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
   if (!role) return listing.kind === "produce";
 
   if (listing.kind === "produce") {
-    return role === "restaurant" || role === "resident";
+    return role === "hotel_restaurant" || role === "resident";
   }
 
   if (listing.kind === "waste") {
-    return (role === "farmer" && listing.role === "lgu_admin") ||
-      (role === "lgu_admin" && listing.role === "restaurant");
+    return role === "farmer" && listing.role === "hotel_restaurant";
   }
 
   return false;
@@ -105,7 +94,7 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
 
 const canTradeListing = (listing: Listing, role: AppRole | null | undefined) => {
   if (!role) return false;
-  return role === "restaurant" && listing.kind === "produce";
+  return role === "hotel_restaurant" && listing.kind === "produce";
 };
 
 export function MarketplaceView() {
@@ -117,8 +106,8 @@ export function MarketplaceView() {
   const [kg, setKg] = useState(0);
   const [price, setPrice] = useState("");
   const [availableAt, setAvailableAt] = useState("Today");
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [filterUserRole, setFilterUserRole] = useState<"farmer" | "restaurant" | "resident" | "lgu_admin" | "all">("all");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
@@ -238,16 +227,6 @@ export function MarketplaceView() {
     void loadIncomingRequests();
   }, [user, userListings]);
 
-  useEffect(() => {
-      if (!file) {
-        setPreviewUrl(null);
-        return;
-      }
-
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    }, [file]);
 
   const createListing = async () => {
     if (!user || !profile) return;
@@ -256,35 +235,42 @@ export function MarketplaceView() {
       return;
     }
 
-    let imageUrl: string | null = null;
-    if (file) {
+    let imageUrls: string[] = [];
+    if (files.length > 0) {
+      setUploading(true);
       try {
-        const filePath = `marketplace/${user.id}/${Date.now()}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
-        if (uploadError) throw uploadError;
-        const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
-        imageUrl = publicData.publicUrl;
+        const uploadPromises = files.map(async (file) => {
+          const filePath = `marketplace/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
+          const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+          if (uploadError) throw uploadError;
+          const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
+          return publicData.publicUrl;
+        });
+        imageUrls = await Promise.all(uploadPromises);
       } catch (err: any) {
         const msg = err?.message ?? String(err);
         if (msg.includes("Bucket not found") || msg.includes("bucket not found") || msg.includes("no such bucket")) {
           toast.error(`Storage bucket "${STORAGE_BUCKET}" not found. Create it in Supabase Storage or set VITE_SUPABASE_STORAGE_BUCKET.`);
         } else if (msg.includes("row-level security") || msg.includes("violates row-level")) {
           toast.error(
-            "Could not upload image: storage upload blocked by row-level security. " +
+            "Could not upload images: storage upload blocked by row-level security. " +
             "Ensure the signed-in user is authenticated and the Supabase storage bucket policy allows uploads."
           );
         } else {
-          toast.error(`Could not upload image: ${msg}`);
+          toast.error(`Could not upload images: ${msg}`);
         }
+        setUploading(false);
         return;
+      } finally {
+        setUploading(false);
       }
     }
 
     if (!canCreateListing(profile.primary_role, kind)) {
       const message = profile.primary_role === "farmer"
         ? "Farmers can only list food produce." 
-        : profile.primary_role === "restaurant"
-          ? "Restaurants can only list food waste for the LGU." 
+        : profile.primary_role === "hotel_restaurant"
+          ? "Hotels/Restaurants can only list food waste for the LGU." 
           : profile.primary_role === "lgu_admin"
             ? "LGU staff can only post organic fertilizer listings." 
             : "Residents can only list food produce.";
@@ -303,7 +289,8 @@ export function MarketplaceView() {
         kg,
         price: price.trim() || null,
         available_at: availableAt,
-        image: imageUrl,
+        image: imageUrls.length > 0 ? imageUrls[0] : null,
+        images: imageUrls,
         barangay: profile.barangay || "Siargao",
         transaction_type: "sell_and_barter",
         acceptable_exchanges: [],
@@ -331,7 +318,7 @@ export function MarketplaceView() {
     setKg(0);
     setPrice("");
     setAvailableAt("Today");
-    setFile(null);
+    setFiles([]);
     setTransactionType("sell_and_barter");
     setAcceptableExchanges([]);
     setCategory("");
@@ -369,8 +356,8 @@ export function MarketplaceView() {
   };
 
   const handleTradeRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["trade_status"]) => {
-    const { error } = await supabase
-      .from("trade_requests")
+    const { error } = await (supabase
+      .from("trade_requests") as any)
       .update({ status })
       .eq("id", requestId);
 
@@ -388,12 +375,9 @@ export function MarketplaceView() {
     toast.success(`Trade request ${status}.`);
   };
 
-  const handlePurchaseRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["trade_status"]) => {
-    const dbStatus = status === "accepted" ? "approved" : status === "rejected" ? "pending" : status;
-    const uiStatus = status === "accepted" ? "accepted" : status;
-
-    const { data: existingRequest, error: existingRequestError } = await supabase
-      .from("purchase_requests")
+  const handlePurchaseRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["purchase_status"]) => {
+    const { data: existingRequest, error: existingRequestError } = await (supabase
+      .from("purchase_requests") as any)
       .select("status, listing_id, quantity_kg")
       .eq("id", requestId)
       .single();
@@ -403,9 +387,9 @@ export function MarketplaceView() {
       return;
     }
 
-    const { data: updatedRequest, error } = await supabase
-      .from("purchase_requests")
-      .update({ status: dbStatus as any })
+    const { data: updatedRequest, error } = await (supabase
+      .from("purchase_requests") as any)
+      .update({ status })
       .eq("id", requestId)
       .select("status, listing_id, quantity_kg")
       .single();
@@ -417,7 +401,7 @@ export function MarketplaceView() {
 
     setIncomingPurchaseRequests((prev) =>
       prev.map((request) =>
-        request.id === requestId ? { ...request, status: uiStatus } : request
+        request.id === requestId ? { ...request, status } : request
       )
     );
 
@@ -426,12 +410,12 @@ export function MarketplaceView() {
       if (shouldDeduct) {
         const listing = listings.find((item) => item.id === updatedRequest.listing_id) ?? userListings.find((item) => item.id === updatedRequest.listing_id);
         if (listing) {
-          const requestedQty = Math.max(1, Number((updatedRequest as any)?.quantity_kg ?? (existingRequest as any)?.quantity_kg ?? 1) || 1);
+          const requestedQty = Math.max(1, Number(updatedRequest?.quantity_kg ?? existingRequest?.quantity_kg ?? 1) || 1);
           const currentKg = Number(listing.kg ?? 0);
           const nextKg = Math.max(0, currentKg - requestedQty);
 
-          const { error: stockError } = await supabase
-            .from("marketplace_listings")
+          const { error: stockError } = await (supabase
+            .from("marketplace_listings") as any)
             .update({ kg: nextKg, updated_at: new Date().toISOString() })
             .eq("id", listing.id);
 
@@ -447,7 +431,7 @@ export function MarketplaceView() {
       }
     }
 
-    toast.success(`Purchase request ${uiStatus}.`);
+    toast.success(`Purchase request ${status}.`);
   };
 
   const getListingById = (id: string) => userListings.find(l => l.id === id);
@@ -558,9 +542,9 @@ export function MarketplaceView() {
   );
 
   const heroSub = profile?.primary_role === "farmer"
-    ? "See the fresh produce you posted and buy organic fertilizer from LGU food waste listings."
+    ? "See the fresh produce you posted."
     : profile?.primary_role === "lgu_admin"
-      ? "Buy restaurant food waste and post organic fertilizer for farmers."
+      ? "Buy restaurant food waste."
       : "Buy or barter fresh produce from local farmers. Or list food waste so it gets composted instead of landfilled.";
 
   return (
@@ -645,11 +629,11 @@ export function MarketplaceView() {
                 <h2 className="font-display text-xl font-semibold text-primary">Create a new listing</h2>
                 <p className="text-sm text-slate-600/70">
                   {profile?.primary_role === "farmer"
-                    ? "Farmers can publish fresh produce only. Organic fertilizer appears from LGU food waste posts."
+                    ? "Farmers can publish fresh produce only."
                     : profile?.primary_role === "lgu_admin"
-                      ? "LGU staff can publish organic fertilizer listings for farmers."
-                      : profile?.primary_role === "restaurant"
-                        ? "Restaurants can post waste listings only."
+                      ? "LGU staff cannot create listings."
+                      : profile?.primary_role === "hotel_restaurant"
+                        ? "Hotels/Restaurants can post waste listings only."
                         : "Farmers can publish fresh produce or waste available for barter or pickup."}
                 </p>
               </div>
@@ -661,16 +645,13 @@ export function MarketplaceView() {
               <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price or terms" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
               <Input value={availableAt} onChange={(e) => setAvailableAt(e.target.value)} placeholder="Available date" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
               <div className="sm:col-span-2 flex flex-wrap gap-3">
-                {profile?.primary_role === "restaurant" ? (
+                {profile?.primary_role === "hotel_restaurant" ? (
                   <Button type="button" className="bg-secondary text-slate-900 hover:bg-secondary/90">♻️ Waste</Button>
+                ) : profile?.primary_role === "lgu_admin" ? (
+                  <span className="text-sm text-slate-500">LGU staff cannot create listings</span>
                 ) : (
                   <>
-                    {profile?.primary_role !== "lgu_admin" && (
-                      <Button type="button" className={kind === "produce" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("produce")}>🌾 Produce</Button>
-                    )}
-                    {profile?.primary_role !== "farmer" && (
-                      <Button type="button" className={kind === "waste" ? "bg-secondary text-slate-900 hover:bg-secondary/90" : "text-slate-700 border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("waste")}>🧪 Organic Fertilizer</Button>
-                    )}
+                    <Button type="button" className={kind === "produce" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("produce")}>🌾 Produce</Button>
                   </>
                 )}
               </div>
@@ -720,7 +701,7 @@ export function MarketplaceView() {
                           <Label htmlFor="restaurant-food-waste" className="text-sm">Restaurant Food Waste</Label>
                         </div>
                       </>
-                    ) : profile?.primary_role === "restaurant" ? (
+                    ) : profile?.primary_role === "hotel_restaurant" ? (
                       <>
                         <div className="flex items-center space-x-2">
                           <Checkbox
@@ -788,15 +769,69 @@ export function MarketplaceView() {
               </div>
             </div>
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium text-primary">Add a photo</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="text-sm border border-primary/30 rounded-md p-2 w-full"
-              />
-              {previewUrl && (
-                <img src={previewUrl} alt="Preview" className="mt-3 h-40 w-full rounded-md object-cover border-2 border-primary/30" />
+              <label className="mb-2 block text-sm font-medium text-primary">Add photos</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files || []);
+                    setFiles([...files, ...newFiles]);
+                  }}
+                  className="text-sm border-2 border-dashed border-primary/40 rounded-lg p-4 w-full cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-colors"
+                />
+                {files.length === 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center text-primary/60">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-sm">Click to upload images</p>
+                      <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {files.length > 0 && (
+                <>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="text-sm text-primary/70 font-medium">
+                      {files.length} image{files.length !== 1 ? 's' : ''} selected
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => (document.querySelector('input[type="file"]') as HTMLElement)?.click()}
+                      className="text-xs border-primary/40 text-primary hover:bg-primary/10"
+                    >
+                      + Add More
+                    </Button>
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+                    {files.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`preview ${index + 1}`}
+                          className="h-20 w-full object-cover rounded-md border-2 border-primary/30"
+                        />
+                        <button
+                          onClick={() => setFiles(files.filter((_, i) => i !== index))}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">
+                          {index + 1}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
             <div className="mt-4">
@@ -824,19 +859,21 @@ export function MarketplaceView() {
               </div>
             )}
             <div className="mt-4">
-              <Button onClick={createListing} className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90">Publish listing</Button>
+              <Button onClick={createListing} disabled={uploading} className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90">
+                {uploading ? "Uploading images..." : "Publish listing"}
+              </Button>
             </div>
           </Card>
         )}
 
         <Tabs defaultValue={profile?.primary_role === "lgu_admin" ? "organic-fertilizer" : "produce"} className="mt-8">
-          <TabsList className={`grid w-full ${profile?.primary_role === "lgu_admin" ? "grid-cols-1" : profile?.primary_role === "farmer" ? "grid-cols-2" : profile?.primary_role === "restaurant" ? "grid-cols-2" : "grid-cols-1"} bg-sand/50 border-2 border-primary/30 rounded-lg p-1`}>
+          <TabsList className={`grid w-full ${profile?.primary_role === "lgu_admin" ? "grid-cols-1" : profile?.primary_role === "farmer" ? "grid-cols-2" : profile?.primary_role === "hotel_restaurant" ? "grid-cols-2" : "grid-cols-1"} bg-sand/50 border-2 border-primary/30 rounded-lg p-1`}>
             {profile?.primary_role !== "lgu_admin" && (
               <TabsTrigger value="produce" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white text-slate-700">
-                {profile?.primary_role === "farmer" ? "🌾 My Produce" : profile?.primary_role === "restaurant" ? "🌾 Produce" : "🌾 Fresh Produce"}
+                {profile?.primary_role === "farmer" ? "🌾 My Produce" : profile?.primary_role === "hotel_restaurant" ? "🌾 Produce" : "🌾 Fresh Produce"}
               </TabsTrigger>
             )}
-            {profile?.primary_role === "restaurant" && (
+            {profile?.primary_role === "hotel_restaurant" && (
               <TabsTrigger value="restaurant-waste" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
                 🍽️ My Food Waste
               </TabsTrigger>
@@ -870,7 +907,7 @@ export function MarketplaceView() {
               </div>
             </TabsContent>
           )}
-          {profile?.primary_role === "restaurant" && (
+          {profile?.primary_role === "hotel_restaurant" && (
             <TabsContent value="restaurant-waste" className="mt-6">
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered("waste", "restaurant").map((l) => (

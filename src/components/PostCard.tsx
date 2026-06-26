@@ -47,8 +47,15 @@ export function PostCard({ post, onDelete }: { post: FeedPost; onDelete?: (id: s
   console.log("PostCard profiles data:", post.profiles);
 
   let img: string | undefined;
-  if (post.image) {
-    // If image field is a URL (uploaded to storage), use it directly. Otherwise use local media map keys.
+  let images: string[] = [];
+  
+  // Handle multiple images from the images array
+  if (post.images && post.images.length > 0) {
+    images = post.images.filter((url) => typeof url === "string" && (url.startsWith("http") || url.startsWith("/")));
+  }
+  
+  // Fallback to single image field for backward compatibility
+  if (images.length === 0 && post.image) {
     if (typeof post.image === "string" && (post.image.startsWith("http") || post.image.startsWith("/"))) {
       img = post.image;
     } else {
@@ -71,7 +78,7 @@ export function PostCard({ post, onDelete }: { post: FeedPost; onDelete?: (id: s
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("feed_posts")
       .update({ body: updatedBody })
       .eq("id", post.id)
@@ -83,7 +90,7 @@ export function PostCard({ post, onDelete }: { post: FeedPost; onDelete?: (id: s
       return;
     }
 
-    setBody(data.body ?? updatedBody);
+    setBody(data?.body ?? updatedBody);
     setIsEditOpen(false);
     toast.success("Post updated.");
   };
@@ -229,7 +236,31 @@ export function PostCard({ post, onDelete }: { post: FeedPost; onDelete?: (id: s
           </Button>
         </div>
       )}
-      {img && (
+      {images.length > 0 ? (
+        <div className="grid gap-1 p-1">
+          {images.map((imageUrl, index) => (
+            <Dialog key={index}>
+              <DialogTrigger asChild>
+                <button className="block overflow-hidden rounded-none text-left focus:outline-none focus:ring-2 focus:ring-primary/70">
+                  <img
+                    src={imageUrl}
+                    alt={`Post image ${index + 1}`}
+                    loading="lazy"
+                    className="h-56 w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
+                  />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-5xl p-0">
+                <img
+                  src={imageUrl}
+                  alt={`Post image ${index + 1}`}
+                  className="max-h-[85vh] w-full object-contain"
+                />
+              </DialogContent>
+            </Dialog>
+          ))}
+        </div>
+      ) : img && (
         <Dialog>
           <DialogTrigger asChild>
             <button className="block w-full overflow-hidden rounded-none text-left focus:outline-none focus:ring-2 focus:ring-primary/70">

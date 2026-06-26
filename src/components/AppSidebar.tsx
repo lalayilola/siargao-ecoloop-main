@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Leaf, LayoutDashboard, Store, ArrowLeftRight, User as UserIcon, LogOut, Home, MessageCircle, Sprout, TreePine, Recycle, Megaphone, FileText, Package } from "lucide-react";
+import { Leaf, LayoutDashboard, Newspaper, Store, Calendar, ArrowLeftRight, User as UserIcon, LogOut, Home, MessageCircle, Sprout, TreePine, Recycle, Bell, Megaphone, FileText, Package, ShoppingCart, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -25,10 +25,17 @@ const memberItems = [
 ];
 
 const farmerItems = [
-  { to: "/inventory", label: "Produce Inventory", icon: Package },
+  { to: "/orders", label: "Orders", icon: ShoppingCart },
 ];
 
-const restaurantItems = [];
+const hotelItems = [
+  { to: "/dashboard/hotel", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/marketplace", label: "Produce Marketplace", icon: Store },
+  { to: "/waste-reports", label: "Waste Reports", icon: Recycle },
+  { to: "/waste-collections", label: "Collections", icon: Calendar },
+  { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/feed", label: "News Feed", icon: Newspaper },
+];
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -39,7 +46,7 @@ export function AppSidebar() {
   const isActive = (p: string) => path === p;
 
   const isFarmer = profile?.primary_role === "farmer";
-  const isRestaurant = profile?.primary_role === "restaurant";
+  const isHotel = profile?.primary_role === "hotel_restaurant";
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
@@ -152,15 +159,15 @@ export function AppSidebar() {
           </SidebarGroup>
         )}
 
-        {isRestaurant && restaurantItems.length > 0 && (
+        {isHotel && hotelItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-accent font-semibold">Restaurant Portal</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-green-700 font-semibold">Hotel Portal</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {restaurantItems.map((it) => (
+                {hotelItems.map((it) => (
                   <SidebarMenuItem key={it.to}>
                     <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                      <Link to={it.to} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-accent/20 hover:text-accent">
+                      <Link to={it.to} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                         <it.icon className="h-4 w-4" />
                         <span>{it.label}</span>
                       </Link>

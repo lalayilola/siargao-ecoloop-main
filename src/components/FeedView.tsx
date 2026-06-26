@@ -25,7 +25,7 @@ type FeedPost = Database["public"]["Tables"]["feed_posts"]["Row"];
 const filters: { key: FeedPost["role"] | "all"; label: string }[] = [
   { key: "all", label: "All" },
   { key: "farmer", label: "Farmers" },
-  { key: "restaurant", label: "Restaurants" },
+  { key: "hotel_restaurant", label: "Restaurants" },
   { key: "resident", label: "Residents" },
   { key: "lgu_admin", label: "LGU" },
 ];
@@ -39,7 +39,7 @@ export function FeedView() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [draft, setDraft] = useState("");
   const [photoAttached, setPhotoAttached] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [locationAdded, setLocationAdded] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
@@ -105,24 +105,29 @@ export function FeedView() {
       // ignore - we'll surface insert errors below
     }
 
-    let imageUrl: string | null = null;
-    if (file) {
+    let imageUrls: string[] = [];
+    if (files.length > 0) {
       setUploading(true);
       try {
-        const filePath = `feed/${user.id}/${Date.now()}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
-        if (uploadError) throw uploadError;
-        const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
-        imageUrl = publicData.publicUrl;
+        const uploadPromises = files.map(async (file) => {
+          const filePath = `feed/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
+          const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+          if (uploadError) throw uploadError;
+          const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
+          return publicData.publicUrl;
+        });
+        imageUrls = await Promise.all(uploadPromises);
       } catch (err: any) {
         const msg = err?.message ?? String(err);
         if (msg.includes("Bucket not found") || msg.includes("bucket not found") || msg.includes("no such bucket")) {
-          toast.error(`Storage bucket \"${STORAGE_BUCKET}\" not found. Create it in Supabase Storage or set VITE_SUPABASE_STORAGE_BUCKET.`);        } else if (msg.includes("row-level security") || msg.includes("violates row-level")) {
+          toast.error(`Storage bucket "${STORAGE_BUCKET}" not found. Create it in Supabase Storage or set VITE_SUPABASE_STORAGE_BUCKET.`);
+        } else if (msg.includes("row-level security") || msg.includes("violates row-level")) {
           toast.error(
-            "Could not upload image: storage upload blocked by row-level security. " +
+            "Could not upload images: storage upload blocked by row-level security. " +
             "Ensure the signed-in user is authenticated and the Supabase storage bucket policy allows uploads."
-          );        } else {
-          toast.error(`Could not upload image: ${msg}`);
+          );
+        } else {
+          toast.error(`Could not upload images: ${msg}`);
         }
         setUploading(false);
         return;
@@ -137,7 +142,8 @@ export function FeedView() {
       author: profile.full_name,
       barangay: profile.barangay,
       body,
-      image: imageUrl ?? (photoAttached ? "produce" : null),
+      image: imageUrls.length > 0 ? imageUrls[0] : (photoAttached ? "produce" : null),
+      images: imageUrls,
       kg: null,
       price: null,
       date: locationAdded ? "Posted now" : "Now",
@@ -145,6 +151,7 @@ export function FeedView() {
       longitude: selectedLocation?.longitude || null,
       location_name: selectedLocation?.locationName || null,
       location_address: selectedLocation?.locationAddress || null,
+      post_type: "farmer_produce" as const,
     } as any;
 
     const { data, error } = await supabase
@@ -164,19 +171,20 @@ export function FeedView() {
     }
 
     // Add profile data to the new post
-    const postWithProfile = {
-      ...data,
-      profiles: {
-        profile_picture_url: profile?.profile_picture_url,
-        full_name: profile?.full_name,
-      },
+    const postWithProfile: any = {};
+    if (data) {
+      Object.assign(postWithProfile, data);
+    }
+    postWithProfile.profiles = {
+      profile_picture_url: profile?.profile_picture_url,
+      full_name: profile?.full_name,
     };
 
     console.log("New post with profile:", postWithProfile);
     setPosts((current) => [postWithProfile, ...current]);
     setDraft("");
     setPhotoAttached(false);
-    setFile(null);
+    setFiles([]);
     setLocationAdded(false);
     setShowLocationPicker(false);
     setSelectedLocation(null);
@@ -266,11 +274,21 @@ export function FeedView() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                      multiple
+                      onChange={(e) => setFiles(Array.from(e.target.files || []))}
                       className="text-sm"
                     />
-                    {file && (
-                      <img src={URL.createObjectURL(file)} alt="preview" className="mt-3 h-32 w-full object-cover rounded-md" />
+                    {files.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 gap-2">
+                        {files.map((file, index) => (
+                          <img
+                            key={index}
+                            src={URL.createObjectURL(file)}
+                            alt={`preview ${index + 1}`}
+                            className="h-24 w-full object-cover rounded-md"
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 )}
@@ -342,7 +360,6 @@ export function FeedView() {
                 <span className="text-lg">🔥</span> Trending in Siargao
               </h3>
               <ul className="mt-3 space-y-1.5 text-sm text-earth-green/80">
-                <li className="flex items-center gap-2 p-2 rounded-md hover:bg-earth-green/10 transition-colors cursor-pointer"><span className="text-earth-green">→</span> #compost</li>
                 <li className="flex items-center gap-2 p-2 rounded-md hover:bg-earth-green/10 transition-colors cursor-pointer"><span className="text-earth-green">→</span> #barter</li>
                 <li className="flex items-center gap-2 p-2 rounded-md hover:bg-earth-green/10 transition-colors cursor-pointer"><span className="text-earth-green">→</span> #localharvest</li>
                 <li className="flex items-center gap-2 p-2 rounded-md hover:bg-earth-green/10 transition-colors cursor-pointer"><span className="text-earth-green">→</span> #zerowaste</li>

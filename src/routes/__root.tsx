@@ -8,7 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -111,6 +111,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const [supabaseUnavailable, setSupabaseUnavailable] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -118,6 +119,27 @@ function RootComponent() {
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
+
+    const detectAuthError = async () => {
+      try {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 4000);
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL}/auth/v1/settings`, {
+          method: "GET",
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || ""}`,
+          },
+          signal: controller.signal,
+        });
+        window.clearTimeout(timeout);
+        setSupabaseUnavailable(!response.ok);
+      } catch {
+        setSupabaseUnavailable(true);
+      }
+    };
+
+    detectAuthError();
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
 
@@ -125,6 +147,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
+          {supabaseUnavailable && (
+            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-800">
+              EcoLoop is temporarily unavailable. Please try again in a few moments.
+            </div>
+          )}
           <Shell />
           <NotificationListener />
           <MessageNotification />

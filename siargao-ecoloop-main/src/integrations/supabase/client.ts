@@ -2,6 +2,95 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+type SupabaseLikeClient = ReturnType<typeof createClient<Database>>;
+
+function createOfflineQueryBuilder() {
+  return new Proxy(
+    {},
+    {
+      get(_target, prop) {
+        if (prop === 'then') return undefined;
+        if (prop === 'maybeSingle' || prop === 'single' || prop === 'execute') {
+          return async () => ({ data: null, error: null });
+        }
+        if (
+          prop === 'select' ||
+          prop === 'eq' ||
+          prop === 'neq' ||
+          prop === 'gt' ||
+          prop === 'gte' ||
+          prop === 'lt' ||
+          prop === 'lte' ||
+          prop === 'in' ||
+          prop === 'contains' ||
+          prop === 'order' ||
+          prop === 'limit' ||
+          prop === 'range' ||
+          prop === 'or' ||
+          prop === 'not' ||
+          prop === 'filter'
+        ) {
+          return () => createOfflineQueryBuilder();
+        }
+        if (prop === 'insert' || prop === 'upsert' || prop === 'update' || prop === 'delete') {
+          return async () => ({ data: null, error: null });
+        }
+        return createOfflineQueryBuilder();
+      },
+    },
+  );
+}
+
+function createFallbackSupabaseClient(): SupabaseLikeClient {
+  return {
+    auth: {
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+      getSession: async () => ({ data: { session: null }, error: null }),
+      getUser: async () => ({ data: { user: null }, error: null }),
+      signOut: async () => ({ data: { session: null }, error: null }),
+      signInWithOtp: async () => ({ data: { user: null, session: null }, error: null }),
+      signInWithOAuth: async () => ({ data: { user: null, session: null }, error: null }),
+      signUp: async () => ({ data: { user: null, session: null }, error: null }),
+      setSession: async () => ({ data: { user: null, session: null }, error: null }),
+    },
+    from: () => createOfflineQueryBuilder(),
+    rpc: async () => ({ data: null, error: null }),
+    storage: {
+      from: () => ({
+        upload: async () => ({ data: null, error: null }),
+        download: async () => ({ data: null, error: null }),
+        remove: async () => ({ data: null, error: null }),
+        list: async () => ({ data: [], error: null }),
+        getPublicUrl: () => ({ data: { publicUrl: '' } }),
+      }),
+    },
+    channel: () => ({ subscribe: () => ({ unsubscribe() {} }) }),
+    removeChannel: () => undefined,
+    functions: { invoke: async () => ({ data: null, error: null }) },
+  } as unknown as SupabaseLikeClient;
+}
+
+async function probeSupabaseConnection(url: string, key: string) {
+  if (typeof window === 'undefined') return true;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 4000);
+    const response = await fetch(`${url}/auth/v1/settings`, {
+      method: 'GET',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      signal: controller.signal,
+    });
+    window.clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
@@ -14,24 +103,33 @@ function createSupabaseClient() {
       ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
     ];
     const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase] ${message}`);
+    return createFallbackSupabaseClient();
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  const client = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
+    },
+  });
+
+  void probeSupabaseConnection(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY).then((isReachable) => {
+    if (!isReachable) {
+      console.warn('[Supabase] The configured project is unavailable. Switching to offline mode.');
+      _supabase = createFallbackSupabaseClient();
     }
   });
+
+  return client;
 }
 
-let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
+let _supabase: SupabaseLikeClient | undefined;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
-export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
+export const supabase = new Proxy({} as SupabaseLikeClient, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
     return Reflect.get(_supabase, prop, receiver);

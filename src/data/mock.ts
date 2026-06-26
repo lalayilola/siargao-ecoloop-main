@@ -1,8 +1,8 @@
-export type Role = "farmer" | "restaurant" | "resident" | "lgu_admin";
+export type Role = "farmer" | "hotel_restaurant" | "resident" | "lgu_admin";
 
 export const roleMeta: Record<Role, { label: string; color: string }> = {
   farmer: { label: "Farmer", color: "bg-primary/10 text-primary border-primary/20" },
-  restaurant: { label: "Restaurant", color: "bg-accent/15 text-accent-foreground border-accent/30" },
+  hotel_restaurant: { label: "Restaurant", color: "bg-accent/15 text-accent-foreground border-accent/30" },
   resident: { label: "Resident", color: "bg-ocean/15 text-ocean border-ocean/30" },
   lgu_admin: { label: "LGU", color: "bg-foreground/10 text-foreground border-foreground/20" },
 };
@@ -35,7 +35,7 @@ export const feedPosts: FeedPost[] = [
   },
   {
     id: "2",
-    role: "restaurant",
+    role: "hotel_restaurant",
     author: "Kawayan Kitchen",
     barangay: "Cloud 9",
     time: "5h ago",
@@ -66,7 +66,7 @@ export const feedPosts: FeedPost[] = [
   },
   {
     id: "5",
-    role: "restaurant",
+    role: "hotel_restaurant",
     author: "Bravo Beach Resort",
     barangay: "General Luna",
     time: "2d ago",
@@ -103,10 +103,10 @@ export const listings: Listing[] = [
   { id: "p2", title: "Mixed Salad Greens", kind: "produce", seller: "Siargao Greens Coop", role: "farmer", barangay: "Dapa", kg: 18, price: "₱120/kg", date: "Fri, Jun 26", image: "produce" },
   { id: "p3", title: "Organic Herbs Bundle", kind: "produce", seller: "Highland Roots", role: "farmer", barangay: "Pilar", kg: 4, price: "₱60/bundle", date: "Tomorrow", image: "produce" },
   { id: "p4", title: "Sweet Bananas", kind: "produce", seller: "Ate Lina's Plot", role: "farmer", barangay: "Burgos", kg: 25, price: "₱45/kg", date: "Today", image: "produce" },
-  { id: "w1", title: "Vegetable Trimmings", kind: "waste", seller: "Kawayan Kitchen", role: "restaurant", barangay: "Cloud 9", kg: 20, date: "Daily 3–5pm", image: "compost" },
-  { id: "w2", title: "Fruit Peels & Pulp", kind: "waste", seller: "Bravo Beach Resort", role: "restaurant", barangay: "General Luna", kg: 30, date: "Mon/Wed/Fri", image: "compost" },
+  { id: "w1", title: "Vegetable Trimmings", kind: "waste", seller: "Kawayan Kitchen", role: "hotel_restaurant", barangay: "Cloud 9", kg: 20, date: "Daily 3–5pm", image: "compost" },
+  { id: "w2", title: "Fruit Peels & Pulp", kind: "waste", seller: "Bravo Beach Resort", role: "hotel_restaurant", barangay: "General Luna", kg: 30, date: "Mon/Wed/Fri", image: "compost" },
   { id: "w3", title: "Household Scraps", kind: "waste", seller: "Ate Marites", role: "resident", barangay: "Catangnan", kg: 6, date: "Weekends", image: "compost" },
-  { id: "w4", title: "Coffee Grounds", kind: "waste", seller: "Tide Cafe", role: "restaurant", barangay: "Cloud 9", kg: 5, date: "Daily", image: "compost" },
+  { id: "w4", title: "Coffee Grounds", kind: "waste", seller: "Tide Cafe", role: "hotel_restaurant", barangay: "Cloud 9", kg: 5, date: "Daily", image: "compost" },
 ];
 
 export type PlanningEntry = {
@@ -120,10 +120,10 @@ export type PlanningEntry = {
 
 export const planning: PlanningEntry[] = [
   { id: "n1", role: "farmer", author: "Mang Tonyo's Farm", need: "Need food waste for compost production", when: "Next month", kg: 50 },
-  { id: "n2", role: "restaurant", author: "Kawayan Kitchen", need: "Expected vegetable scraps available weekly", when: "Starting July", kg: 30 },
+  { id: "n2", role: "hotel_restaurant", author: "Kawayan Kitchen", need: "Expected vegetable scraps available weekly", when: "Starting July", kg: 30 },
   { id: "n3", role: "resident", author: "Tita Cora", need: "Looking to buy organic tomatoes", when: "Next month", kg: 5 },
   { id: "n4", role: "farmer", author: "Siargao Greens Coop", need: "Pre-orders open for August lettuce harvest", when: "August", kg: 200 },
-  { id: "n5", role: "restaurant", author: "Bravo Beach Resort", need: "Sourcing organic herbs for new menu", when: "July 15", kg: 12 },
+  { id: "n5", role: "hotel_restaurant", author: "Bravo Beach Resort", need: "Sourcing organic herbs for new menu", when: "July 15", kg: 12 },
 ];
 
 export type Trade = {
@@ -135,10 +135,10 @@ export type Trade = {
 };
 
 export const trades: Trade[] = [
-  { id: "t1", from: { name: "Kawayan Kitchen", role: "restaurant", gives: "20kg vegetable scraps" }, to: { name: "Mang Tonyo's Farm", role: "farmer", gives: "10kg fresh tomatoes" }, status: "completed", date: "Jun 12" },
+  { id: "t1", from: { name: "Kawayan Kitchen", role: "hotel_restaurant", gives: "20kg vegetable scraps" }, to: { name: "Mang Tonyo's Farm", role: "farmer", gives: "10kg fresh tomatoes" }, status: "completed", date: "Jun 12" },
   { id: "t2", from: { name: "Ate Marites", role: "resident", gives: "6kg coconut husks" }, to: { name: "Highland Roots", role: "farmer", gives: "2kg kangkong" }, status: "approved", date: "Jun 14" },
-  { id: "t3", from: { name: "Siargao Greens Coop", role: "farmer", gives: "15kg salad greens" }, to: { name: "Bravo Beach Resort", role: "restaurant", gives: "Catered staff meal" }, status: "pending", date: "Jun 16" },
-  { id: "t4", from: { name: "Tide Cafe", role: "restaurant", gives: "5kg coffee grounds" }, to: { name: "Mang Tonyo's Farm", role: "farmer", gives: "Free herb basket" }, status: "completed", date: "Jun 10" },
+  { id: "t3", from: { name: "Siargao Greens Coop", role: "farmer", gives: "15kg salad greens" }, to: { name: "Bravo Beach Resort", role: "hotel_restaurant", gives: "Catered staff meal" }, status: "pending", date: "Jun 16" },
+  { id: "t4", from: { name: "Tide Cafe", role: "hotel_restaurant", gives: "5kg coffee grounds" }, to: { name: "Mang Tonyo's Farm", role: "farmer", gives: "Free herb basket" }, status: "completed", date: "Jun 10" },
 ];
 
 export const kpis = {
