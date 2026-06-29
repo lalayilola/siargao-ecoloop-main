@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,14 +16,21 @@ interface TradeRequestModalProps {
   onOpenChange: (open: boolean) => void;
   listing: Listing | null;
   userListings: Listing[];
-  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["app_role"] } | null;
+  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["role"] } | null;
   onSuccess?: () => void;
 }
 
 export function TradeRequestModal({ open, onOpenChange, listing, userListings, user, onSuccess }: TradeRequestModalProps) {
   const [offeredItemId, setOfferedItemId] = useState<string>("");
   const [message, setMessage] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setQuantity(Math.max(1, Math.min(listing?.kg ?? 1, 1)));
+    }
+  }, [open, listing?.kg]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +49,9 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
         offered_item_id: offeredItemId || null,
         offered_item_title: offeredItem?.title || null,
         message: message || "I'm interested in trading for this item.",
+        quantity_kg: quantity,
         status: "pending",
-      });
+      } as any);
 
       if (error) throw error;
 
@@ -54,7 +62,7 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
         title: "New Trade Request",
         message: `${user.full_name} wants to trade for your listing: ${listing.title}`,
         link: `/marketplace`,
-      });
+      } as any);
 
       toast.success("Trade request sent successfully!");
       setMessage("");
@@ -79,6 +87,18 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="quantity">Quantity (kg)</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="1"
+                max={listing?.kg ?? 1}
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+              />
+              <p className="text-xs text-slate-500">Available: {listing?.kg ?? 0} kg</p>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="offered-item">Your Offered Item (Optional)</Label>
               <Select value={offeredItemId} onValueChange={setOfferedItemId}>

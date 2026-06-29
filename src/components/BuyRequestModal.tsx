@@ -14,7 +14,7 @@ interface BuyRequestModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listing: Listing | null;
-  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["app_role"] } | null;
+  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["role"] } | null;
   onSuccess?: () => void;
 }
 
@@ -54,10 +54,10 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
       const { error } = await supabase.from("purchase_requests").insert({
         ...basePayload,
         quantity_kg: quantity,
-      });
+      } as any);
 
       if (error?.message?.toLowerCase().includes("quantity_kg")) {
-        const { error: fallbackError } = await supabase.from("purchase_requests").insert(basePayload);
+        const { error: fallbackError } = await supabase.from("purchase_requests").insert(basePayload as any);
         if (fallbackError) throw fallbackError;
       } else if (error) {
         throw error;
@@ -69,7 +69,7 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
         title: "New Purchase Request",
         message: `${user.full_name} wants to buy your listing: ${listing.title}`,
         link: `/marketplace`,
-      });
+      } as any);
 
       try {
         await supabase.functions.invoke("send-purchase-sms", {

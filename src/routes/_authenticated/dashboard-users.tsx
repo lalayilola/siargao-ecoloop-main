@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { UserCheck, Search, Filter, Phone, MapPin, Calendar, AlertCircle } from "lucide-react";
+import { UserCheck, Search, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard-users")({
-  head: () => ({ meta: [{ title: "User Management — LGU Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Members Dashboard — LGU Dashboard" }] }),
   component: UserManagement,
 });
 
@@ -26,10 +26,12 @@ type UserProfile = {
   lgu_approved: boolean | null;
   created_at: string;
   profile_picture_url: string | null;
+  municipality: string | null;
+  is_super_admin: boolean | null;
 };
 
 function UserManagement() {
-  const { isLguAdmin } = useAuth();
+  const { isLguAdmin, profile } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterRole, setFilterRole] = useState<string>("all");
@@ -37,9 +39,9 @@ function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    if (!isLguAdmin) return;
-    loadUsers();
-  }, [isLguAdmin]);
+    if (!isLguAdmin || !profile?.municipality) return;
+    void loadUsers();
+  }, [isLguAdmin, profile?.municipality]);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -47,6 +49,7 @@ function UserManagement() {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
+        .eq("municipality", profile?.municipality)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -58,16 +61,15 @@ function UserManagement() {
     }
   };
 
-  // Calculate real statistics
-  const farmers = users.filter(u => u.primary_role === "farmer").length;
-  const restaurants = users.filter(u => u.primary_role === "restaurant").length;
-  const localUsers = users.filter(u => u.primary_role === "local_user").length;
-  const lguAdmins = users.filter(u => u.primary_role === "lgu_admin").length;
+  const farmers = users.filter((user) => user.primary_role === "farmer").length;
+  const restaurants = users.filter((user) => user.primary_role === "restaurant").length;
+  const buyers = users.filter((user) => user.primary_role === "resident" || user.primary_role === "local_user").length;
 
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
       farmer: "bg-green-100 text-green-700 border-green-200",
       restaurant: "bg-orange-100 text-orange-700 border-orange-200",
+      resident: "bg-blue-100 text-blue-700 border-blue-200",
       local_user: "bg-blue-100 text-blue-700 border-blue-200",
       lgu_admin: "bg-purple-100 text-purple-700 border-purple-200",
     };
@@ -78,18 +80,19 @@ function UserManagement() {
     const labels: Record<string, string> = {
       farmer: "Farmer",
       restaurant: "Restaurant Owner",
-      local_user: "Local User",
+      resident: "Buyer",
+      local_user: "Buyer",
       lgu_admin: "LGU Admin",
     };
     return labels[role] || role;
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     const matchesRole = filterRole === "all" || user.primary_role === filterRole;
-    const matchesStatus = filterStatus === "all" || 
+    const matchesStatus = filterStatus === "all" ||
       (filterStatus === "approved" && user.lgu_approved) ||
       (filterStatus === "pending" && !user.lgu_approved && user.primary_role === "lgu_admin");
-    const matchesSearch = searchQuery === "" || 
+    const matchesSearch = searchQuery === "" ||
       user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.barangay && user.barangay.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesRole && matchesStatus && matchesSearch;
@@ -110,11 +113,10 @@ function UserManagement() {
   return (
     <Container className="py-12">
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold">User Management</h1>
-        <p className="mt-2 text-muted-foreground">View and manage user profiles of Farmers, Restaurant Owners, and Local Users</p>
+        <h1 className="font-display text-3xl font-bold">Members Dashboard</h1>
+        <p className="mt-2 text-muted-foreground">View and manage farmers, restaurant owners, and buyers registered in your municipality.</p>
       </div>
 
-      {/* Filters */}
       <Card className="p-6 mb-8">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-[200px]">
@@ -136,7 +138,7 @@ function UserManagement() {
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="farmer">Farmers</SelectItem>
               <SelectItem value="restaurant">Restaurant Owners</SelectItem>
-              <SelectItem value="local_user">Local Users</SelectItem>
+              <SelectItem value="resident">Buyers</SelectItem>
               <SelectItem value="lgu_admin">LGU Admins</SelectItem>
             </SelectContent>
           </Select>
@@ -153,7 +155,6 @@ function UserManagement() {
         </div>
       </Card>
 
-      {/* User Statistics */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card className="p-5">
           <div className="flex items-center justify-between">
@@ -162,7 +163,7 @@ function UserManagement() {
             </span>
             <span className="text-2xl font-bold">{users.length}</span>
           </div>
-          <div className="mt-4 text-sm text-muted-foreground">Total Users</div>
+          <div className="mt-4 text-sm text-muted-foreground">Total Members</div>
         </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between">
@@ -178,18 +179,17 @@ function UserManagement() {
         </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold">{localUsers}</span>
+            <span className="text-2xl font-bold">{buyers}</span>
           </div>
-          <div className="mt-4 text-sm text-muted-foreground">Local Users</div>
+          <div className="mt-4 text-sm text-muted-foreground">Buyers</div>
         </Card>
       </div>
 
-      {/* Users List */}
       <Card className="p-6">
         {loading ? (
-          <p className="text-muted-foreground text-center py-8">Loading users...</p>
+          <p className="text-muted-foreground text-center py-8">Loading members...</p>
         ) : filteredUsers.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No users found</p>
+          <p className="text-muted-foreground text-center py-8">No members found for this municipality.</p>
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
@@ -208,29 +208,55 @@ function UserManagement() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-semibold">{user.full_name}</h3>
                       <Badge className={getRoleColor(user.primary_role)}>{getRoleLabel(user.primary_role)}</Badge>
-                      {user.primary_role === 'lgu_admin' && (
+                      {user.primary_role === "lgu_admin" && (
                         <Badge className={user.lgu_approved ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"}>
                           {user.lgu_approved ? "Approved" : "Pending"}
                         </Badge>
                       )}
+                      {user.primary_role === "lgu_admin" && !user.lgu_approved && (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                            onClick={async () => {
+                              try {
+                                const { error } = await (supabase.from("profiles") as any)
+                                  .update({ lgu_approved: true })
+                                  .eq("id", user.id);
+                                if (error) throw error;
+                                toast.success("LGU account approved");
+                                void loadUsers();
+                              } catch (error: any) {
+                                toast.error(`Failed to approve: ${error.message}`);
+                              }
+                            }}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-7 text-xs"
+                            onClick={async () => {
+                              try {
+                                const { error } = await supabase.from("profiles").delete().eq("id", user.id);
+                                if (error) throw error;
+                                toast.success("LGU account rejected and deleted");
+                                void loadUsers();
+                              } catch (error: any) {
+                                toast.error(`Failed to reject: ${error.message}`);
+                              }
+                            }}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      {user.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4" />
-                          {user.phone}
-                        </div>
-                      )}
-                      {user.barangay && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          {user.barangay}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Joined {new Date(user.created_at).toLocaleDateString()}
-                      </div>
+                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                      <span>{user.phone || "No phone number"}</span>
+                      <span>{user.barangay || "No barangay"}</span>
+                      <span>{new Date(user.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>

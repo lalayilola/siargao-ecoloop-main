@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Upload, MessageCircle, ArrowLeft } from "lucide-react";
+import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import farmerBg from "@/assets/farmers-ecobg.jpg";
 import restaurantBg from "@/assets/restaurant-food.jpg";
 import localBg from "@/assets/siargao-locals.jpg";
@@ -51,6 +51,9 @@ function ProfilePage() {
   const [showChat, setShowChat] = useState(false);
   const [loadingOtherProfile, setLoadingOtherProfile] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
 
   useEffect(() => {
@@ -322,37 +325,64 @@ function ProfilePage() {
                 >
                   <div className="space-y-1.5">
                     <Label htmlFor="current-password">{t("profile.currentPassword")}</Label>
-                    <Input
-                      id="current-password"
-                      type="password"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                      className="border-primary/30 focus:border-primary focus:ring-primary/50"
-                      placeholder={t("profile.enterCurrentPassword")}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="current-password"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10"
+                        placeholder={t("profile.enterCurrentPassword")}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="new-password">{t("profile.newPassword")}</Label>
-                      <Input
-                        id="new-password"
-                        type="password"
-                        value={passwordForm.newPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                        className="border-primary/30 focus:border-primary focus:ring-primary/50"
-                        placeholder={t("profile.enterNewPassword")}
-                      />
+                      <div className="relative">
+                        <Input
+                          id="new-password"
+                          type={showNewPassword ? "text" : "password"}
+                          value={passwordForm.newPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                          className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10"
+                          placeholder={t("profile.enterNewPassword")}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="confirm-password">{t("profile.confirmPassword")}</Label>
-                      <Input
-                        id="confirm-password"
-                        type="password"
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                        className="border-primary/30 focus:border-primary focus:ring-primary/50"
-                        placeholder={t("profile.confirmNewPassword")}
-                      />
+                      <div className="relative">
+                        <Input
+                          id="confirm-password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                          className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10"
+                          placeholder={t("profile.confirmNewPassword")}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <Button

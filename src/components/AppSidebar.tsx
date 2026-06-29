@@ -106,7 +106,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-diversion")}>
                     <Link to="/dashboard-diversion" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <Recycle />
-                      <span>Monitor Diversion</span>
+                      <span>Transactions Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -114,7 +114,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-users")}>
                     <Link to="/dashboard-users" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <UserIcon />
-                      <span>User Management</span>
+                      <span>Members Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

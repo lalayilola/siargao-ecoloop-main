@@ -38,6 +38,7 @@ export function ListingCard({
   onMessage,
   onEdit,
   onDelete,
+  onViewDetails,
 }: {
   item: Listing;
   onAction?: () => void;
@@ -46,6 +47,7 @@ export function ListingCard({
   onMessage?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onViewDetails?: () => void;
 }) {
   const { user } = useAuth();
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -97,7 +99,10 @@ export function ListingCard({
     .join("");
 
   return (
-    <Card className="overflow-hidden p-0 border-2 border-primary/20 bg-white/95 hover:border-primary/60 hover:shadow-lg transition-all group">
+    <Card
+      className={`overflow-hidden p-0 border-2 border-primary/20 bg-white/95 hover:border-primary/60 hover:shadow-lg transition-all group ${onViewDetails ? "cursor-pointer" : ""}`}
+      onClick={onViewDetails}
+    >
       <div className="relative h-44 w-full">
         {currentImage ? (
           <img 
@@ -154,6 +159,7 @@ export function ListingCard({
             to="/profile" 
             search={{ userId: item.user_id }}
             className="text-sm text-slate-600/80 font-medium hover:text-primary hover:underline"
+            onClick={(event) => event.stopPropagation()}
           >
             {item.seller}
           </Link>
@@ -174,7 +180,10 @@ export function ListingCard({
           <span className="inline-flex items-center gap-1 bg-sand px-2 py-1 rounded-full"><Calendar className="h-3.5 w-3.5" />{item.available_at}</span>
         </div>
         {(item as any).location_name && (
-          <div className="pt-1 text-xs text-slate-600/70 flex items-center gap-1 cursor-pointer hover:text-primary" onClick={() => setShowLocationDialog(true)}>
+          <div className="pt-1 text-xs text-slate-600/70 flex items-center gap-1 cursor-pointer hover:text-primary" onClick={(event) => {
+            event.stopPropagation();
+            setShowLocationDialog(true);
+          }}>
             <MapPin className="h-3.5 w-3.5" />
             <span>{(item as any).location_name}</span>
           </div>
@@ -220,7 +229,10 @@ export function ListingCard({
                   size="sm"
                   variant="outline"
                   className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
-                  onClick={onEdit}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onEdit();
+                  }}
                 >
                   <Edit3 className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
@@ -232,6 +244,7 @@ export function ListingCard({
                       size="sm"
                       variant="outline"
                       className="rounded-full border-red-400 text-red-600 hover:bg-red-50"
+                      onClick={(event) => event.stopPropagation()}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                     </Button>
@@ -264,7 +277,10 @@ export function ListingCard({
                   size="sm"
                   variant="outline"
                   className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
-                  onClick={onMessage}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onMessage();
+                  }}
                 >
                   <MessageCircle className="h-3.5 w-3.5 mr-1" /> Message
                 </Button>
@@ -274,7 +290,10 @@ export function ListingCard({
                   size="sm"
                   variant="outline"
                   className="rounded-full border-green-500 text-green-700 hover:bg-green-50"
-                  onClick={onTrade}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onTrade();
+                  }}
                 >
                   <GitCompareArrows className="h-3.5 w-3.5 mr-1" /> Trade
                 </Button>
@@ -283,7 +302,10 @@ export function ListingCard({
                 <Button
                   size="sm"
                   className="rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/10 hover:from-primary/90 hover:to-secondary/90"
-                  onClick={onBuy}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onBuy();
+                  }}
                 >
                   <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Buy
                 </Button>
@@ -292,7 +314,10 @@ export function ListingCard({
                 <Button
                   size="sm"
                   className="rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/10 hover:from-primary/90 hover:to-secondary/90"
-                  onClick={onAction}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onAction();
+                  }}
                 >
                   {item.kind === "waste" ? "Request pickup" : "Reserve"}
                 </Button>

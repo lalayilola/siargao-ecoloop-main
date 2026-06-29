@@ -18,6 +18,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { AppSidebar } from "@/components/AppSidebar";
+import { AIChatbot } from "@/components/AIChatbot";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { NotificationListener } from "@/components/NotificationListener";
 import { MessageNotification } from "@/components/MessageNotification";
@@ -156,6 +157,7 @@ function RootComponent() {
           <NotificationListener />
           <MessageNotification />
           <AnnouncementNotification />
+          <AIChatbot />
           <Toaster />
         </AuthProvider>
       </LanguageProvider>

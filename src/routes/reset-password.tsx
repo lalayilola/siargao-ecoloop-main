@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useLanguage } from "@/hooks/use-language";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [{ title: "Reset password — EcoLoop Siargao" }] }),
@@ -19,6 +20,7 @@ function ResetPage() {
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
@@ -42,7 +44,16 @@ function ResetPage() {
               }}
             >
               <Label htmlFor="np">{t("resetPassword.newPassword")}</Label>
-              <Input id="np" type="password" minLength={8} required value={pw} onChange={(e) => setPw(e.target.value)} />
+              <div className="relative">
+                <Input id="np" type={showPassword ? "text" : "password"} minLength={8} required value={pw} onChange={(e) => setPw(e.target.value)} className="pr-10" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               <Button type="submit" className="w-full">{t("resetPassword.updatePassword")}</Button>
             </form>
           ) : (

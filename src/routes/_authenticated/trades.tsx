@@ -213,7 +213,7 @@ export function TransactionHistoryPage() {
           item_name: listing.title || `Purchase Request #${p.id.slice(0, 8)}`,
           item_image: listing.image,
           item_category: listing.kind,
-          quantity: listing.kg,
+          quantity: p.quantity_kg, // Use the purchased quantity, not the listing total
           location: listing.barangay,
           buyer_name: buyerName,
           seller_name: sellerName,

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/Section";
 import { useLanguage } from "@/hooks/use-language";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import hero from "@/assets/hero.jpg";
 import compost from "@/assets/compost.jpg";
 import produce from "@/assets/produce.jpg";
@@ -24,6 +26,51 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { t } = useLanguage();
+  const [stats, setStats] = useState({
+    wasteCollected: 0,
+    divertedPercentage: 0,
+    activeMembers: 0,
+    municipalities: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const [profilesResult, wasteReportsResult] = await Promise.all([
+          supabase.from("profiles").select("id"),
+          supabase.from("food_waste_reports").select("quantity_kg, status"),
+        ]);
+
+        const profiles = profilesResult.data || [];
+        const wasteReports = (wasteReportsResult.data || []) as Array<{ quantity_kg: number | null; status: string }>;
+
+        const wasteCollected = wasteReports
+          .filter((report) => ["collected", "processed"].includes(report.status))
+          .reduce((sum, report) => sum + (Number(report.quantity_kg) || 0), 0);
+
+        const totalWaste = wasteReports.reduce((sum, report) => sum + (Number(report.quantity_kg) || 0), 0);
+        const divertedPercentage = totalWaste > 0 ? Math.round((wasteCollected / totalWaste) * 100) : 0;
+
+        // Get unique municipalities from profiles
+        const { data: municipalityData } = await supabase.from("profiles").select("municipality").not("municipality", "is", null);
+        const uniqueMunicipalities = new Set((municipalityData || []).map((p: any) => p.municipality));
+
+        setStats({
+          wasteCollected,
+          divertedPercentage,
+          activeMembers: profiles.length,
+          municipalities: uniqueMunicipalities.size,
+        });
+      } catch (error) {
+        console.error("Error loading stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadStats();
+  }, []);
 
   const roles = [
     { icon: Sprout, titleKey: "home.roles.farmer", bodyKey: "home.roles.farmerDesc" },
@@ -78,9 +125,9 @@ function Index() {
             </div>
             <dl className="mt-10 grid max-w-md grid-cols-3 gap-6">
               {[
-                { k: "4,820 kg", v: t("home.hero.wasteCollected") },
-                { k: "82%", v: t("home.hero.divertedFromLandfill") },
-                { k: "612", v: t("home.hero.activeMembers") },
+                { k: loading ? "..." : `${stats.wasteCollected.toLocaleString()} kg`, v: t("home.hero.wasteCollected") },
+                { k: loading ? "..." : `${stats.divertedPercentage}%`, v: t("home.hero.divertedFromLandfill") },
+                { k: loading ? "..." : stats.activeMembers.toLocaleString(), v: t("home.hero.activeMembers") },
               ].map((s) => (
                 <div key={s.v}>
                   <dt className="font-display text-2xl font-semibold text-primary">{s.k}</dt>

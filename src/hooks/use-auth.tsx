@@ -3,7 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
-export type AppRole = "farmer" | "hotel_restaurant" | "resident" | "lgu_admin";
+export type AppRole = "farmer" | "restaurant" | "resident" | "lgu_admin" | "super_admin";
+
+export type Municipality = "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen";
 
 export type Profile = {
   id: string;
@@ -14,6 +16,8 @@ export type Profile = {
   primary_role: AppRole;
   lgu_approved: boolean;
   profile_picture_url: string | null;
+  municipality: Municipality;
+  is_super_admin: boolean;
 };
 
 type AuthCtx = {
@@ -46,8 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("profiles").select("*").eq("id", u.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", u.id),
       ]);
+
+      const metadataRole = (u.user_metadata?.role ?? u.app_metadata?.role) as AppRole | undefined;
+      const dbRoles = ((rs as { role: AppRole }[]) ?? []).map((r) => r.role);
+      const derivedRoles = Array.from(new Set([...(metadataRole ? [metadataRole] : []), ...dbRoles]));
+
       setProfile((prof as Profile | null) ?? null);
-      setRoles(((rs as { role: AppRole }[]) ?? []).map((r) => r.role));
+      setRoles(derivedRoles);
     } catch (error) {
       console.error("Unable to load auth profile:", getSupabaseErrorMessage(error));
       setProfile(null);
@@ -110,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         roles,
         loading,
-        isLguAdmin: profile?.primary_role === "lgu_admin" && profile?.lgu_approved === true,
+        isLguAdmin: profile?.primary_role === "lgu_admin" || roles.includes("lgu_admin") || (profile?.primary_role as string | undefined) === "lgu_admin",
         refresh,
         signOut,
       }}

@@ -272,6 +272,34 @@ const resources = {
         couldNotUploadImage: "Could not upload image",
         publishBlocked: "Publish blocked by row-level security. Ensure you're signed in and the database RLS policies allow inserts for your user.",
         couldNotPublish: "Could not publish post"
+      },
+      // How It Works Page
+      howItWorks: {
+        hero: {
+          eyebrow: "How it works",
+          title: "A four-step loop the whole island can use.",
+          subtitle: "EcoLoop is designed to feel as natural as a barangay tiangge — easy to join, quick to use, fair for everyone."
+        },
+        steps: {
+          post: "01 · Post",
+          postDesc: "Share what you have or need — food waste, fresh harvest, or future supply.",
+          match: "02 · Match",
+          matchDesc: "Browse the EcoFeed or use Smart Search to find a partner nearby.",
+          exchange: "03 · Exchange",
+          exchangeDesc: "Coordinate pickup, barter or sale through the trade request flow.",
+          track: "04 · Track",
+          trackDesc: "Every completed trade rolls up to the LGU dashboard as community impact."
+        },
+        example: {
+          title: "Example: a week in the loop",
+          monday: "Monday",
+          mondayDesc: "Kawayan Kitchen posts 20kg of vegetable trimmings available daily after lunch.",
+          tuesday: "Tuesday",
+          tuesdayDesc: "Mang Tonyo's Farm sends a trade request: 20kg scraps for 10kg fresh tomatoes.",
+          friday: "Friday",
+          fridayDesc: "Trade completed. LGU dashboard updated: +20kg diverted, +1 successful trade."
+        },
+        startPost: "Start your first post"
       }
     }
   },

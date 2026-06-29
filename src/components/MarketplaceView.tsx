@@ -7,7 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ListingCard } from "@/components/ListingCard";
 import { Search, Lock, Plus, Filter, Check, X, MessageCircle, MapPin } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,22 +45,27 @@ type TradeRequest = Database["public"]["Tables"]["trade_requests"]["Row"];
 type PurchaseRequest = Database["public"]["Tables"]["purchase_requests"]["Row"];
 
 const canViewListing = (listing: Listing, role: AppRole | null | undefined, currentUserId?: string) => {
+  // Always show own listings
   if (currentUserId && listing.user_id === currentUserId) return true;
 
   if (!role) {
     return listing.kind === "produce";
   }
 
-  if (role === "farmer") {
-    return listing.kind === "produce" && currentUserId && listing.user_id === currentUserId;
-  }
-
+  // LGU admin can see all listings in their municipality (filtered at query level)
   if (role === "lgu_admin") {
-    return (listing.kind === "waste" && listing.role === "hotel_restaurant") ||
-      (listing.kind === "waste" && listing.user_id === currentUserId);
+    return true;
   }
 
-  if (role === "hotel_restaurant" || role === "resident") {
+  if (role === "farmer") {
+    return listing.kind === "produce" || listing.kind === "compost";
+  }
+
+  if (role === "restaurant") {
+    return listing.kind === "produce" || listing.kind === "waste";
+  }
+
+  if (role === "resident") {
     return listing.kind === "produce";
   }
 
@@ -67,12 +79,12 @@ const canCreateListing = (role: AppRole | null | undefined, kind: Listing["kind"
     return kind === "produce";
   }
 
-  if (role === "hotel_restaurant") {
+  if (role === "restaurant") {
     return kind === "waste";
   }
 
   if (role === "lgu_admin") {
-    return false;
+    return kind === "compost";
   }
 
   return false;
@@ -82,11 +94,11 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
   if (!role) return listing.kind === "produce";
 
   if (listing.kind === "produce") {
-    return role === "hotel_restaurant" || role === "resident";
+    return role === "restaurant" || role === "resident";
   }
 
   if (listing.kind === "waste") {
-    return role === "farmer" && listing.role === "hotel_restaurant";
+    return role === "farmer" && listing.role === "restaurant";
   }
 
   return false;
@@ -94,7 +106,7 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
 
 const canTradeListing = (listing: Listing, role: AppRole | null | undefined) => {
   if (!role) return false;
-  return role === "hotel_restaurant" && listing.kind === "produce";
+  return role === "restaurant" && listing.kind === "produce";
 };
 
 export function MarketplaceView() {
@@ -111,6 +123,8 @@ export function MarketplaceView() {
   const [filterUserRole, setFilterUserRole] = useState<"farmer" | "restaurant" | "resident" | "lgu_admin" | "all">("all");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [filterTransactionType, setFilterTransactionType] = useState<"sell_only" | "barter_only" | "sell_and_barter" | "all">("all");
@@ -124,6 +138,13 @@ export function MarketplaceView() {
   const [incomingPurchaseRequests, setIncomingPurchaseRequests] = useState<PurchaseRequest[]>([]);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number; locationName: string; locationAddress: string } | null>(null);
+  const [listingLocationName, setListingLocationName] = useState("");
+  const [listingLocationAddress, setListingLocationAddress] = useState("");
+  const [showEditLocationPicker, setShowEditLocationPicker] = useState(false);
+  const [editLocationName, setEditLocationName] = useState("");
+  const [editLocationAddress, setEditLocationAddress] = useState("");
+  const [editLatitude, setEditLatitude] = useState<number | null>(null);
+  const [editLongitude, setEditLongitude] = useState<number | null>(null);
   const [showChat, setShowChat] = useState(false);
   const [chatUserId, setChatUserId] = useState<string | undefined>();
   const [chatUserName, setChatUserName] = useState<string | undefined>();
@@ -139,10 +160,19 @@ export function MarketplaceView() {
 
   useEffect(() => {
     const loadListings = async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from("marketplace_listings")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
+
+      // Always include own listings, and filter by municipality if set
+      if (user?.id && profile?.municipality) {
+        query.or(`municipality.eq.${profile.municipality},user_id.eq.${user.id}`);
+      } else if (user?.id) {
+        // If no municipality set, just show own listings
+        query.eq("user_id", user.id);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) {
         toast.error(`Unable to load marketplace listings: ${error.message}`);
       } else {
@@ -165,7 +195,7 @@ export function MarketplaceView() {
       }
     };
     void loadListings();
-  }, []);
+  }, [profile, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -227,6 +257,10 @@ export function MarketplaceView() {
     void loadIncomingRequests();
   }, [user, userListings]);
 
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [selectedListing]);
+
 
   const createListing = async () => {
     if (!user || !profile) return;
@@ -269,10 +303,10 @@ export function MarketplaceView() {
     if (!canCreateListing(profile.primary_role, kind)) {
       const message = profile.primary_role === "farmer"
         ? "Farmers can only list food produce." 
-        : profile.primary_role === "hotel_restaurant"
+        : profile.primary_role === "restaurant"
           ? "Hotels/Restaurants can only list food waste for the LGU." 
           : profile.primary_role === "lgu_admin"
-            ? "LGU staff can only post organic fertilizer listings." 
+            ? "LGU staff can only post compost listings." 
             : "Residents can only list food produce.";
       toast.error(message);
       return;
@@ -292,9 +326,14 @@ export function MarketplaceView() {
         image: imageUrls.length > 0 ? imageUrls[0] : null,
         images: imageUrls,
         barangay: profile.barangay || "Siargao",
+        municipality: profile.municipality || "general_luna",
         transaction_type: "sell_and_barter",
         acceptable_exchanges: [],
         category: kind === "produce" ? "fresh produce" : "food waste",
+        location_name: listingLocationName.trim() || selectedLocation?.locationName || null,
+        location_address: listingLocationAddress.trim() || selectedLocation?.locationAddress || null,
+        latitude: selectedLocation?.latitude ?? null,
+        longitude: selectedLocation?.longitude ?? null,
       })
       .select()
       .single();
@@ -322,6 +361,8 @@ export function MarketplaceView() {
     setTransactionType("sell_and_barter");
     setAcceptableExchanges([]);
     setCategory("");
+    setListingLocationName("");
+    setListingLocationAddress("");
     setShowForm(false);
     setShowLocationPicker(false);
     setSelectedLocation(null);
@@ -449,6 +490,10 @@ export function MarketplaceView() {
     setEditKg(listing.kg);
     setEditPrice(listing.price || "");
     setEditAvailableAt(listing.available_at || "Today");
+    setEditLocationName(listing.location_name || "");
+    setEditLocationAddress(listing.location_address || "");
+    setEditLatitude(listing.latitude ?? null);
+    setEditLongitude(listing.longitude ?? null);
     setIsEditModalOpen(true);
   };
 
@@ -465,6 +510,10 @@ export function MarketplaceView() {
         kg: editKg,
         price: editPrice.trim() || null,
         available_at: editAvailableAt,
+        location_name: editLocationName.trim() || null,
+        location_address: editLocationAddress.trim() || null,
+        latitude: editLatitude,
+        longitude: editLongitude,
       })
       .eq("id", editingListing.id);
 
@@ -483,6 +532,10 @@ export function MarketplaceView() {
               kg: editKg,
               price: editPrice.trim() || null,
               available_at: editAvailableAt,
+              location_name: editLocationName.trim() || null,
+              location_address: editLocationAddress.trim() || null,
+              latitude: editLatitude,
+              longitude: editLongitude,
             }
           : l
       )
@@ -497,6 +550,10 @@ export function MarketplaceView() {
               kg: editKg,
               price: editPrice.trim() || null,
               available_at: editAvailableAt,
+              location_name: editLocationName.trim() || null,
+              location_address: editLocationAddress.trim() || null,
+              latitude: editLatitude,
+              longitude: editLongitude,
             }
           : l
       )
@@ -566,7 +623,16 @@ export function MarketplaceView() {
               <Filter className="mr-1 h-4 w-4" /> Filters
             </Button>
             {user && profile?.primary_role !== "resident" && (
-              <Button size="sm" className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" onClick={() => setShowForm((value) => !value)}>
+              <Button size="sm" className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" onClick={() => {
+                setShowForm((value) => !value);
+                if (profile?.primary_role === "lgu_admin") {
+                  setKind("compost");
+                } else if (profile?.primary_role === "restaurant") {
+                  setKind("waste");
+                } else {
+                  setKind("produce");
+                }
+              }}>
                 <Plus className="mr-1 h-4 w-4" /> New listing
               </Button>
             )}
@@ -645,10 +711,10 @@ export function MarketplaceView() {
               <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price or terms" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
               <Input value={availableAt} onChange={(e) => setAvailableAt(e.target.value)} placeholder="Available date" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
               <div className="sm:col-span-2 flex flex-wrap gap-3">
-                {profile?.primary_role === "hotel_restaurant" ? (
-                  <Button type="button" className="bg-secondary text-slate-900 hover:bg-secondary/90">♻️ Waste</Button>
+                {profile?.primary_role === "restaurant" ? (
+                  <Button type="button" className={kind === "waste" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("waste")}>♻️ Waste</Button>
                 ) : profile?.primary_role === "lgu_admin" ? (
-                  <span className="text-sm text-slate-500">LGU staff cannot create listings</span>
+                  <Button type="button" className={kind === "compost" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("compost")}>🌱 Compost</Button>
                 ) : (
                   <>
                     <Button type="button" className={kind === "produce" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("produce")}>🌾 Produce</Button>
@@ -834,14 +900,32 @@ export function MarketplaceView() {
                 </>
               )}
             </div>
-            <div className="mt-4">
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Location (Type or use map)</label>
+                <Input
+                  value={listingLocationName}
+                  onChange={(e) => setListingLocationName(e.target.value)}
+                  placeholder="e.g., Cloud 9, General Luna"
+                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Address (Optional)</label>
+                <Input
+                  value={listingLocationAddress}
+                  onChange={(e) => setListingLocationAddress(e.target.value)}
+                  placeholder="e.g., Near the main beach"
+                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
+                />
+              </div>
               <Button 
                 variant={selectedLocation ? "secondary" : "outline"} 
                 onClick={() => setShowLocationPicker(true)}
-                className="flex items-center gap-2"
+                className="w-full flex items-center gap-2"
               >
                 <MapPin className="h-4 w-4" />
-                {selectedLocation ? "Location Selected" : "Add Location"}
+                {selectedLocation ? "Location Updated from Map" : "Or pick from map"}
               </Button>
               {selectedLocation && (
                 <p className="text-sm text-muted-foreground mt-2">{selectedLocation.locationName}</p>
@@ -851,6 +935,8 @@ export function MarketplaceView() {
               <div className="mt-4">
                 <LocationPicker 
                   onLocationSelect={(location) => {
+                    setListingLocationName(location.locationName);
+                    setListingLocationAddress(location.locationAddress);
                     setSelectedLocation(location);
                     setShowLocationPicker(false);
                   }}
@@ -866,77 +952,81 @@ export function MarketplaceView() {
           </Card>
         )}
 
-        <Tabs defaultValue={profile?.primary_role === "lgu_admin" ? "organic-fertilizer" : "produce"} className="mt-8">
-          <TabsList className={`grid w-full ${profile?.primary_role === "lgu_admin" ? "grid-cols-1" : profile?.primary_role === "farmer" ? "grid-cols-2" : profile?.primary_role === "hotel_restaurant" ? "grid-cols-2" : "grid-cols-1"} bg-sand/50 border-2 border-primary/30 rounded-lg p-1`}>
-            {profile?.primary_role !== "lgu_admin" && (
-              <TabsTrigger value="produce" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white text-slate-700">
-                {profile?.primary_role === "farmer" ? "🌾 My Produce" : profile?.primary_role === "hotel_restaurant" ? "🌾 Produce" : "🌾 Fresh Produce"}
-              </TabsTrigger>
-            )}
-            {profile?.primary_role === "hotel_restaurant" && (
-              <TabsTrigger value="restaurant-waste" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
-                🍽️ My Food Waste
-              </TabsTrigger>
-            )}
-            {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin") && (
-              <TabsTrigger value="organic-fertilizer" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
-                🧪 Organic Fertilizer
+        <Tabs defaultValue={profile?.primary_role === "restaurant" ? "produce" : profile?.primary_role === "lgu_admin" ? "compost" : "produce"} className="mt-8">
+          <TabsList className={`grid w-full ${profile?.primary_role === "lgu_admin" ? "grid-cols-3" : profile?.primary_role === "farmer" || profile?.primary_role === "restaurant" ? "grid-cols-2" : "grid-cols-1"} bg-sand/50 border-2 border-primary/30 rounded-lg p-1`}>
+            <TabsTrigger value="produce" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white text-slate-700">
+              🌾 Fresh Produce
+            </TabsTrigger>
+            <TabsTrigger value="waste" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
+              🍽️ Food Waste
+            </TabsTrigger>
+            {profile?.primary_role === "lgu_admin" && (
+              <TabsTrigger value="compost" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
+                🧪 Compost
               </TabsTrigger>
             )}
           </TabsList>
-          {profile?.primary_role !== "lgu_admin" && (
-            <TabsContent value="produce" className="mt-6">
+          <TabsContent value="produce" className="mt-6">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered("produce").map((l) => (
+                <ListingCard
+                  key={l.id}
+                  item={l}
+                  onViewDetails={() => {
+                    setSelectedListing(l);
+                    setShowDetailModal(true);
+                  }}
+                  onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                    setSelectedListing(l);
+                    setShowTradeModal(true);
+                  } : undefined}
+                  onBuy={canBuyListing(l, profile?.primary_role) ? () => {
+                    setSelectedListing(l);
+                    setShowBuyModal(true);
+                  } : undefined}
+                  onMessage={() => handleMessageClick(l)}
+                  onEdit={() => handleEditListing(l)}
+                  onDelete={() => handleDeleteListing(l.id)}
+                />
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="waste" className="mt-6">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered("waste", "restaurant").map((l) => (
+                <ListingCard
+                  key={l.id}
+                  item={l}
+                  onViewDetails={() => {
+                    setSelectedListing(l);
+                    setShowDetailModal(true);
+                  }}
+                  onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                    setSelectedListing(l);
+                    setShowTradeModal(true);
+                  } : undefined}
+                  onBuy={canBuyListing(l, profile?.primary_role) ? () => {
+                    setSelectedListing(l);
+                    setShowBuyModal(true);
+                  } : undefined}
+                  onMessage={() => handleMessageClick(l)}
+                  onEdit={() => handleEditListing(l)}
+                  onDelete={() => handleDeleteListing(l.id)}
+                />
+              ))}
+            </div>
+          </TabsContent>
+          {profile?.primary_role === "lgu_admin" && (
+            <TabsContent value="compost" className="mt-6">
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered("produce").map((l) => (
+                {filtered("compost", "lgu_admin").map((l) => (
                   <ListingCard
                     key={l.id}
                     item={l}
-                    onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                    onViewDetails={() => {
                       setSelectedListing(l);
-                      setShowTradeModal(true);
-                    } : undefined}
-                    onBuy={canBuyListing(l, profile?.primary_role) ? () => {
-                      setSelectedListing(l);
-                      setShowBuyModal(true);
-                    } : undefined}
-                    onMessage={() => handleMessageClick(l)}
-                    onEdit={() => handleEditListing(l)}
-                    onDelete={() => handleDeleteListing(l.id)}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-          )}
-          {profile?.primary_role === "hotel_restaurant" && (
-            <TabsContent value="restaurant-waste" className="mt-6">
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered("waste", "restaurant").map((l) => (
-                  <ListingCard
-                    key={l.id}
-                    item={l}
-                    onTrade={canTradeListing(l, profile?.primary_role) ? () => {
-                      setSelectedListing(l);
-                      setShowTradeModal(true);
-                    } : undefined}
-                    onBuy={canBuyListing(l, profile?.primary_role) ? () => {
-                      setSelectedListing(l);
-                      setShowBuyModal(true);
-                    } : undefined}
-                    onMessage={() => handleMessageClick(l)}
-                    onEdit={() => handleEditListing(l)}
-                    onDelete={() => handleDeleteListing(l.id)}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-          )}
-          {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin") && (
-            <TabsContent value="organic-fertilizer" className="mt-6">
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered("waste", "lgu_admin").map((l) => (
-                  <ListingCard
-                    key={l.id}
-                    item={l}
+                      setShowDetailModal(true);
+                    }}
                     onTrade={canTradeListing(l, profile?.primary_role) ? () => {
                       setSelectedListing(l);
                       setShowTradeModal(true);
@@ -976,6 +1066,159 @@ export function MarketplaceView() {
           toast.success("Purchase request sent successfully!");
         }}
       />
+
+      <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
+        <DialogContent className="max-w-6xl w-full overflow-hidden p-0">
+          {selectedListing ? (
+            <div className="grid gap-6 bg-background sm:grid-cols-[1.5fr_1fr]">
+              <div className="relative overflow-hidden bg-slate-950">
+                {selectedListing.images && selectedListing.images.length > 0 ? (
+                  <>
+                    <img
+                      src={selectedListing.images[currentImageIndex]}
+                      alt={selectedListing.title}
+                      className="h-full w-full object-cover"
+                    />
+                    {selectedListing.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => (prev - 1 + selectedListing.images!.length) % selectedListing.images!.length)}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => (prev + 1) % selectedListing.images!.length)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                          {selectedListing.images.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentImageIndex(index)}
+                              className={`h-2 rounded-full transition-all ${index === currentImageIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : selectedListing.image ? (
+                  <img
+                    src={selectedListing.image}
+                    alt={selectedListing.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-slate-900 text-slate-200 text-sm">
+                    No image available
+                  </div>
+                )}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-6">
+                  <p className="text-sm uppercase tracking-[0.2em] text-slate-200/70">{selectedListing.kind === "produce" ? "Produce" : "Waste"}</p>
+                  <h2 className="mt-2 text-3xl font-semibold text-white">{selectedListing.title}</h2>
+                  <p className="mt-2 text-lg font-semibold text-primary">{selectedListing.price ? `₱${selectedListing.price}` : "Free / Barter"}</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-6 p-6">
+                <DialogHeader>
+                  <DialogTitle>{selectedListing.title}</DialogTitle>
+                  <DialogDescription>
+                    {selectedListing.barangay} • {selectedListing.available_at} • {selectedListing.kg} kg
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <div className="rounded-3xl border border-slate-200/60 bg-white/80 p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">Seller</p>
+                        <p className="text-base font-semibold text-slate-800">{selectedListing.seller}</p>
+                        <p className="text-sm text-slate-600">{selectedListing.role.replace("hotel_restaurant", "Restaurant").replace("lgu_admin", "LGU")}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-500">Transaction</p>
+                        <p className="font-semibold text-slate-800">{selectedListing.transaction_type.replace("sell_only", "Sell only").replace("barter_only", "Barter only").replace("sell_and_barter", "Sell & barter")}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-900">Description</p>
+                    <p className="text-sm leading-relaxed text-slate-700">
+                      {selectedListing.category ? `${selectedListing.category.charAt(0).toUpperCase() + selectedListing.category.slice(1)} available in ${selectedListing.barangay}.` : "A marketplace listing from the community."}
+                    </p>
+                    {selectedListing.acceptable_exchanges && selectedListing.acceptable_exchanges.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {selectedListing.acceptable_exchanges.map((exchange, index) => (
+                          <span key={index} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">{exchange}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedListing.images && selectedListing.images.length > 1 && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-slate-900">All photos</p>
+                      <div className="grid grid-cols-4 gap-2 max-h-32 overflow-y-auto">
+                        {selectedListing.images.map((photo, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`relative rounded-xl overflow-hidden border-2 transition-all hover:border-primary ${
+                              index === currentImageIndex ? "border-primary ring-2 ring-primary" : "border-slate-200/60 hover:border-primary/60"
+                            }`}
+                          >
+                            <img
+                              src={photo}
+                              alt={`${selectedListing.title} ${index + 1}`}
+                              className="h-24 w-full object-cover"
+                            />
+                            {index === currentImageIndex && (
+                              <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1 text-sm text-slate-600">
+                    <p>{selectedListing.location_name || "Location not provided"}</p>
+                    {selectedListing.location_address && <p>{selectedListing.location_address}</p>}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {canBuyListing(selectedListing, profile?.primary_role) && (
+                      <Button onClick={() => {
+                        setShowDetailModal(false);
+                        setSelectedListing(selectedListing);
+                        setShowBuyModal(true);
+                      }} className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90">
+                        Contact / Buy
+                      </Button>
+                    )}
+                    <Button variant="outline" onClick={() => setShowDetailModal(false)} className="rounded-full border-slate-300 text-slate-700 hover:bg-slate-100">
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       <ChatMessenger
         open={showChat}
@@ -1025,6 +1268,24 @@ export function MarketplaceView() {
                   value={editAvailableAt}
                   onChange={(e) => setEditAvailableAt(e.target.value)}
                   placeholder="Today"
+                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                <Input
+                  value={editLocationName}
+                  onChange={(e) => setEditLocationName(e.target.value)}
+                  placeholder="e.g., Cloud 9, General Luna"
+                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Address (Optional)</label>
+                <Input
+                  value={editLocationAddress}
+                  onChange={(e) => setEditLocationAddress(e.target.value)}
+                  placeholder="e.g., Near the main beach"
                   className="border-primary/30 focus:border-primary focus:ring-primary/50"
                 />
               </div>

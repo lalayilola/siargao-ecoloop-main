@@ -4,7 +4,7 @@ import { Container, PageHero } from "@/components/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Recycle, Leaf, Users, Handshake, TrendingUp, ShieldAlert, FileText, UserCheck, BarChart3, Store, Truck, Calendar, Globe, ArrowRightLeft } from "lucide-react";
+import { Recycle, Leaf, Users, Handshake, TrendingUp, ShieldAlert, Megaphone, FileText, UserCheck, BarChart3, Store, Truck, Package, Calendar, Globe, ShoppingCart, ArrowRightLeft } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,38 +15,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-const roleColors = ["#10b981", "#f59e0b", "#3b82f6"];
+const chartColors = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)"];
+const roleColors = ["#10b981", "#f59e0b", "#3b82f6", "#8b5cf6"];
 
-type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"];
-type UserProfileRow = {
-  id: string;
-  full_name: string;
-  primary_role: string;
-  barangay: string | null;
-  municipality: string | null;
-  created_at: string;
-};
-type ListingRow = {
-  id: string;
-  kind: "produce" | "waste" | "compost";
-  price: string | null;
-  municipality: string | null;
-};
-type PurchaseRow = {
-  id: string;
-  listing_id: string;
-  buyer_name: string;
-  status: string;
-  quantity_kg: number | null;
-  created_at: string;
-};
-type TradeRow = {
-  id: string;
-  listing_id: string;
-  requester_name: string;
-  status: string;
-  created_at: string;
-};
+type UserProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+type ListingRow = Database["public"]["Tables"]["marketplace_listings"]["Row"];
+type PurchaseRow = Database["public"]["Tables"]["purchase_requests"]["Row"];
+type TradeRow = Database["public"]["Tables"]["trade_requests"]["Row"];
+type WasteReportRow = Database["public"]["Tables"]["food_waste_reports"]["Row"];
 
 type MemberSummary = {
   id: string;
@@ -59,9 +35,11 @@ type MemberSummary = {
 
 type TransactionSummary = {
   id: string;
+  type: "purchase" | "trade";
   title: string;
   actor: string;
   status: string;
+  amount: number;
   created_at: string;
 };
 
@@ -87,9 +65,9 @@ function Stat({ icon: Icon, label, value, sub }: { icon: typeof Recycle; label: 
 function DashboardPage() {
   const { isLguAdmin, profile, user } = useAuth();
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [recentMessages, setRecentMessages] = useState<NotificationRow[]>([]);
+  const [recentMessages, setRecentMessages] = useState<Database["public"]["Tables"]["notifications"]["Row"][]>([]);
   const [monitoringStats, setMonitoringStats] = useState({
-    municipalityLabel: "your municipality",
+    municipalityLabel: "Your municipality",
     totalMembers: 0,
     farmers: 0,
     restaurants: 0,
@@ -111,25 +89,6 @@ function DashboardPage() {
       return;
     }
 
-    const loadMessageNotifications = async () => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("type", "message")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error("Error loading message notifications:", error);
-        return;
-      }
-
-      const messages = (data || []) as NotificationRow[];
-      setRecentMessages(messages);
-      setUnreadMessages(messages.filter((notification) => !notification.read_at).length);
-    };
-
     const loadMonitoringData = async () => {
       try {
         const municipality = profile.municipality;
@@ -145,31 +104,37 @@ function DashboardPage() {
         const listings = (listingsResult.data || []) as ListingRow[];
         const purchases = (purchaseResult.data || []) as PurchaseRow[];
         const trades = (tradeResult.data || []) as TradeRow[];
-        const wasteReports = (wasteReportResult.data || []) as Array<{ id: string; restaurant_id: string; quantity_kg: number; status: string }>;
+        const wasteReports = (wasteReportResult.data || []) as WasteReportRow[];
         const listingIds = new Set(listings.map((listing) => listing.id));
 
+        const municipalityListings = listings.filter((listing) => listing.municipality === municipality);
         const municipalityPurchases = purchases.filter((purchase) => listingIds.has(purchase.listing_id));
         const municipalityTrades = trades.filter((trade) => listingIds.has(trade.listing_id));
-        const municipalityWasteReports = wasteReports.filter((report) => {
-          const owner = profiles.find((member) => member.id === report.restaurant_id);
-          return owner?.municipality === municipality;
-        });
+
+        const restaurantIds = wasteReports.map((report) => report.restaurant_id).filter(Boolean);
+        const restaurantProfiles = profiles.filter((profileItem) => restaurantIds.includes(profileItem.id));
+        const restaurantMunicipalityMap = new Map(restaurantProfiles.map((profileItem) => [profileItem.id, profileItem.municipality]));
+        const municipalityWasteReports = wasteReports.filter((report) => restaurantMunicipalityMap.get(report.restaurant_id) === municipality);
 
         const freshProduceSales = municipalityPurchases
-          .filter((purchase) => purchase.status === "completed")
+          .filter((purchase) => {
+            const listing = municipalityListings.find((item) => item.id === purchase.listing_id);
+            return purchase.status === "completed" && listing?.kind === "produce";
+          })
           .reduce((sum, purchase) => {
-            const listing = listings.find((item) => item.id === purchase.listing_id);
-            if (!listing || listing.kind !== "produce") return sum;
-            const unitValue = Number(listing.price ?? "0");
+            const listing = municipalityListings.find((item) => item.id === purchase.listing_id);
+            const unitValue = Number(listing?.price ?? "0");
             return sum + (Number(purchase.quantity_kg || 0) * unitValue);
           }, 0);
 
         const compostSales = municipalityPurchases
-          .filter((purchase) => purchase.status === "completed")
+          .filter((purchase) => {
+            const listing = municipalityListings.find((item) => item.id === purchase.listing_id);
+            return purchase.status === "completed" && listing?.kind === "compost";
+          })
           .reduce((sum, purchase) => {
-            const listing = listings.find((item) => item.id === purchase.listing_id);
-            if (!listing || listing.kind !== "compost") return sum;
-            const unitValue = Number(listing.price ?? "0");
+            const listing = municipalityListings.find((item) => item.id === purchase.listing_id);
+            const unitValue = Number(listing?.price ?? "0");
             return sum + (Number(purchase.quantity_kg || 0) * unitValue);
           }, 0);
 
@@ -190,9 +155,9 @@ function DashboardPage() {
         setMonitoringStats({
           municipalityLabel: municipality.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
           totalMembers: profiles.length,
-          farmers: profiles.filter((member) => member.primary_role === "farmer").length,
-          restaurants: profiles.filter((member) => member.primary_role === "restaurant").length,
-          buyers: profiles.filter((member) => member.primary_role === "resident").length,
+          farmers: profiles.filter((entry) => entry.primary_role === "farmer").length,
+          restaurants: profiles.filter((entry) => entry.primary_role === "restaurant").length,
+          buyers: profiles.filter((entry) => entry.primary_role === "resident").length,
           activeListings: listings.length,
           freshProduceSales,
           compostSales,
@@ -201,46 +166,68 @@ function DashboardPage() {
           pendingRequests,
         });
 
-        setMembersPreview(
-          profiles
-            .slice()
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, 5)
-            .map((member) => ({
-              id: member.id,
-              full_name: member.full_name,
-              primary_role: member.primary_role,
-              barangay: member.barangay,
-              municipality: member.municipality,
-              created_at: member.created_at,
-            })),
-        );
+        const recentMembers = profiles
+          .slice()
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 5)
+          .map((entry) => ({
+            id: entry.id,
+            full_name: entry.full_name,
+            primary_role: entry.primary_role,
+            barangay: entry.barangay,
+            municipality: entry.municipality,
+            created_at: entry.created_at,
+          }));
 
-        setTransactionsPreview(
-          [
-            ...municipalityPurchases.map((purchase) => ({
-              id: purchase.id,
-              title: `Purchase request • ${purchase.buyer_name}`,
-              actor: purchase.buyer_name,
-              status: purchase.status,
-              created_at: purchase.created_at,
-            })),
-            ...municipalityTrades.map((trade) => ({
-              id: trade.id,
-              title: `Trade request • ${trade.requester_name}`,
-              actor: trade.requester_name,
-              status: trade.status,
-              created_at: trade.created_at,
-            })),
-          ]
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, 6),
-        );
+        const recentTransactions = [
+          ...municipalityPurchases.map((purchase) => ({
+            id: purchase.id,
+            type: "purchase" as const,
+            title: `Purchase request • ${purchase.buyer_name}`,
+            actor: purchase.buyer_name,
+            status: purchase.status,
+            amount: Number(purchase.quantity_kg || 0),
+            created_at: purchase.created_at,
+          })),
+          ...municipalityTrades.map((trade) => ({
+            id: trade.id,
+            type: "trade" as const,
+            title: `Trade request • ${trade.requester_name}`,
+            actor: trade.requester_name,
+            status: trade.status,
+            amount: Number(trade.offered_item_title ? 1 : 0),
+            created_at: trade.created_at,
+          })),
+        ]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 6);
+
+        setMembersPreview(recentMembers);
+        setTransactionsPreview(recentTransactions);
       } catch (error) {
         console.error("Error loading LGU monitoring data:", error);
       } finally {
         setLoading(false);
       }
+    };
+
+    const loadMessageNotifications = async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("type", "message")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) {
+        console.error("Error loading message notifications:", error);
+        return;
+      }
+
+      const messages = (data || []) as Database["public"]["Tables"]["notifications"]["Row"][];
+      setRecentMessages(messages);
+      setUnreadMessages(messages.filter((notification) => !notification.read_at).length);
     };
 
     void loadMessageNotifications();

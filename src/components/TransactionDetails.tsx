@@ -137,51 +137,83 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
 
     setMarkingComplete(true);
     try {
-      const tableName = safeTransaction.type === 'trade' ? 'trades' : 'purchase_requests';
+      const tableName = safeTransaction.type === 'trade' ? 'trade_requests' : 'purchase_requests';
       console.log(`Updating ${tableName} with id ${safeTransaction.id} to status 'completed'`);
       
-      // Use REST API for both types to bypass schema cache
-      const { data: { session } } = await supabase.auth.getSession();
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-      
-      // For trades, try using a different approach - check if column exists first
-      if (safeTransaction.type === 'trade') {
-        // Try to get the trade data first to see what columns exist
-        const checkResponse = await fetch(`${supabaseUrl}/rest/v1/trades?id=eq.${safeTransaction.id}&select=*`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': supabaseKey,
-          },
-        });
-        
-        if (checkResponse.ok) {
-          const tradeData = await checkResponse.json();
-          console.log("Trade data columns:", tradeData[0] ? Object.keys(tradeData[0]) : 'No data');
-        }
-      }
-      
-      const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?id=eq.${safeTransaction.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-          'apikey': supabaseKey,
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({ status: 'completed' }),
-      });
+      // First, fetch the transaction data to get listing_id and quantity
+      const { data: transactionData, error: fetchError } = await supabase
+        .from(tableName as any)
+        .select('*')
+        .eq('id', safeTransaction.id)
+        .single();
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("REST API error:", errorText);
-        throw new Error(errorText || 'Failed to update');
+      if (fetchError) {
+        console.error("Error fetching transaction data:", fetchError);
+        throw new Error(`Failed to fetch transaction data: ${fetchError.message}`);
+      }
+
+      console.log("Transaction data:", transactionData);
+
+      // Update transaction status to completed
+      const { error: updateError } = await supabase
+        .from(tableName as any)
+        .update({ status: 'completed' })
+        .eq('id', safeTransaction.id);
+
+      if (updateError) {
+        console.error("Error updating transaction status:", updateError);
+        throw new Error(`Failed to update transaction status: ${updateError.message}`);
+      }
+
+      // Update marketplace listing inventory
+      const listingId = (transactionData as any).listing_id;
+      const quantityKg = (transactionData as any).quantity_kg || 0;
+
+      if (listingId && quantityKg > 0) {
+        console.log(`Updating listing ${listingId} by reducing ${quantityKg} kg`);
+
+        // Get current listing data
+        const { data: listingData, error: listingFetchError } = await supabase
+          .from('marketplace_listings')
+          .select('kg')
+          .eq('id', listingId)
+          .single();
+
+        if (listingFetchError) {
+          console.error("Error fetching listing data:", listingFetchError);
+          throw new Error(`Failed to fetch listing data: ${listingFetchError.message}`);
+        }
+
+        const currentKg = listingData?.kg || 0;
+        const newKg = Math.max(0, currentKg - quantityKg);
+        const listingStatus = newKg <= 0 ? 'sold_out' : 'available';
+
+        console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}`);
+
+        // Update listing
+        const { error: listingUpdateError } = await supabase
+          .from('marketplace_listings')
+          .update({
+            kg: newKg,
+            listing_status: listingStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', listingId);
+
+        if (listingUpdateError) {
+          console.error("Error updating listing inventory:", listingUpdateError);
+          // Don't throw error here - transaction is already marked complete
+          console.warn("Transaction completed but inventory update failed");
+        } else {
+          console.log("Listing inventory updated successfully");
+        }
+      } else {
+        console.log("No listing_id or quantity_kg found, skipping inventory update");
       }
 
       toast.success("Transaction marked as completed");
       onClose();
-      // Refresh the page to show updated status
+      // Refresh the page to show updated status and inventory
       window.location.reload();
     } catch (error: any) {
       console.error("Mark complete error:", error);

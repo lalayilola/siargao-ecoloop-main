@@ -60,6 +60,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_role public.app_role;
+  v_municipality public.municipality;
   v_meta JSONB := COALESCE(NEW.raw_user_meta_data, '{}'::jsonb);
 BEGIN
   BEGIN
@@ -69,7 +70,14 @@ BEGIN
   END;
   IF v_role IS NULL THEN v_role := 'resident'; END IF;
 
-  INSERT INTO public.profiles (id, full_name, barangay, address, phone, primary_role, lgu_approved)
+  BEGIN
+    v_municipality := (v_meta->>'municipality')::public.municipality;
+  EXCEPTION WHEN OTHERS THEN
+    v_municipality := 'general_luna';
+  END;
+  IF v_municipality IS NULL THEN v_municipality := 'general_luna'; END IF;
+
+  INSERT INTO public.profiles (id, full_name, barangay, address, phone, primary_role, lgu_approved, municipality, is_super_admin)
   VALUES (
     NEW.id,
     COALESCE(v_meta->>'full_name', ''),
@@ -77,6 +85,8 @@ BEGIN
     COALESCE(v_meta->>'address', ''),
     COALESCE(v_meta->>'phone', ''),
     v_role,
+    false,
+    v_municipality,
     false
   );
 

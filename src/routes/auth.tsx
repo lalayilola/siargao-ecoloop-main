@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Leaf } from "lucide-react";
+import { Leaf, Eye, EyeOff } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
 export const Route = createFileRoute("/auth")({
@@ -35,6 +35,7 @@ const signupSchema = z.object({
   barangay: z.string().trim().min(2).max(80),
   address: z.string().trim().max(200).optional().default(""),
   role: z.enum(["farmer", "restaurant", "resident", "lgu_admin"]),
+  municipality: z.enum(["burgos", "dapa", "general_luna", "pilar", "san_benito", "san_isidro", "santa_monica", "socorro", "del_carmen"]),
 });
 
 const AUTH_RATE_LIMIT_COOLDOWN_MS = 3 * 60 * 1000;
@@ -151,6 +152,7 @@ function LoginForm() {
   const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
@@ -210,7 +212,16 @@ function LoginForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="li-pw">{t("auth.password")}</Label>
-        <Input id="li-pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div className="relative">
+          <Input id="li-pw" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} className="pr-10" />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
       <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
         {busy ? t("auth.signingIn") : isCooldownActive ? "Please wait…" : t("auth.signIn")}
@@ -232,7 +243,9 @@ function SignupForm() {
     barangay: "",
     address: "",
     role: "resident" as "farmer" | "restaurant" | "resident" | "lgu_admin",
+    municipality: "general_luna" as "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
@@ -284,18 +297,19 @@ function SignupForm() {
                 barangay: parsed.data.barangay,
                 address: parsed.data.address,
                 role: parsed.data.role,
+                municipality: parsed.data.municipality,
               },
             },
           });
 
           if (signupError) {
-            const message = signupError.message || "";
+            const message = signupError.message || String(signupError);
             if (isRateLimitMessage(message)) {
               const until = activateAuthCooldown();
               setCooldownUntil(until);
               toast.error("Too many sign-up attempts. Please wait a few minutes and try again.");
             } else {
-              toast.error(getSupabaseErrorMessage(signupError, `${message}${signupError.code ? ` (${signupError.code})` : ""}`));
+              toast.error(getSupabaseErrorMessage(signupError, message));
             }
             return;
           }
@@ -385,7 +399,16 @@ function SignupForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="su-pw">{t("auth.password")}</Label>
-        <Input id="su-pw" type="password" required value={form.password} onChange={(e) => set("password", e.target.value)} />
+        <div className="relative">
+          <Input id="su-pw" type={showPassword ? "text" : "password"} required value={form.password} onChange={(e) => set("password", e.target.value)} className="pr-10" />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="su-brgy">{t("auth.barangay")}</Label>
@@ -394,6 +417,23 @@ function SignupForm() {
       <div className="space-y-1.5">
         <Label htmlFor="su-addr">{t("auth.address")}</Label>
         <Input id="su-addr" value={form.address} onChange={(e) => set("address", e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="su-municipality">Municipality</Label>
+        <Select value={form.municipality} onValueChange={(v) => set("municipality", v as typeof form.municipality)}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="burgos">Burgos</SelectItem>
+            <SelectItem value="dapa">Dapa</SelectItem>
+            <SelectItem value="general_luna">General Luna</SelectItem>
+            <SelectItem value="pilar">Pilar</SelectItem>
+            <SelectItem value="san_benito">San Benito</SelectItem>
+            <SelectItem value="san_isidro">San Isidro</SelectItem>
+            <SelectItem value="santa_monica">Santa Monica</SelectItem>
+            <SelectItem value="socorro">Socorro</SelectItem>
+            <SelectItem value="del_carmen">Del Carmen</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-1.5">
         <Label>{t("auth.iAmA")}</Label>

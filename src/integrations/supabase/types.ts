@@ -192,11 +192,11 @@ export interface Database {
         Row: {
           id: string
           from_user_id: string
-          from_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          from_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           from_name: string
           from_gives: string
           to_user_id: string | null
-          to_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          to_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           to_name: string
           to_gives: string
           status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -207,11 +207,11 @@ export interface Database {
         Insert: {
           id?: string
           from_user_id: string
-          from_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          from_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           from_name: string
           from_gives: string
           to_user_id?: string | null
-          to_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          to_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           to_name: string
           to_gives: string
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -222,11 +222,11 @@ export interface Database {
         Update: {
           id?: string
           from_user_id?: string
-          from_role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          from_role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           from_name?: string
           from_gives?: string
           to_user_id?: string | null
-          to_role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          to_role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           to_name?: string
           to_gives?: string
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -241,10 +241,11 @@ export interface Database {
           listing_id: string
           requester_user_id: string
           requester_name: string
-          requester_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          requester_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           offered_item_id: string | null
           offered_item_title: string | null
           message: string
+          quantity_kg: number
           status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
           created_at: string
           updated_at: string
@@ -254,10 +255,11 @@ export interface Database {
           listing_id: string
           requester_user_id: string
           requester_name: string
-          requester_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          requester_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           offered_item_id?: string | null
           offered_item_title?: string | null
           message: string
+          quantity_kg?: number
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
           created_at?: string
           updated_at?: string
@@ -267,10 +269,11 @@ export interface Database {
           listing_id?: string
           requester_user_id?: string
           requester_name?: string
-          requester_role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          requester_role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           offered_item_id?: string | null
           offered_item_title?: string | null
           message?: string
+          quantity_kg?: number
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
           created_at?: string
           updated_at?: string
@@ -282,7 +285,7 @@ export interface Database {
           listing_id: string
           buyer_user_id: string
           buyer_name: string
-          buyer_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          buyer_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           message: string | null
           quantity_kg: number
           status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -294,7 +297,7 @@ export interface Database {
           listing_id: string
           buyer_user_id: string
           buyer_name: string
-          buyer_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          buyer_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           message?: string | null
           quantity_kg?: number | null
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -306,7 +309,7 @@ export interface Database {
           listing_id?: string
           buyer_user_id?: string
           buyer_name?: string
-          buyer_role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          buyer_role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           message?: string | null
           quantity_kg?: number
           status?: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -318,10 +321,10 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           seller: string
           title: string
-          kind: 'produce' | 'waste'
+          kind: 'produce' | 'waste' | 'compost'
           kg: number
           price: string | null
           available_at: string
@@ -335,16 +338,17 @@ export interface Database {
           longitude: number | null
           location_name: string | null
           location_address: string | null
+          listing_status: 'available' | 'sold_out'
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           seller: string
           title: string
-          kind: 'produce' | 'waste'
+          kind: 'produce' | 'waste' | 'compost'
           kg: number
           price?: string | null
           available_at: string
@@ -358,13 +362,14 @@ export interface Database {
           longitude?: number | null
           location_name?: string | null
           location_address?: string | null
+          listing_status?: 'available' | 'sold_out'
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           seller?: string
           title?: string
           kind?: 'produce' | 'waste' | 'compost'
@@ -381,6 +386,7 @@ export interface Database {
           longitude?: number | null
           location_name?: string | null
           location_address?: string | null
+          listing_status?: 'available' | 'sold_out'
           created_at?: string
           updated_at?: string
         }
@@ -388,8 +394,8 @@ export interface Database {
       food_waste_reports: {
         Row: {
           id: string
-          hotel_restaurant_id: string
-          hotel_restaurant_name: string
+          restaurant_id: string
+          restaurant_name: string
           waste_type: string
           quantity_kg: number
           collection_date: string
@@ -400,8 +406,8 @@ export interface Database {
         }
         Insert: {
           id?: string
-          hotel_restaurant_id: string
-          hotel_restaurant_name: string
+          restaurant_id: string
+          restaurant_name: string
           waste_type: string
           quantity_kg: number
           collection_date: string
@@ -412,8 +418,8 @@ export interface Database {
         }
         Update: {
           id?: string
-          hotel_restaurant_id?: string
-          hotel_restaurant_name?: string
+          restaurant_id?: string
+          restaurant_name?: string
           waste_type?: string
           quantity_kg?: number
           collection_date?: string
@@ -465,7 +471,7 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           author: string
           barangay: string
           body: string
@@ -485,7 +491,7 @@ export interface Database {
         Insert: {
           id?: string
           user_id: string
-          role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           author: string
           barangay: string
           body: string
@@ -505,7 +511,7 @@ export interface Database {
         Update: {
           id?: string
           user_id?: string
-          role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          role?: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
           author?: string
           barangay?: string
           body?: string
@@ -727,8 +733,8 @@ export interface Database {
     Enums: {
       trade_status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
       purchase_status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
-      role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
-      listing_kind: 'produce' | 'waste'
+      role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin'
+      listing_kind: 'produce' | 'waste' | 'compost'
       transaction_type: 'sell_only' | 'barter_only' | 'sell_and_barter'
       post_type: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'lgu_announcement' | 'sustainability_tip'
       notification_type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general' | 'order_received' | 'order_approved'
