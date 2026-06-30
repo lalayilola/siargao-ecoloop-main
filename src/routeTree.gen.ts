@@ -9,21 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedWasteReportsRouteImport } from './routes/_authenticated/waste-reports'
 import { Route as AuthenticatedWasteCollectionRouteImport } from './routes/_authenticated/waste-collection'
 import { Route as AuthenticatedTradesRouteImport } from './routes/_authenticated/trades'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
-import { Route as AuthenticatedOrderHistoryRouteImport } from './routes/_authenticated/order-history'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
@@ -41,14 +44,34 @@ import { Route as AuthenticatedDashboardRestaurantRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardHotelRouteImport } from './routes/_authenticated/dashboard/hotel'
 import { Route as AuthenticatedDashboardFarmerRouteImport } from './routes/_authenticated/dashboard/farmer'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesRoute = FeaturesRouteImport.update({
@@ -80,6 +103,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedWasteReportsRoute =
   AuthenticatedWasteReportsRouteImport.update({
     id: '/waste-reports',
@@ -107,17 +135,6 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedOrderHistoryRoute =
-  AuthenticatedOrderHistoryRouteImport.update({
-    id: '/order-history',
-    path: '/order-history',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
@@ -212,11 +229,15 @@ const AuthenticatedDashboardFarmerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
@@ -230,13 +251,12 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
-  '/order-history': typeof AuthenticatedOrderHistoryRoute
-  '/orders': typeof AuthenticatedOrdersRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/trades': typeof AuthenticatedTradesRoute
   '/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/waste-reports': typeof AuthenticatedWasteReportsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
   '/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
@@ -244,11 +264,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
@@ -262,13 +286,12 @@ export interface FileRoutesByTo {
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
-  '/order-history': typeof AuthenticatedOrderHistoryRoute
-  '/orders': typeof AuthenticatedOrdersRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/trades': typeof AuthenticatedTradesRoute
   '/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/waste-reports': typeof AuthenticatedWasteReportsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
   '/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
@@ -278,11 +301,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/announcements': typeof AuthenticatedAnnouncementsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
@@ -296,13 +323,12 @@ export interface FileRoutesById {
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
-  '/_authenticated/order-history': typeof AuthenticatedOrderHistoryRoute
-  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/trades': typeof AuthenticatedTradesRoute
   '/_authenticated/waste-collection': typeof AuthenticatedWasteCollectionRoute
   '/_authenticated/waste-reports': typeof AuthenticatedWasteReportsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/dashboard/farmer': typeof AuthenticatedDashboardFarmerRoute
   '/_authenticated/dashboard/hotel': typeof AuthenticatedDashboardHotelRoute
   '/_authenticated/dashboard/restaurant': typeof AuthenticatedDashboardRestaurantRoute
@@ -315,8 +341,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/features'
+    | '/forgot-password'
     | '/how-it-works'
+    | '/login'
+    | '/register'
     | '/reset-password'
+    | '/verify-email'
     | '/announcements'
     | '/dashboard'
     | '/dashboard-announcements'
@@ -330,13 +360,12 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/messages'
     | '/notifications'
-    | '/order-history'
-    | '/orders'
     | '/profile'
     | '/requests'
     | '/trades'
     | '/waste-collection'
     | '/waste-reports'
+    | '/auth/callback'
     | '/dashboard/farmer'
     | '/dashboard/hotel'
     | '/dashboard/restaurant'
@@ -347,8 +376,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/features'
+    | '/forgot-password'
     | '/how-it-works'
+    | '/login'
+    | '/register'
     | '/reset-password'
+    | '/verify-email'
     | '/announcements'
     | '/dashboard'
     | '/dashboard-announcements'
@@ -362,13 +395,12 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/messages'
     | '/notifications'
-    | '/order-history'
-    | '/orders'
     | '/profile'
     | '/requests'
     | '/trades'
     | '/waste-collection'
     | '/waste-reports'
+    | '/auth/callback'
     | '/dashboard/farmer'
     | '/dashboard/hotel'
     | '/dashboard/restaurant'
@@ -380,8 +412,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/features'
+    | '/forgot-password'
     | '/how-it-works'
+    | '/login'
+    | '/register'
     | '/reset-password'
+    | '/verify-email'
     | '/_authenticated/announcements'
     | '/_authenticated/dashboard'
     | '/_authenticated/dashboard-announcements'
@@ -395,13 +431,12 @@ export interface FileRouteTypes {
     | '/_authenticated/marketplace'
     | '/_authenticated/messages'
     | '/_authenticated/notifications'
-    | '/_authenticated/order-history'
-    | '/_authenticated/orders'
     | '/_authenticated/profile'
     | '/_authenticated/requests'
     | '/_authenticated/trades'
     | '/_authenticated/waste-collection'
     | '/_authenticated/waste-reports'
+    | '/auth/callback'
     | '/_authenticated/dashboard/farmer'
     | '/_authenticated/dashboard/hotel'
     | '/_authenticated/dashboard/restaurant'
@@ -411,15 +446,26 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -427,11 +473,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/how-it-works': {
       id: '/how-it-works'
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features': {
@@ -476,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/waste-reports': {
       id: '/_authenticated/waste-reports'
       path: '/waste-reports'
@@ -509,20 +583,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/orders': {
-      id: '/_authenticated/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/order-history': {
-      id: '/_authenticated/order-history'
-      path: '/order-history'
-      fullPath: '/order-history'
-      preLoaderRoute: typeof AuthenticatedOrderHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notifications': {
@@ -673,8 +733,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
-  AuthenticatedOrderHistoryRoute: typeof AuthenticatedOrderHistoryRoute
-  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedTradesRoute: typeof AuthenticatedTradesRoute
@@ -697,8 +755,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
-  AuthenticatedOrderHistoryRoute: AuthenticatedOrderHistoryRoute,
-  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedTradesRoute: AuthenticatedTradesRoute,
@@ -709,15 +765,29 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

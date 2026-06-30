@@ -78,9 +78,6 @@ export function SiteHeader() {
                   <LayoutDashboard className="mr-1.5 h-4 w-4" /> {t("nav.openApp")}
                 </Link>
               </Button>
-              <Button asChild size="sm" variant="outline" className="border-primary/40 text-primary hover:bg-primary/10">
-                <Link to="/requests">{t("nav.myRequests")}</Link>
-              </Button>
               <Button size="sm" variant="ghost" className="border border-primary/20 text-slate-700 hover:bg-secondary/10 hover:text-primary" onClick={async () => { await signOut(); navigate({ to: "/" }); }}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -123,9 +120,6 @@ export function SiteHeader() {
               <>
                 <Link to="/profile" search={{ userId: undefined }} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm text-foreground hover:bg-secondary">
                   {t("nav.myProfile")}
-                </Link>
-                <Link to="/requests" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm text-foreground hover:bg-secondary">
-                  {t("nav.myRequests")}
                 </Link>
                 <Link to="/messages" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground">
                   {t("nav.openApp")}

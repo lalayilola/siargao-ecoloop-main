@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { confirmUserEmail } from "@/lib/api/auth.functions";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Container, PageHero } from "@/components/Section";
@@ -13,8 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Leaf, Eye, EyeOff } from "lucide-react";
+import { Leaf, Eye, EyeOff, Upload, X, AlertCircle } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
 export const Route = createFileRoute("/auth")({
@@ -111,8 +111,13 @@ function GoogleButton() {
       onClick={async () => {
         setBusy(true);
         try {
-          const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-          if (r.error) toast.error(r.error.message || t("auth.googleSignInFailed"));
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: `${window.location.origin}/auth/callback`,
+            },
+          });
+          if (error) toast.error(error.message || t("auth.googleSignInFailed"));
         } catch (error) {
           toast.error(getSupabaseErrorMessage(error, t("auth.googleSignInFailed")));
         } finally {
@@ -150,11 +155,15 @@ async function signInOrCreateAccount(email: string, password: string) {
 
 function LoginForm() {
   const { t } = useLanguage();
+  const { user, profile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
+  const [showIdUploadModal, setShowIdUploadModal] = useState(false);
+  const [governmentIdFile, setGovernmentIdFile] = useState<File | null>(null);
+  const [uploadingId, setUploadingId] = useState(false);
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
 
   useEffect(() => {
@@ -171,65 +180,168 @@ function LoginForm() {
     return () => window.clearTimeout(timeout);
   }, [cooldownUntil]);
 
+  // Check if user needs to upload government ID
+  useEffect(() => {
+    if (user && profile && !profile.government_id_url) {
+      setShowIdUploadModal(true);
+    }
+  }, [user, profile]);
+
+  const handleIdUpload = async () => {
+    if (!governmentIdFile || !user || !user.email) return;
+    setUploadingId(true);
+    try {
+      const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
+      const fileExt = governmentIdFile.name.split('.').pop();
+      const fileName = `${user.email.replace(/[@.]/g, '_')}_gov_id_${Date.now()}.${fileExt}`;
+      const filePath = `government-ids/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(filePath, governmentIdFile);
+
+      if (uploadError) {
+        toast.error(`Failed to upload government ID: ${uploadError.message}`);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await (supabase.from("profiles") as any)
+        .update({ government_id_url: publicUrl })
+        .eq("id", user.id);
+
+      if (updateError) {
+        toast.error(`Failed to update profile: ${updateError.message}`);
+        return;
+      }
+
+      toast.success("Government ID uploaded successfully");
+      setShowIdUploadModal(false);
+      setGovernmentIdFile(null);
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(`Failed to upload ID: ${error.message}`);
+    } finally {
+      setUploadingId(false);
+    }
+  };
+
   return (
-    <form
-      className="space-y-3 pt-4"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (busy || isCooldownActive) {
-          if (isCooldownActive) {
-            toast.error("Too many requests. Please wait a few minutes and try again.");
-          }
-          return;
-        }
-        setBusy(true);
-        try {
-          const normalizedEmail = email.trim().toLowerCase();
-          const result = await signInOrCreateAccount(normalizedEmail, password);
-          if (!result.ok) {
-            if (result.reason === "rate_limit") {
-              const until = activateAuthCooldown();
-              setCooldownUntil(until);
-              toast.error("Too many sign-in attempts. Please wait a few minutes and try again.");
-            } else if (result.reason === "invalid_credentials") {
-              toast.error("Incorrect email or password. If you do not have an account yet, please use Create account.");
-            } else {
-              toast.error(getSupabaseErrorMessage(result.error, t("auth.signInFailed")));
+    <>
+      <form
+        className="space-y-3 pt-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (busy || isCooldownActive) {
+            if (isCooldownActive) {
+              toast.error("Too many requests. Please wait a few minutes and try again.");
             }
-          } else {
-            toast.success(t("auth.welcomeBack"));
+            return;
           }
-        } catch (error) {
-          toast.error(getSupabaseErrorMessage(error, t("auth.signInFailed")));
-        } finally {
-          setBusy(false);
-        }
-      }}
-    >
-      <div className="space-y-1.5">
-        <Label htmlFor="li-email">{t("auth.email")}</Label>
-        <Input id="li-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="li-pw">{t("auth.password")}</Label>
-        <div className="relative">
-          <Input id="li-pw" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} className="pr-10" />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
+          setBusy(true);
+          try {
+            const normalizedEmail = email.trim().toLowerCase();
+            const result = await signInOrCreateAccount(normalizedEmail, password);
+            if (!result.ok) {
+              if (result.reason === "rate_limit") {
+                const until = activateAuthCooldown();
+                setCooldownUntil(until);
+                toast.error("Too many sign-in attempts. Please wait a few minutes and try again.");
+              } else if (result.reason === "invalid_credentials") {
+                toast.error("Incorrect email or password. If you do not have an account yet, please use Create account.");
+              } else {
+                toast.error(getSupabaseErrorMessage(result.error, t("auth.signInFailed")));
+              }
+            } else {
+              toast.success(t("auth.welcomeBack"));
+            }
+          } catch (error) {
+            toast.error(getSupabaseErrorMessage(error, t("auth.signInFailed")));
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <div className="space-y-1.5">
+          <Label htmlFor="li-email">{t("auth.email")}</Label>
+          <Input id="li-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
-      </div>
-      <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
-        {busy ? t("auth.signingIn") : isCooldownActive ? "Please wait…" : t("auth.signIn")}
-      </Button>
-      <p className="text-center text-xs text-muted-foreground">
-        <Link to="/reset-password" className="underline">{t("auth.forgotPassword")}</Link>
-      </p>
-    </form>
+        <div className="space-y-1.5">
+          <Label htmlFor="li-pw">{t("auth.password")}</Label>
+          <div className="relative">
+            <Input id="li-pw" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} className="pr-10" />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+        <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
+          {busy ? t("auth.signingIn") : isCooldownActive ? "Please wait…" : t("auth.signIn")}
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          <Link to="/reset-password" className="underline">{t("auth.forgotPassword")}</Link>
+        </p>
+      </form>
+
+      <Dialog open={showIdUploadModal} onOpenChange={setShowIdUploadModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              Government ID Required
+            </DialogTitle>
+            <DialogDescription>
+              To participate in marketplace activities, you must upload a valid government-issued ID for LGU verification.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="gov-id-upload">Upload Government ID</Label>
+              <Input 
+                id="gov-id-upload"
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setGovernmentIdFile(file);
+                  }
+                }}
+              />
+              {governmentIdFile && (
+                <p className="text-xs text-muted-foreground">Selected: {governmentIdFile.name}</p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleIdUpload}
+                disabled={!governmentIdFile || uploadingId}
+                className="flex-1"
+              >
+                {uploadingId ? "Uploading..." : "Upload ID"}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setShowIdUploadModal(false)}
+                disabled={uploadingId}
+              >
+                Skip for now
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Note: You will not be able to create listings, buy products, or participate in marketplace transactions until your ID is verified by the LGU.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -244,7 +356,9 @@ function SignupForm() {
     address: "",
     role: "resident" as "farmer" | "restaurant" | "resident" | "lgu_admin",
     municipality: "general_luna" as "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen",
+    government_id_url: "" as string | null,
   });
+  const [governmentIdFile, setGovernmentIdFile] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
@@ -284,8 +398,32 @@ function SignupForm() {
           return;
         }
 
+        if (!governmentIdFile) {
+          toast.error("Government ID is required for account verification");
+          return;
+        }
+
         setBusy(true);
         try {
+          // Upload government ID to Supabase storage
+          const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
+          const fileExt = governmentIdFile.name.split('.').pop();
+          const fileName = `${parsed.data.email.replace(/[@.]/g, '_')}_gov_id_${Date.now()}.${fileExt}`;
+          const filePath = `government-ids/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from(STORAGE_BUCKET)
+            .upload(filePath, governmentIdFile);
+
+          if (uploadError) {
+            toast.error(`Failed to upload government ID: ${uploadError.message}`);
+            return;
+          }
+
+          const { data: { publicUrl } } = supabase.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(filePath);
+
           const normalizedEmail = parsed.data.email.toLowerCase();
           const { data, error: signupError } = await supabase.auth.signUp({
             email: normalizedEmail,
@@ -298,6 +436,7 @@ function SignupForm() {
                 address: parsed.data.address,
                 role: parsed.data.role,
                 municipality: parsed.data.municipality,
+                government_id_url: publicUrl,
               },
             },
           });
@@ -446,6 +585,41 @@ function SignupForm() {
             <SelectItem value="lgu_admin">{t("auth.lguAdmin")}</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="su-gov-id">Government ID *</Label>
+        <div className="relative">
+          <Input 
+            id="su-gov-id" 
+            type="file" 
+            accept="image/*,.pdf"
+            required
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setGovernmentIdFile(file);
+              }
+            }}
+            className="cursor-pointer"
+          />
+          {governmentIdFile && (
+            <button
+              type="button"
+              onClick={() => {
+                setGovernmentIdFile(null);
+                const input = document.getElementById('su-gov-id') as HTMLInputElement;
+                if (input) input.value = '';
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        {governmentIdFile && (
+          <p className="text-xs text-muted-foreground mt-1">Selected: {governmentIdFile.name}</p>
+        )}
+        <p className="text-xs text-muted-foreground">Required for account verification by LGU</p>
       </div>
       <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
         {busy ? t("auth.creatingAccount") : isCooldownActive ? "Please wait…" : t("auth.createAccount")}

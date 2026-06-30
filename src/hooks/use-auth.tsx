@@ -18,6 +18,7 @@ export type Profile = {
   profile_picture_url: string | null;
   municipality: Municipality;
   is_super_admin: boolean;
+  government_id_url: string | null;
 };
 
 type AuthCtx = {
@@ -26,6 +27,7 @@ type AuthCtx = {
   roles: AppRole[];
   loading: boolean;
   isLguAdmin: boolean;
+  isEmailVerified: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -120,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         roles,
         loading,
         isLguAdmin: profile?.primary_role === "lgu_admin" || roles.includes("lgu_admin") || (profile?.primary_role as string | undefined) === "lgu_admin",
+        isEmailVerified: !!user?.email_confirmed_at,
         refresh,
         signOut,
       }}

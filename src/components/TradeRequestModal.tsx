@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import type { Database } from "@/integrations/supabase/types";
 
 type Listing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
@@ -21,6 +22,7 @@ interface TradeRequestModalProps {
 }
 
 export function TradeRequestModal({ open, onOpenChange, listing, userListings, user, onSuccess }: TradeRequestModalProps) {
+  const { profile } = useAuth();
   const [offeredItemId, setOfferedItemId] = useState<string>("");
   const [message, setMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -35,6 +37,12 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!listing || !user) return;
+
+    // Check if user is verified
+    if (!profile?.lgu_approved) {
+      toast.error("Your account must be verified by the LGU before you can send trade requests. Please upload your government ID and wait for verification.");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -61,7 +69,7 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
         type: "trade_request",
         title: "New Trade Request",
         message: `${user.full_name} wants to trade for your listing: ${listing.title}`,
-        link: `/marketplace`,
+        link: `/requests`,
       } as any);
 
       toast.success("Trade request sent successfully!");

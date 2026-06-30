@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import type { Database } from "@/integrations/supabase/types";
 
 type Listing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
@@ -19,6 +20,7 @@ interface BuyRequestModalProps {
 }
 
 export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }: BuyRequestModalProps) {
+  const { profile } = useAuth();
   const [message, setMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +34,12 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!listing || !user) return;
+
+    // Check if user is verified
+    if (!profile?.lgu_approved) {
+      toast.error("Your account must be verified by the LGU before you can purchase products. Please upload your government ID and wait for verification.");
+      return;
+    }
 
     if (quantity <= 0 || quantity > (listing.kg ?? 0)) {
       toast.error("Enter a valid quantity that does not exceed the available stock.");
@@ -68,7 +76,7 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
         type: "purchase_request",
         title: "New Purchase Request",
         message: `${user.full_name} wants to buy your listing: ${listing.title}`,
-        link: `/marketplace`,
+        link: `/requests`,
       } as any);
 
       try {

@@ -138,56 +138,6 @@ export interface Database {
           updated_at?: string
         }
       }
-      produce_orders: {
-        Row: {
-          id: string
-          produce_id: string
-          farmer_id: string
-          farmer_name: string
-          buyer_id: string
-          buyer_name: string
-          buyer_type: 'hotel' | 'restaurant' | 'cafe'
-          quantity_kg: number
-          total_price: number
-          status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-          order_date: string
-          delivery_date: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          produce_id: string
-          farmer_id: string
-          farmer_name: string
-          buyer_id: string
-          buyer_name: string
-          buyer_type: 'hotel' | 'restaurant' | 'cafe'
-          quantity_kg: number
-          total_price: number
-          status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-          order_date: string
-          delivery_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          produce_id?: string
-          farmer_id?: string
-          farmer_name?: string
-          buyer_id?: string
-          buyer_name?: string
-          buyer_type?: 'hotel' | 'restaurant' | 'cafe'
-          quantity_kg?: number
-          total_price?: number
-          status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-          order_date?: string
-          delivery_date?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
       trades: {
         Row: {
           id: string
@@ -504,7 +454,7 @@ export interface Database {
           longitude?: number | null
           location_name?: string | null
           location_address?: string | null
-          post_type?: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'compost' | 'lgu_announcement' | 'sustainability_tip'
+          post_type?: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'lgu_announcement' | 'sustainability_tip'
           created_at?: string
           updated_at?: string
         }
@@ -524,7 +474,7 @@ export interface Database {
           longitude?: number | null
           location_name?: string | null
           location_address?: string | null
-          post_type?: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'compost' | 'lgu_announcement' | 'sustainability_tip'
+          post_type?: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'lgu_announcement' | 'sustainability_tip'
           created_at?: string
           updated_at?: string
         }
@@ -584,7 +534,7 @@ export interface Database {
           user_id: string
           title: string
           message: string
-          type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general' | 'order_received' | 'order_approved'
+          type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general'
           link: string | null
           read_at: string | null
           created_at: string
@@ -594,7 +544,7 @@ export interface Database {
           user_id: string
           title: string
           message: string
-          type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general' | 'order_received' | 'order_approved'
+          type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general'
           link?: string | null
           read_at?: string | null
           created_at?: string
@@ -604,7 +554,7 @@ export interface Database {
           user_id?: string
           title?: string
           message?: string
-          type?: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general' | 'order_received' | 'order_approved'
+          type?: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general'
           link?: string | null
           read_at?: string | null
           created_at?: string
@@ -729,6 +679,108 @@ export interface Database {
           earned_at?: string
         }
       }
+      profiles: {
+        Row: {
+          id: string
+          full_name: string
+          phone: string
+          barangay: string
+          address: string | null
+          primary_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          profile_picture_url: string | null
+          lgu_approved: boolean
+          government_id_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          full_name: string
+          phone: string
+          barangay: string
+          address?: string | null
+          primary_role: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          profile_picture_url?: string | null
+          lgu_approved?: boolean
+          government_id_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string
+          phone?: string
+          barangay?: string
+          address?: string | null
+          primary_role?: 'farmer' | 'hotel_restaurant' | 'resident' | 'lgu_admin'
+          profile_picture_url?: string | null
+          lgu_approved?: boolean
+          government_id_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      conversations: {
+        Row: {
+          id: string
+          participant_1_id: string
+          participant_2_id: string
+          trade_request_id: string | null
+          purchase_request_id: string | null
+          listing_id: string | null
+          updated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          participant_1_id: string
+          participant_2_id: string
+          trade_request_id?: string | null
+          purchase_request_id?: string | null
+          listing_id?: string | null
+          updated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          participant_1_id?: string
+          participant_2_id?: string
+          trade_request_id?: string | null
+          purchase_request_id?: string | null
+          listing_id?: string | null
+          updated_at?: string
+          created_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          image_url: string | null
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          image_url?: string | null
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          sender_id?: string
+          content?: string
+          image_url?: string | null
+          read_at?: string | null
+          created_at?: string
+        }
+      }
     }
     Enums: {
       trade_status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
@@ -737,7 +789,7 @@ export interface Database {
       listing_kind: 'produce' | 'waste' | 'compost'
       transaction_type: 'sell_only' | 'barter_only' | 'sell_and_barter'
       post_type: 'farmer_produce' | 'hotel_update' | 'food_waste' | 'lgu_announcement' | 'sustainability_tip'
-      notification_type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general' | 'order_received' | 'order_approved'
+      notification_type: 'trade_request' | 'purchase_request' | 'waste_collection' | 'announcement' | 'general'
       priority: 'low' | 'medium' | 'high'
       target_audience: 'all' | 'farmers' | 'hotels' | 'lgu'
       reaction_type: 'like' | 'love' | 'helpful' | 'support'

@@ -14,16 +14,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CircularEconomyWorkflow } from "@/components/CircularEconomyWorkflow";
+import { Database } from "@/integrations/supabase/types";
 
 export function HotelDashboard() {
   const { user, profile } = useAuth();
   const [stats, setStats] = useState({
-    produceOrders: 0,
     wasteSubmitted: 0,
     collectionRequests: 0,
     sustainabilityScore: 75,
   });
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<Database['public']['Tables']['waste_collections']['Row'][]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +33,7 @@ export function HotelDashboard() {
         const [{ data: wasteReports, error: wasteError }, { data: collections, error: collectionsError }] = await Promise.all([
           supabase.from("food_waste_reports").select("*").eq("hotel_restaurant_id", user.id),
           supabase.from("waste_collections").select("*").order("created_at", { ascending: false }).limit(5),
-        ]);
+        ]) as [{ data: any, error: any }, { data: Database['public']['Tables']['waste_collections']['Row'][] | null, error: any }];
 
         if (wasteError) {
           console.error("Error loading waste reports:", wasteError);
@@ -45,7 +45,6 @@ export function HotelDashboard() {
         const pendingCollections = (collections ?? []).filter((c) => c.status === "scheduled");
 
         setStats({
-          produceOrders: 0,
           wasteSubmitted: (wasteReports ?? []).length,
           collectionRequests: pendingCollections.length,
           sustainabilityScore: 75,
@@ -61,14 +60,6 @@ export function HotelDashboard() {
   }, [user]);
 
   const statCards = [
-    {
-      title: "Produce Orders",
-      value: stats.produceOrders,
-      icon: ShoppingCart,
-      color: "text-green-600",
-      bgColor: "bg-green-500/10",
-      link: "/marketplace",
-    },
     {
       title: "Waste Submitted",
       value: `${stats.wasteSubmitted} kg`,
@@ -110,7 +101,7 @@ export function HotelDashboard() {
     },
   ];
 
-  if (!profile || profile.primary_role !== "hotel_restaurant") {
+  if (!profile || profile.primary_role !== "restaurant") {
     return (
       <Container className="py-12">
         <Card className="p-8 text-center border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10">

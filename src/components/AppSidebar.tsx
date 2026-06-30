@@ -24,9 +24,7 @@ const memberItems = [
   { to: "/announcements", label: "Announcements", icon: Megaphone },
 ];
 
-const farmerItems = [
-  { to: "/orders", label: "Orders", icon: ShoppingCart },
-];
+const farmerItems: Array<{ to: string; label: string; icon: any }> = [];
 
 const hotelItems = [
   { to: "/dashboard/hotel", label: "Dashboard", icon: LayoutDashboard },
@@ -46,7 +44,7 @@ export function AppSidebar() {
   const isActive = (p: string) => path === p;
 
   const isFarmer = profile?.primary_role === "farmer";
-  const isHotel = profile?.primary_role === "hotel_restaurant";
+  const isHotel = profile?.primary_role === "restaurant";
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
@@ -134,26 +132,6 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {isFarmer && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-green-700 font-semibold">Farmer Portal</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {farmerItems.map((it) => (
-                  <SidebarMenuItem key={it.to}>
-                    <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                      <Link to={it.to} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
-                        <it.icon className="h-4 w-4" />
-                        <span>{it.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

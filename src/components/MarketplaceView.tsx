@@ -269,6 +269,12 @@ export function MarketplaceView() {
       return;
     }
 
+    // Check if user is verified
+    if (!profile.lgu_approved) {
+      toast.error("Your account must be verified by the LGU before you can create listings. Please upload your government ID and wait for verification.");
+      return;
+    }
+
     let imageUrls: string[] = [];
     if (files.length > 0) {
       setUploading(true);
@@ -698,7 +704,7 @@ export function MarketplaceView() {
                     ? "Farmers can publish fresh produce only."
                     : profile?.primary_role === "lgu_admin"
                       ? "LGU staff cannot create listings."
-                      : profile?.primary_role === "hotel_restaurant"
+                      : profile?.primary_role === "restaurant"
                         ? "Hotels/Restaurants can post waste listings only."
                         : "Farmers can publish fresh produce or waste available for barter or pickup."}
                 </p>
@@ -767,7 +773,7 @@ export function MarketplaceView() {
                           <Label htmlFor="restaurant-food-waste" className="text-sm">Restaurant Food Waste</Label>
                         </div>
                       </>
-                    ) : profile?.primary_role === "hotel_restaurant" ? (
+                    ) : profile?.primary_role === "restaurant" ? (
                       <>
                         <div className="flex items-center space-x-2">
                           <Checkbox
@@ -1051,7 +1057,7 @@ export function MarketplaceView() {
         onOpenChange={setShowTradeModal}
         listing={selectedListing}
         userListings={userListings}
-        user={user ? { id: user.id, full_name: profile?.full_name || "", primary_role: profile?.primary_role || "resident" } : null}
+        user={user ? { id: user.id, full_name: profile?.full_name || "", primary_role: (profile?.primary_role || "resident") as Database["public"]["Enums"]["role"] } : null}
         onSuccess={() => {
           toast.success("Trade request sent successfully!");
         }}
@@ -1061,7 +1067,7 @@ export function MarketplaceView() {
         open={showBuyModal}
         onOpenChange={setShowBuyModal}
         listing={selectedListing}
-        user={user ? { id: user.id, full_name: profile?.full_name || "", primary_role: profile?.primary_role || "resident" } : null}
+        user={user ? { id: user.id, full_name: profile?.full_name || "", primary_role: (profile?.primary_role || "resident") as Database["public"]["Enums"]["role"] } : null}
         onSuccess={() => {
           toast.success("Purchase request sent successfully!");
         }}

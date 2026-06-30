@@ -20,37 +20,27 @@ type WasteCollection = Database["public"]["Tables"]["waste_collections"]["Row"];
 export function RestaurantDashboard() {
   const { user, profile } = useAuth();
   const [stats, setStats] = useState({
-    totalOrders: 0,
-    pendingOrders: 0,
-    completedOrders: 0,
     wasteReports: 0,
     collectionRequests: 0,
   });
-  const [recentActivity, setRecentActivity] = useState<PurchaseRequest[]>([]);
+  const [recentActivity, setRecentActivity] = useState<WasteReport[]>([]);
 
   useEffect(() => {
     if (!user) return;
 
     const loadDashboardData = async () => {
       try {
-        const { data: purchaseData, error: purchaseError } = await supabase
-          .from("purchase_requests")
-          .select("*")
-          .eq("buyer_user_id", user.id);
-
         const { data: reportData, error: reportError } = await supabase
           .from("food_waste_reports")
           .select("*")
-          .eq("hotel_restaurant_id", user.id);
+          .eq("hotel_restaurant_id", user.id)
+          .returns<WasteReport[]>();
 
         const reportIds = (reportData ?? []).map((report) => report.id);
         const { data: collectionData, error: collectionError } = reportIds.length
           ? await supabase.from("waste_collections").select("*").in("waste_report_id", reportIds)
           : { data: [], error: null };
 
-        if (purchaseError) {
-          console.error("Error loading purchase requests:", purchaseError);
-        }
         if (reportError) {
           console.error("Error loading waste reports:", reportError);
         }
@@ -58,18 +48,11 @@ export function RestaurantDashboard() {
           console.error("Error loading waste collections:", collectionError);
         }
 
-        const purchaseList = purchaseData ?? [];
-        const pendingOrders = purchaseList.filter((p) => p.status === "pending");
-        const completedOrders = purchaseList.filter((p) => p.status === "completed");
-
         setStats({
-          totalOrders: purchaseList.length,
-          pendingOrders: pendingOrders.length,
-          completedOrders: completedOrders.length,
           wasteReports: reportData?.length || 0,
           collectionRequests: collectionData?.length || 0,
         });
-        setRecentActivity(purchaseList.slice(0, 5));
+        setRecentActivity(reportData?.slice(0, 5) || []);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
         toast.error("Could not load restaurant dashboard data.");
@@ -81,20 +64,20 @@ export function RestaurantDashboard() {
 
   const statCards = [
     {
-      title: "Pending Orders",
-      value: stats.pendingOrders,
+      title: "Waste Reports",
+      value: stats.wasteReports,
+      icon: Leaf,
+      color: "text-green-600",
+      bgColor: "bg-green-500/10",
+      link: "/waste-reports",
+    },
+    {
+      title: "Collection Requests",
+      value: stats.collectionRequests,
       icon: Package,
       color: "text-blue-600",
       bgColor: "bg-blue-500/10",
-      link: "/trades",
-    },
-    {
-      title: "Completed Orders",
-      value: stats.completedOrders,
-      icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-500/10",
-      link: "/trades",
+      link: "/waste-collections",
     },
   ];
 
@@ -181,9 +164,9 @@ export function RestaurantDashboard() {
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-medium text-slate-900">Order from farmer</p>
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        activity.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                        activity.status === "accepted" ? "bg-green-100 text-green-800" :
-                        activity.status === "completed" ? "bg-blue-100 text-blue-800" :
+                        activity.status === "scheduled" ? "bg-yellow-100 text-yellow-800" :
+                        activity.status === "collected" ? "bg-green-100 text-green-800" :
+                        activity.status === "processed" ? "bg-blue-100 text-blue-800" :
                         "bg-slate-100 text-slate-800"
                       }`}>
                         {activity.status}

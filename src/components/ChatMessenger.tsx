@@ -71,12 +71,29 @@ export function ChatMessenger({
         .single();
 
       if (!error && data) {
-        setOtherUserPictureUrl(data.profile_picture_url);
+        setOtherUserPictureUrl((data as { profile_picture_url: string | null }).profile_picture_url);
       }
     };
 
     loadOtherUserProfile();
   }, [otherUserId]);
+
+  const loadMessages = async (convId: string) => {
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", convId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error loading messages:", error);
+      return;
+    }
+
+    setMessages(data ?? []);
+    scrollToBottom();
+    markMessagesAsRead(data ?? []);
+  };
 
   useEffect(() => {
     if (!open || !user) return;
@@ -93,7 +110,7 @@ export function ChatMessenger({
           .from("conversations")
           .select("*")
           .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`)
-          .single();
+          .single<Conversation>();
 
         if (existingConv) {
           setConversationId(existingConv.id);
@@ -110,11 +127,11 @@ export function ChatMessenger({
             listing_id: listingId || null,
             participant_1_id: user.id,
             participant_2_id: otherUserId,
-          })
+          } as any)
           .select()
-          .single();
+          .single() as { data: Conversation | null; error: any };
 
-        if (convError) {
+        if (convError || !newConv) {
           toast.error("Failed to create conversation");
           return;
         }
@@ -130,23 +147,6 @@ export function ChatMessenger({
   useEffect(() => {
     if (!conversationId) return;
 
-    const loadMessages = async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Error loading messages:", error);
-        return;
-      }
-
-      setMessages(data ?? []);
-      scrollToBottom();
-      markMessagesAsRead(data ?? []);
-    };
-
     const loadConversation = async () => {
       const { data, error } = await supabase
         .from("conversations")
@@ -159,10 +159,8 @@ export function ChatMessenger({
       }
     };
 
-    loadMessages();
+    loadMessages(conversationId);
     loadConversation();
-
-    loadMessages();
 
     // Set up real-time subscription
     const channel = supabase
@@ -202,10 +200,13 @@ export function ChatMessenger({
   };
 
   const markMessageAsRead = async (messageId: string) => {
-    await supabase
-      .from("messages")
+    const { error } = await (supabase.from("messages") as any)
       .update({ read_at: new Date().toISOString() })
       .eq("id", messageId);
+
+    if (error) {
+      console.error("Error marking message as read:", error);
+    }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -224,14 +225,20 @@ export function ChatMessenger({
         imageUrl = publicData.publicUrl;
       }
 
-      const { error } = await supabase.from("messages").insert({
+      const { data: insertedMessage, error } = await (supabase.from("messages") as any).insert({
         conversation_id: conversationId,
         sender_id: user.id,
         content: newMessage.trim() || "",
         image_url: imageUrl,
-      });
+      }).select().single() as { data: Message | null; error: any };
 
       if (error) throw error;
+
+      // Immediately add the new message to the messages state
+      if (insertedMessage) {
+        setMessages((prev) => [...prev, insertedMessage]);
+        scrollToBottom();
+      }
 
       const recipientId = otherUserId ??
         (conversation?.participant_1_id === user.id ? conversation.participant_2_id : conversation?.participant_1_id);
@@ -239,12 +246,12 @@ export function ChatMessenger({
       if (recipientId && recipientId !== user.id) {
         const title = `${profile?.full_name ?? "Someone"} sent you a message`;
         const messagePreview = newMessage.trim().slice(0, 120) || "You have a new message.";
-        await supabase.from("notifications").insert({
+        await (supabase.from("notifications") as any).insert({
           user_id: recipientId,
           type: "message",
           title,
           message: messagePreview,
-          link: `/profile?userId=${user.id}`,
+          link: `/messages`,
         });
       }
 
@@ -281,8 +288,7 @@ export function ChatMessenger({
       return;
     }
 
-    const { error } = await supabase
-      .from("messages")
+    const { error } = await (supabase.from("messages") as any)
       .update({ content: editContent.trim() })
       .eq("id", editingMessageId);
 

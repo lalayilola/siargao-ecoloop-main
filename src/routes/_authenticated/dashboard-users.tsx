@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { UserCheck, Search, AlertCircle } from "lucide-react";
+import { UserCheck, Search, AlertCircle, X, FileText, Calendar, MapPin, Phone, Shield, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard-users")({
@@ -24,6 +25,7 @@ type UserProfile = {
   address: string | null;
   primary_role: string;
   lgu_approved: boolean | null;
+  government_id_url: string | null;
   created_at: string;
   profile_picture_url: string | null;
   municipality: string | null;
@@ -37,6 +39,7 @@ function UserManagement() {
   const [filterRole, setFilterRole] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     if (!isLguAdmin || !profile?.municipality) return;
@@ -44,12 +47,13 @@ function UserManagement() {
   }, [isLguAdmin, profile?.municipality]);
 
   const loadUsers = async () => {
+    if (!profile?.municipality) return;
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("municipality", profile?.municipality)
+        .eq("municipality", profile.municipality)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -90,8 +94,8 @@ function UserManagement() {
   const filteredUsers = users.filter((user) => {
     const matchesRole = filterRole === "all" || user.primary_role === filterRole;
     const matchesStatus = filterStatus === "all" ||
-      (filterStatus === "approved" && user.lgu_approved) ||
-      (filterStatus === "pending" && !user.lgu_approved && user.primary_role === "lgu_admin");
+      (filterStatus === "verified" && user.lgu_approved) ||
+      (filterStatus === "unverified" && !user.lgu_approved);
     const matchesSearch = searchQuery === "" ||
       user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.barangay && user.barangay.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -148,8 +152,8 @@ function UserManagement() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="pending">Pending Approval</SelectItem>
+              <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="unverified">Not Verified</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -193,7 +197,11 @@ function UserManagement() {
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <div key={user.id} className="border rounded-lg p-4 hover:border-primary/30 transition-colors">
+              <div 
+                key={user.id} 
+                className="border rounded-lg p-4 hover:border-primary/30 transition-colors cursor-pointer"
+                onClick={() => setSelectedUser(user)}
+              >
                 <div className="flex items-start gap-4">
                   <div className="h-12 w-12 rounded-full overflow-hidden bg-primary/10 border-2 border-primary/40 flex-shrink-0">
                     {user.profile_picture_url ? (
@@ -208,50 +216,9 @@ function UserManagement() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-semibold">{user.full_name}</h3>
                       <Badge className={getRoleColor(user.primary_role)}>{getRoleLabel(user.primary_role)}</Badge>
-                      {user.primary_role === "lgu_admin" && (
-                        <Badge className={user.lgu_approved ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"}>
-                          {user.lgu_approved ? "Approved" : "Pending"}
-                        </Badge>
-                      )}
-                      {user.primary_role === "lgu_admin" && !user.lgu_approved && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="h-7 text-xs bg-green-600 hover:bg-green-700"
-                            onClick={async () => {
-                              try {
-                                const { error } = await (supabase.from("profiles") as any)
-                                  .update({ lgu_approved: true })
-                                  .eq("id", user.id);
-                                if (error) throw error;
-                                toast.success("LGU account approved");
-                                void loadUsers();
-                              } catch (error: any) {
-                                toast.error(`Failed to approve: ${error.message}`);
-                              }
-                            }}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="h-7 text-xs"
-                            onClick={async () => {
-                              try {
-                                const { error } = await supabase.from("profiles").delete().eq("id", user.id);
-                                if (error) throw error;
-                                toast.success("LGU account rejected and deleted");
-                                void loadUsers();
-                              } catch (error: any) {
-                                toast.error(`Failed to reject: ${error.message}`);
-                              }
-                            }}
-                          >
-                            Reject
-                          </Button>
-                        </div>
-                      )}
+                      <Badge className={user.lgu_approved ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"}>
+                        {user.lgu_approved ? "Verified" : "Not Verified"}
+                      </Badge>
                     </div>
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <span>{user.phone || "No phone number"}</span>
@@ -265,6 +232,135 @@ function UserManagement() {
           </div>
         )}
       </Card>
+
+      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>User Profile Details</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="h-20 w-20 rounded-full overflow-hidden bg-primary/10 border-2 border-primary/40 flex-shrink-0">
+                  {selectedUser.profile_picture_url ? (
+                    <img src={selectedUser.profile_picture_url} alt={selectedUser.full_name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center font-semibold text-primary text-2xl">
+                      {selectedUser.full_name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold">{selectedUser.full_name}</h3>
+                  <Badge className={getRoleColor(selectedUser.primary_role)} mt-2>{getRoleLabel(selectedUser.primary_role)}</Badge>
+                  <Badge className={selectedUser.lgu_approved ? "bg-green-100 text-green-700 border-green-200 ml-2" : "bg-yellow-100 text-yellow-700 border-yellow-200 ml-2"}>
+                    {selectedUser.lgu_approved ? "Verified" : "Not Verified"}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm">{selectedUser.phone || "No phone number"}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm">{selectedUser.barangay || "No barangay"}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm">{selectedUser.address || "No address provided"}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm">Registered: {new Date(selectedUser.created_at).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Government ID
+                </h4>
+                {selectedUser.government_id_url ? (
+                  <div className="space-y-3">
+                    <img 
+                      src={selectedUser.government_id_url} 
+                      alt="Government ID" 
+                      className="w-full max-w-md rounded-lg border" 
+                    />
+                    <a 
+                      href={selectedUser.government_id_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary underline"
+                    >
+                      Open ID in new tab
+                    </a>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No government ID uploaded</p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t">
+                {selectedUser.lgu_approved ? (
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const { error } = await (supabase.from("profiles") as any)
+                          .update({ lgu_approved: false })
+                          .eq("id", selectedUser.id);
+                        if (error) throw error;
+                        toast.success("User verification revoked");
+                        void loadUsers();
+                        setSelectedUser({ ...selectedUser, lgu_approved: false });
+                      } catch (error: any) {
+                        toast.error(`Failed to revoke verification: ${error.message}`);
+                      }
+                    }}
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Unverify
+                  </Button>
+                ) : (
+                  <Button
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const { error } = await (supabase.from("profiles") as any)
+                          .update({ lgu_approved: true })
+                          .eq("id", selectedUser.id);
+                        if (error) throw error;
+                        toast.success("User verified successfully");
+                        void loadUsers();
+                        setSelectedUser({ ...selectedUser, lgu_approved: true });
+                      } catch (error: any) {
+                        toast.error(`Failed to verify: ${error.message}`);
+                      }
+                    }}
+                  >
+                    <ShieldCheck className="h-4 w-4 mr-2" />
+                    Verify
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedUser(null)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 }
