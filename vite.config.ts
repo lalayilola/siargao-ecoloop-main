@@ -18,7 +18,6 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks: {
-            'react-vendor': ['react', 'react-dom'],
             'radix-vendor': [
               '@radix-ui/react-accordion',
               '@radix-ui/react-alert-dialog',
@@ -47,7 +46,6 @@ export default defineConfig({
               '@radix-ui/react-toggle-group',
               '@radix-ui/react-tooltip',
             ],
-            'tanstack-vendor': ['@tanstack/react-query', '@tanstack/react-router'],
             'supabase-vendor': ['@supabase/supabase-js'],
             'recharts-vendor': ['recharts'],
             'leaflet-vendor': ['leaflet', 'react-leaflet'],
