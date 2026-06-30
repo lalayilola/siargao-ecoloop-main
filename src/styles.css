@@ -3,8 +3,9 @@
 
 /* @theme is a valid Tailwind CSS v4 at-rule */
 /* eslint-disable-next-line at-rule-no-unknown */
+/* eslint-disable-next-line */
+@variant dark (&:is(.dark *));
 @theme inline {
-  @variant dark (&:is(.dark *));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
