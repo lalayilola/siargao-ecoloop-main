@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Leaf, LayoutDashboard, Newspaper, Store, Calendar, ArrowLeftRight, User as UserIcon, LogOut, Home, MessageCircle, Sprout, TreePine, Recycle, Bell, Megaphone, FileText, Package, ShoppingCart, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,11 +41,18 @@ export function AppSidebar() {
   const { profile, isLguAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const isActive = (p: string) => path === p;
 
   const isFarmer = profile?.primary_role === "farmer";
   const isHotel = profile?.primary_role === "restaurant";
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
@@ -56,7 +64,7 @@ export function AppSidebar() {
           <Sprout className="h-6 w-6 text-primary" />
         </div>
         <div className="flex items-center justify-between px-4 py-4">
-          <Link to="/" className="flex items-center gap-3 rounded-b-3xl relative z-10">
+          <Link to="/" onClick={handleLinkClick} className="flex items-center gap-3 rounded-b-3xl relative z-10">
             <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-primary to-green-600 text-white shadow-lg animate-pulse">
               <Leaf className="h-6 w-6" />
             </span>
@@ -76,7 +84,7 @@ export function AppSidebar() {
               {memberItems.map((it) => (
                 <SidebarMenuItem key={it.to}>
                   <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                    <Link to={it.to} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <it.icon className="h-4 w-4" />
                       <span>{it.label}</span>
                     </Link>
@@ -94,7 +102,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard")}>
-                    <Link to="/dashboard" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to="/dashboard" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <LayoutDashboard />
                       <span>Dashboard</span>
                     </Link>
@@ -102,7 +110,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-diversion")}>
-                    <Link to="/dashboard-diversion" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to="/dashboard-diversion" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <Recycle />
                       <span>Transactions Dashboard</span>
                     </Link>
@@ -110,7 +118,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-users")}>
-                    <Link to="/dashboard-users" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to="/dashboard-users" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <UserIcon />
                       <span>Members Dashboard</span>
                     </Link>
@@ -118,7 +126,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-announcements")}>
-                    <Link to="/dashboard-announcements" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to="/dashboard-announcements" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <Megaphone />
                       <span>Announcements</span>
                     </Link>
@@ -126,7 +134,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-reports")}>
-                    <Link to="/dashboard-reports" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link to="/dashboard-reports" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <FileText />
                       <span>Reports</span>
                     </Link>
@@ -145,7 +153,7 @@ export function AppSidebar() {
                 {hotelItems.map((it) => (
                   <SidebarMenuItem key={it.to}>
                     <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                      <Link to={it.to} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                      <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                         <it.icon className="h-4 w-4" />
                         <span>{it.label}</span>
                       </Link>

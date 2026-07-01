@@ -22,14 +22,14 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full overflow-hidden">
         <AppSidebar />
         <SidebarInset className="flex-1">
           <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border/60 bg-background/85 px-3 backdrop-blur">
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
           </header>
-          <main className="flex-1">
+          <main className="flex-1 overflow-hidden">
             <Outlet />
           </main>
         </SidebarInset>

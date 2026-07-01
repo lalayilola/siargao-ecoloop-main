@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "EcoLoop Siargao — Food Waste Exchange & Sustainable Farming" },
       { name: "description", content: "A circular economy platform connecting Siargao farmers, restaurants, residents, and LGUs to turn food waste into local harvest." },
       { name: "author", content: "EcoLoop Siargao" },
@@ -193,14 +193,14 @@ function Shell() {
 function PublicInsideAppShell() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full overflow-hidden">
         <AppSidebar />
         <SidebarInset className="flex-1">
           <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border/60 bg-background/85 px-3 backdrop-blur">
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
           </header>
-          <main className="flex-1"><Outlet /></main>
+          <main className="flex-1 overflow-hidden"><Outlet /></main>
         </SidebarInset>
       </div>
     </SidebarProvider>
