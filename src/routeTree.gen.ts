@@ -32,11 +32,9 @@ import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedGisMapRouteImport } from './routes/_authenticated/gis-map'
-import { Route as AuthenticatedFeedRouteImport } from './routes/_authenticated/feed'
 import { Route as AuthenticatedEcoPointsRouteImport } from './routes/_authenticated/eco-points'
 import { Route as AuthenticatedDashboardUsersRouteImport } from './routes/_authenticated/dashboard-users'
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated/dashboard-reports'
-import { Route as AuthenticatedDashboardDiversionRouteImport } from './routes/_authenticated/dashboard-diversion'
 import { Route as AuthenticatedDashboardAnnouncementsRouteImport } from './routes/_authenticated/dashboard-announcements'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAnnouncementsRouteImport } from './routes/_authenticated/announcements'
@@ -162,11 +160,6 @@ const AuthenticatedGisMapRoute = AuthenticatedGisMapRouteImport.update({
   path: '/gis-map',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedFeedRoute = AuthenticatedFeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedEcoPointsRoute = AuthenticatedEcoPointsRouteImport.update({
   id: '/eco-points',
   path: '/eco-points',
@@ -182,12 +175,6 @@ const AuthenticatedDashboardReportsRoute =
   AuthenticatedDashboardReportsRouteImport.update({
     id: '/dashboard-reports',
     path: '/dashboard-reports',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardDiversionRoute =
-  AuthenticatedDashboardDiversionRouteImport.update({
-    id: '/dashboard-diversion',
-    path: '/dashboard-diversion',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardAnnouncementsRoute =
@@ -241,11 +228,9 @@ export interface FileRoutesByFullPath {
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
-  '/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
   '/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/eco-points': typeof AuthenticatedEcoPointsRoute
-  '/feed': typeof AuthenticatedFeedRoute
   '/gis-map': typeof AuthenticatedGisMapRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
@@ -276,11 +261,9 @@ export interface FileRoutesByTo {
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
-  '/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
   '/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/eco-points': typeof AuthenticatedEcoPointsRoute
-  '/feed': typeof AuthenticatedFeedRoute
   '/gis-map': typeof AuthenticatedGisMapRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
@@ -313,11 +296,9 @@ export interface FileRoutesById {
   '/_authenticated/announcements': typeof AuthenticatedAnnouncementsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
-  '/_authenticated/dashboard-diversion': typeof AuthenticatedDashboardDiversionRoute
   '/_authenticated/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/_authenticated/eco-points': typeof AuthenticatedEcoPointsRoute
-  '/_authenticated/feed': typeof AuthenticatedFeedRoute
   '/_authenticated/gis-map': typeof AuthenticatedGisMapRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
@@ -350,11 +331,9 @@ export interface FileRouteTypes {
     | '/announcements'
     | '/dashboard'
     | '/dashboard-announcements'
-    | '/dashboard-diversion'
     | '/dashboard-reports'
     | '/dashboard-users'
     | '/eco-points'
-    | '/feed'
     | '/gis-map'
     | '/inventory'
     | '/marketplace'
@@ -385,11 +364,9 @@ export interface FileRouteTypes {
     | '/announcements'
     | '/dashboard'
     | '/dashboard-announcements'
-    | '/dashboard-diversion'
     | '/dashboard-reports'
     | '/dashboard-users'
     | '/eco-points'
-    | '/feed'
     | '/gis-map'
     | '/inventory'
     | '/marketplace'
@@ -421,11 +398,9 @@ export interface FileRouteTypes {
     | '/_authenticated/announcements'
     | '/_authenticated/dashboard'
     | '/_authenticated/dashboard-announcements'
-    | '/_authenticated/dashboard-diversion'
     | '/_authenticated/dashboard-reports'
     | '/_authenticated/dashboard-users'
     | '/_authenticated/eco-points'
-    | '/_authenticated/feed'
     | '/_authenticated/gis-map'
     | '/_authenticated/inventory'
     | '/_authenticated/marketplace'
@@ -620,13 +595,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGisMapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/feed': {
-      id: '/_authenticated/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof AuthenticatedFeedRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/eco-points': {
       id: '/_authenticated/eco-points'
       path: '/eco-points'
@@ -646,13 +614,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard-reports'
       fullPath: '/dashboard-reports'
       preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard-diversion': {
-      id: '/_authenticated/dashboard-diversion'
-      path: '/dashboard-diversion'
-      fullPath: '/dashboard-diversion'
-      preLoaderRoute: typeof AuthenticatedDashboardDiversionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard-announcements': {
@@ -723,11 +684,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnnouncementsRoute: typeof AuthenticatedAnnouncementsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedDashboardAnnouncementsRoute: typeof AuthenticatedDashboardAnnouncementsRoute
-  AuthenticatedDashboardDiversionRoute: typeof AuthenticatedDashboardDiversionRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardUsersRoute: typeof AuthenticatedDashboardUsersRoute
   AuthenticatedEcoPointsRoute: typeof AuthenticatedEcoPointsRoute
-  AuthenticatedFeedRoute: typeof AuthenticatedFeedRoute
   AuthenticatedGisMapRoute: typeof AuthenticatedGisMapRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
@@ -745,11 +704,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedDashboardAnnouncementsRoute:
     AuthenticatedDashboardAnnouncementsRoute,
-  AuthenticatedDashboardDiversionRoute: AuthenticatedDashboardDiversionRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardUsersRoute: AuthenticatedDashboardUsersRoute,
   AuthenticatedEcoPointsRoute: AuthenticatedEcoPointsRoute,
-  AuthenticatedFeedRoute: AuthenticatedFeedRoute,
   AuthenticatedGisMapRoute: AuthenticatedGisMapRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,

@@ -33,7 +33,6 @@ const hotelItems = [
   { to: "/waste-reports", label: "Waste Reports", icon: Recycle },
   { to: "/waste-collections", label: "Collections", icon: Calendar },
   { to: "/notifications", label: "Notifications", icon: Bell },
-  { to: "/feed", label: "News Feed", icon: Newspaper },
 ];
 
 export function AppSidebar() {
@@ -108,14 +107,7 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard-diversion")}>
-                    <Link to="/dashboard-diversion" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
-                      <Recycle />
-                      <span>Transactions Dashboard</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-users")}>
                     <Link to="/dashboard-users" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">

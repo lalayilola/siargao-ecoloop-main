@@ -135,7 +135,7 @@ function DashboardPage() {
         const municipality = profile.municipality;
         const [profilesResult, listingsResult, purchaseResult, tradeResult, wasteReportResult] = await Promise.all([
           supabase.from("profiles").select("*").eq("municipality", municipality),
-          supabase.from("marketplace_listings").select("*").eq("municipality", municipality),
+          supabase.from("marketplace_listings").select("*"),
           supabase.from("purchase_requests").select("*"),
           supabase.from("trade_requests").select("*"),
           supabase.from("food_waste_reports").select("*"),
@@ -146,7 +146,13 @@ function DashboardPage() {
         const purchases = (purchaseResult.data || []) as PurchaseRow[];
         const trades = (tradeResult.data || []) as TradeRow[];
         const wasteReports = (wasteReportResult.data || []) as Array<{ id: string; restaurant_id: string; quantity_kg: number; status: string }>;
-        const listingIds = new Set(listings.map((listing) => listing.id));
+        
+        const municipalityListings = listings.filter((listing) => {
+          if (listing.municipality === municipality) return true;
+          const owner = profiles.find((member) => member.id === listing.user_id);
+          return owner?.municipality === municipality;
+        });
+        const listingIds = new Set(municipalityListings.map((listing) => listing.id));
 
         const municipalityPurchases = purchases.filter((purchase) => listingIds.has(purchase.listing_id));
         const municipalityTrades = trades.filter((trade) => listingIds.has(trade.listing_id));
@@ -155,12 +161,19 @@ function DashboardPage() {
           return owner?.municipality === municipality;
         });
 
+        const parsePrice = (priceStr: string | null): number => {
+          if (!priceStr) return 0;
+          const clean = priceStr.replace(/[₱$,]/g, "").split("/")[0].trim();
+          const num = Number(clean);
+          return isNaN(num) ? 0 : num;
+        };
+
         const freshProduceSales = municipalityPurchases
           .filter((purchase) => purchase.status === "completed")
           .reduce((sum, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "produce") return sum;
-            const unitValue = Number(listing.price ?? "0");
+            const unitValue = parsePrice(listing.price);
             return sum + (Number(purchase.quantity_kg || 0) * unitValue);
           }, 0);
 
@@ -169,7 +182,7 @@ function DashboardPage() {
           .reduce((sum, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "compost") return sum;
-            const unitValue = Number(listing.price ?? "0");
+            const unitValue = parsePrice(listing.price);
             return sum + (Number(purchase.quantity_kg || 0) * unitValue);
           }, 0);
 
@@ -193,7 +206,7 @@ function DashboardPage() {
           farmers: profiles.filter((member) => member.primary_role === "farmer").length,
           restaurants: profiles.filter((member) => member.primary_role === "restaurant").length,
           buyers: profiles.filter((member) => member.primary_role === "resident").length,
-          activeListings: listings.length,
+          activeListings: municipalityListings.length,
           freshProduceSales,
           compostSales,
           foodWasteCollected,
@@ -272,7 +285,7 @@ function DashboardPage() {
         sub={`Track produce sales, compost activity, food waste collection and member activity across ${monitoringStats.municipalityLabel}.`}
       />
       <Container className="py-12">
-        <div className="mb-8 grid gap-4 lg:grid-cols-4">
+        <div className="mb-8 grid gap-4 lg:grid-cols-3">
           <Link to="/dashboard" className="group">
             <Card className="p-5 transition-all hover:shadow-lg hover:border-primary/30">
               <div className="flex items-center justify-between">
@@ -295,18 +308,6 @@ function DashboardPage() {
               </div>
               <div className="mt-4 font-display text-lg font-semibold">Members Dashboard</div>
               <div className="text-sm text-muted-foreground">View and manage farmers, restaurant owners and buyers</div>
-            </Card>
-          </Link>
-          <Link to="/dashboard-diversion" className="group">
-            <Card className="p-5 transition-all hover:shadow-lg hover:border-primary/30">
-              <div className="flex items-center justify-between">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <ArrowRightLeft className="h-5 w-5" />
-                </span>
-                <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </div>
-              <div className="mt-4 font-display text-lg font-semibold">Transactions Dashboard</div>
-              <div className="text-sm text-muted-foreground">Review marketplace purchases, sales and exchanges</div>
             </Card>
           </Link>
           <Link to="/dashboard-reports" className="group">

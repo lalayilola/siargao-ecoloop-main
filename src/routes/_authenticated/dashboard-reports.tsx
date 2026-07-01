@@ -56,43 +56,60 @@ function ReportsGeneration() {
         const municipality = profile.municipality;
         const [{ data: profilesData }, { data: listingsData }, { data: purchasesData }, { data: wasteReportsData }] = await Promise.all([
           supabase.from("profiles").select("*").eq("municipality", municipality),
-          supabase.from("marketplace_listings").select("*").eq("municipality", municipality),
+          supabase.from("marketplace_listings").select("*"),
           supabase.from("purchase_requests").select("*"),
           supabase.from("food_waste_reports").select("*"),
         ]);
 
-        const listings = (listingsData || []) as Array<{ id: string; kind: string; price: string | null }>;
-        const listingIds = new Set(listings.map((listing) => listing.id));
-        const municipalityPurchases = (purchasesData || []).filter((purchase: any) => listingIds.has(purchase.listing_id));
-        const municipalityWasteReports = (wasteReportsData || []).filter((report: any) => {
-          const owner = (profilesData || []).find((member: any) => member.id === report.restaurant_id);
+        const profiles = (profilesData || []) as Array<{ id: string; municipality: string | null }>;
+        const listings = (listingsData || []) as Array<{ id: string; user_id: string; municipality: string | null; kind: string; price: string | null }>;
+        const purchases = (purchasesData || []) as any[];
+        const wasteReports = (wasteReportsData || []) as any[];
+
+        const municipalityListings = listings.filter((listing) => {
+          if (listing.municipality === municipality) return true;
+          const owner = profiles.find((member) => member.id === listing.user_id);
+          return owner?.municipality === municipality;
+        });
+        const listingIds = new Set(municipalityListings.map((listing) => listing.id));
+
+        const municipalityPurchases = purchases.filter((purchase) => listingIds.has(purchase.listing_id));
+        const municipalityWasteReports = wasteReports.filter((report) => {
+          const owner = profiles.find((member) => member.id === report.restaurant_id);
           return owner?.municipality === municipality;
         });
 
+        const parsePrice = (priceStr: string | null): number => {
+          if (!priceStr) return 0;
+          const clean = priceStr.replace(/[₱$,]/g, "").split("/")[0].trim();
+          const num = Number(clean);
+          return isNaN(num) ? 0 : num;
+        };
+
         const freshProduceSales = municipalityPurchases
-          .filter((purchase: any) => purchase.status === "completed")
-          .reduce((sum: number, purchase: any) => {
+          .filter((purchase) => purchase.status === "completed")
+          .reduce((sum: number, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "produce") return sum;
-            return sum + (Number(purchase.quantity_kg || 0) * Number(listing.price ?? 0));
+            return sum + (Number(purchase.quantity_kg || 0) * parsePrice(listing.price));
           }, 0);
 
         const compostSales = municipalityPurchases
-          .filter((purchase: any) => purchase.status === "completed")
-          .reduce((sum: number, purchase: any) => {
+          .filter((purchase) => purchase.status === "completed")
+          .reduce((sum: number, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "compost") return sum;
-            return sum + (Number(purchase.quantity_kg || 0) * Number(listing.price ?? 0));
+            return sum + (Number(purchase.quantity_kg || 0) * parsePrice(listing.price));
           }, 0);
 
         const wasteCollected = municipalityWasteReports
-          .filter((report: any) => ["collected", "processed"].includes(report.status))
-          .reduce((sum: number, report: any) => sum + Number(report.quantity_kg || 0), 0);
+          .filter((report) => ["collected", "processed"].includes(report.status))
+          .reduce((sum: number, report) => sum + Number(report.quantity_kg || 0), 0);
 
         setReportSummary({
           municipality: municipality.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
-          members: (profilesData || []).length,
-          listings: listings.length,
+          members: profiles.length,
+          listings: municipalityListings.length,
           freshProduceSales,
           compostSales,
           wasteCollected,
