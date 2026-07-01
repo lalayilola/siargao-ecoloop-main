@@ -312,15 +312,23 @@ function UserManagement() {
                     onClick={async (e) => {
                       e.stopPropagation();
                       try {
+                        console.log("Attempting to unverify user:", selectedUser.id);
                         const { error } = await (supabase.from("profiles") as any)
                           .update({ lgu_approved: false })
                           .eq("id", selectedUser.id);
-                        if (error) throw error;
+                        
+                        if (error) {
+                          console.error("Database error:", error);
+                          throw error;
+                        }
+                        
+                        console.log("Unverify successful");
                         toast.success("User verification revoked");
-                        void loadUsers();
-                        setSelectedUser({ ...selectedUser, lgu_approved: false });
+                        await loadUsers();
+                        setSelectedUser(null);
                       } catch (error: any) {
-                        toast.error(`Failed to revoke verification: ${error.message}`);
+                        console.error("Unverification failed:", error);
+                        toast.error(`Failed to revoke verification: ${error.message || 'Unknown error'}`);
                       }
                     }}
                   >
@@ -333,15 +341,23 @@ function UserManagement() {
                     onClick={async (e) => {
                       e.stopPropagation();
                       try {
+                        console.log("Attempting to verify user:", selectedUser.id);
                         const { error } = await (supabase.from("profiles") as any)
                           .update({ lgu_approved: true })
                           .eq("id", selectedUser.id);
-                        if (error) throw error;
+                        
+                        if (error) {
+                          console.error("Database error:", error);
+                          throw error;
+                        }
+                        
+                        console.log("Update successful");
                         toast.success("User verified successfully");
-                        void loadUsers();
-                        setSelectedUser({ ...selectedUser, lgu_approved: true });
+                        await loadUsers();
+                        setSelectedUser(null);
                       } catch (error: any) {
-                        toast.error(`Failed to verify: ${error.message}`);
+                        console.error("Verification failed:", error);
+                        toast.error(`Failed to verify: ${error.message || 'Unknown error'}`);
                       }
                     }}
                   >

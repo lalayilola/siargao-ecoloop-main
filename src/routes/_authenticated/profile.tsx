@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import farmerBg from "@/assets/farmers-ecobg.jpg";
 import restaurantBg from "@/assets/restaurant-food.jpg";
 import localBg from "@/assets/siargao-locals.jpg";
@@ -55,6 +55,10 @@ function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [validId, setValidId] = useState<File | null>(null);
+  const [validIdPreview, setValidIdPreview] = useState<string | null>(null);
+  const [uploadingValidId, setUploadingValidId] = useState(false);
+  const [validIdSaved, setValidIdSaved] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -64,6 +68,7 @@ function ProfilePage() {
         barangay: profile.barangay,
         address: profile.address,
       });
+      setValidIdPreview(profile.government_id_url ?? null);
     }
   }, [profile]);
 
@@ -110,9 +115,19 @@ function ProfilePage() {
     return () => URL.revokeObjectURL(objectUrl);
   }, [profilePicture, profile?.profile_picture_url]);
 
+  useEffect(() => {
+    if (!validId) {
+      setValidIdPreview(profile?.government_id_url ?? null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(validId);
+    setValidIdPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [validId, profile?.government_id_url]);
+
   const handleProfilePictureUpload = async () => {
     if (!profilePicture || !user) return;
-    
+
     setUploading(true);
     try {
       const filePath = `profile-pictures/${user.id}/${Date.now()}-${profilePicture.name}`;
@@ -149,6 +164,50 @@ function ProfilePage() {
       }
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleValidIdUpload = async () => {
+    if (!validId || !user) return;
+
+    setUploadingValidId(true);
+    try {
+      const filePath = `valid-ids/${user.id}/${Date.now()}-${validId.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(filePath, validId);
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicData } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(uploadData.path ?? filePath);
+
+      const idUrl = publicData.publicUrl;
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ government_id_url: idUrl })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      setValidId(null);
+      setValidIdSaved(true);
+      toast.success("Valid ID uploaded successfully");
+      await refresh();
+      setTimeout(() => setValidIdSaved(false), 3000);
+    } catch (err: any) {
+      const msg = err?.message ?? String(err);
+      if (msg.includes("Bucket not found") || msg.includes("no such bucket")) {
+        toast.error(`Storage bucket "${STORAGE_BUCKET}" not found.`);
+      } else if (msg.includes("row-level security")) {
+        toast.error("Upload blocked by security policy.");
+      } else {
+        toast.error(`Could not upload ID: ${msg}`);
+      }
+    } finally {
+      setUploadingValidId(false);
     }
   };
 
@@ -271,6 +330,20 @@ function ProfilePage() {
                   {uploading ? t("profile.uploading") : t("profile.savePhoto")}
                 </Button>
               )}
+              {displayProfile?.lgu_approved ? (
+                <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Verified</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => toast.info("Verification request sent to LGU")}
+                  className="flex items-center gap-2 text-amber-600 text-sm font-medium hover:text-amber-700 transition-colors"
+                >
+                  <XCircle className="h-4 w-4" />
+                  <span>Not Verified</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -316,6 +389,86 @@ function ProfilePage() {
                 </div>
                 <Button type="submit" disabled={busy} className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90">{busy ? t("profile.saving") : t("profile.saveChanges")}</Button>
               </form>
+
+              <div className="border-t border-primary/20 pt-6 mt-6">
+                <h3 className="text-lg font-semibold mb-4">Valid ID</h3>
+                <div className="space-y-4">
+                  {validIdPreview ? (
+                    <div className="relative">
+                      <img
+                        src={validIdPreview}
+                        alt="Valid ID"
+                        className="w-full max-w-md rounded-lg border-2 border-primary/30"
+                      />
+                      {validIdSaved && (
+                        <div className="mt-2 text-sm text-green-600 font-medium">Saved</div>
+                      )}
+                      {isOwnProfile && (
+                        <div className="mt-3 flex gap-2">
+                          <label className="cursor-pointer">
+                            <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10" asChild>
+                              <span>
+                                <Upload className="h-4 w-4 mr-2" />
+                                Replace ID
+                              </span>
+                            </Button>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setValidId(e.target.files?.[0] ?? null)}
+                              className="hidden"
+                            />
+                          </label>
+                          {validId && (
+                            <Button
+                              size="sm"
+                              className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
+                              onClick={handleValidIdUpload}
+                              disabled={uploadingValidId}
+                            >
+                              {uploadingValidId ? "Uploading..." : "Save Changes"}
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center">
+                      <Upload className="h-12 w-12 mx-auto mb-3 text-primary/50" />
+                      <p className="text-sm text-muted-foreground mb-3">No valid ID uploaded yet</p>
+                      {isOwnProfile && (
+                        <>
+                          <label className="cursor-pointer">
+                            <Button size="sm" className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" asChild>
+                              <span>
+                                <Upload className="h-4 w-4 mr-2" />
+                                Upload Valid ID
+                              </span>
+                            </Button>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setValidId(e.target.files?.[0] ?? null)}
+                              className="hidden"
+                            />
+                          </label>
+                          {validId && (
+                            <div className="mt-4">
+                              <Button
+                                className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
+                                onClick={handleValidIdUpload}
+                                disabled={uploadingValidId}
+                              >
+                                {uploadingValidId ? "Uploading..." : "Save Changes"}
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="border-t border-primary/20 pt-6 mt-6">
                 <h3 className="text-lg font-semibold mb-4">{t("profile.changePassword")}</h3>
