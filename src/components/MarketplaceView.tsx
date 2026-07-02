@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 
 import { ListingCard } from "@/components/ListingCard";
 
-import { Search, Lock, Plus, Filter, Check, X, MessageCircle, MapPin } from "lucide-react";
+import { Search, Lock, Plus, Filter, Check, X, MessageCircle, MapPin, AlertCircle } from "lucide-react";
 
 import {
 
@@ -146,9 +146,11 @@ const canViewListing = (listing: Listing, role: AppRole | null | undefined, curr
 
 
 
-const canCreateListing = (role: AppRole | null | undefined, kind: Listing["kind"]) => {
+const canCreateListing = (role: AppRole | null | undefined, kind: Listing["kind"], lguApproved: boolean) => {
 
   if (!role) return false;
+
+  if (!lguApproved) return false;
 
 
 
@@ -182,9 +184,11 @@ const canCreateListing = (role: AppRole | null | undefined, kind: Listing["kind"
 
 
 
-const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
+const canBuyListing = (listing: Listing, role: AppRole | null | undefined, lguApproved: boolean) => {
 
   if (!role) return listing.kind === "produce";
+
+  if (!lguApproved) return false;
 
 
 
@@ -204,15 +208,24 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined) => {
 
 
 
+  if (listing.kind === "compost") {
+
+    return role === "farmer" || role === "lgu_admin";
+
+  }
+
+
+
   return false;
 
 };
 
 
 
-const canTradeListing = (listing: Listing, role: AppRole | null | undefined) => {
+const canTradeListing = (listing: Listing, role: AppRole | null | undefined, lguApproved: boolean) => {
 
   if (!role) return false;
+  if (!lguApproved) return false;
 
   return role === "restaurant" && listing.kind === "produce";
 
@@ -614,21 +627,17 @@ export function MarketplaceView() {
 
 
 
-    if (!canCreateListing(profile.primary_role, kind)) {
+    if (!canCreateListing(profile.primary_role, kind, profile.lgu_approved || false)) {
 
-      const message = profile.primary_role === "farmer"
-
-        ? "Farmers can only list food produce." 
-
-        : profile.primary_role === "restaurant"
-
-          ? "Hotels/Restaurants can only list food waste for the LGU." 
-
-          : profile.primary_role === "lgu_admin"
-
-            ? "LGU staff can only post compost listings." 
-
-            : "Residents can only list food produce.";
+      const message = !profile.lgu_approved
+        ? "Your account must be verified by the LGU before you can create listings. Please upload your government ID and wait for verification."
+        : profile.primary_role === "farmer"
+          ? "Farmers can only list food produce."
+          : profile.primary_role === "restaurant"
+            ? "Hotels/Restaurants can only list food waste for the LGU."
+            : profile.primary_role === "lgu_admin"
+              ? "LGU staff can only post compost listings."
+              : "Residents can only list food produce.";
 
       toast.error(message);
 
@@ -971,6 +980,10 @@ export function MarketplaceView() {
   const handleMessageClick = (listing: Listing) => {
 
     if (!user || user.id === listing.user_id) return;
+    if (!profile?.lgu_approved) {
+      toast.error("Your account must be verified by the LGU before you can send messages. Please upload your government ID in your profile.");
+      return;
+    }
 
     setChatUserId(listing.user_id);
 
@@ -1240,6 +1253,20 @@ export function MarketplaceView() {
 
       <Container className="py-12">
 
+        {user && profile && !profile.lgu_approved && (
+          <div className="mb-6 rounded-3xl border-2 border-amber-400 bg-amber-50 p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-amber-400 flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-amber-800" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-amber-900">Account Verification Required</p>
+                <p className="text-sm text-amber-700">Upload your government ID in your <Link to="/profile" className="underline font-medium">profile</Link> to get verified by the LGU. Verification is required to create listings, buy, trade, and send messages.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-primary/20 bg-secondary/10 p-6 shadow-sm shadow-primary/10 sm:flex-row sm:items-center sm:justify-between">
 
           <div className="relative w-full max-w-md">
@@ -1258,7 +1285,7 @@ export function MarketplaceView() {
 
             </Button>
 
-            {user && profile?.primary_role !== "resident" && (
+            {user && profile?.primary_role !== "resident" && profile?.lgu_approved && (
 
               <Button size="sm" className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" onClick={() => {
 
@@ -1928,13 +1955,7 @@ export function MarketplaceView() {
 
             </TabsTrigger>
 
-            {profile?.primary_role === "farmer" ? (
-              <TabsTrigger value="compost" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
-
-                🧪 Compost
-
-              </TabsTrigger>
-            ) : (
+            {(profile?.primary_role === "restaurant" || profile?.primary_role === "lgu_admin") && (
               <TabsTrigger value="waste" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
 
                 🍽️ Food Waste
@@ -1942,14 +1963,12 @@ export function MarketplaceView() {
               </TabsTrigger>
             )}
 
-            {profile?.primary_role === "lgu_admin" && (
-
+            {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin") && (
               <TabsTrigger value="compost" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700">
 
                 🧪 Compost
 
               </TabsTrigger>
-
             )}
 
           </TabsList>
@@ -1974,7 +1993,7 @@ export function MarketplaceView() {
 
                   }}
 
-                  onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                  onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                     setSelectedListing(l);
 
@@ -1982,7 +2001,7 @@ export function MarketplaceView() {
 
                   } : undefined}
 
-                  onBuy={canBuyListing(l, profile?.primary_role) ? () => {
+                  onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                     setSelectedListing(l);
 
@@ -2008,7 +2027,7 @@ export function MarketplaceView() {
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-              {filtered("waste", "restaurant").map((l) => (
+              {filtered("waste", profile?.primary_role === "lgu_admin" ? "all" : "restaurant").map((l) => (
 
                 <ListingCard
 
@@ -2024,7 +2043,7 @@ export function MarketplaceView() {
 
                   }}
 
-                  onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                  onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                     setSelectedListing(l);
 
@@ -2032,7 +2051,7 @@ export function MarketplaceView() {
 
                   } : undefined}
 
-                  onBuy={canBuyListing(l, profile?.primary_role) ? () => {
+                  onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                     setSelectedListing(l);
 
@@ -2076,7 +2095,7 @@ export function MarketplaceView() {
 
                     }}
 
-                    onTrade={canTradeListing(l, profile?.primary_role) ? () => {
+                    onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                       setSelectedListing(l);
 
@@ -2084,7 +2103,7 @@ export function MarketplaceView() {
 
                     } : undefined}
 
-                    onBuy={canBuyListing(l, profile?.primary_role) ? () => {
+                    onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                       setSelectedListing(l);
 
@@ -2422,7 +2441,7 @@ export function MarketplaceView() {
 
                   <div className="flex flex-wrap gap-3">
 
-                    {canBuyListing(selectedListing, profile?.primary_role) && (
+                    {canBuyListing(selectedListing, profile?.primary_role, profile?.lgu_approved || false) && (
 
                       <Button onClick={() => {
 

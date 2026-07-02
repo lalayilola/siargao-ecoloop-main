@@ -64,6 +64,13 @@ function Index() {
         });
       } catch (error) {
         console.error("Error loading stats:", error);
+        // Set default stats on error so page still renders
+        setStats({
+          wasteCollected: 0,
+          divertedPercentage: 0,
+          activeMembers: 0,
+          municipalities: 0,
+        });
       } finally {
         setLoading(false);
       }

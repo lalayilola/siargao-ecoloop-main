@@ -194,7 +194,7 @@ function LoginForm() {
       const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
       const fileExt = governmentIdFile.name.split('.').pop();
       const fileName = `${user.email.replace(/[@.]/g, '_')}_gov_id_${Date.now()}.${fileExt}`;
-      const filePath = `government-ids/${fileName}`;
+      const filePath = `valid-ids/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from(STORAGE_BUCKET)
@@ -356,9 +356,7 @@ function SignupForm() {
     address: "",
     role: "resident" as "farmer" | "restaurant" | "resident" | "lgu_admin",
     municipality: "general_luna" as "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen",
-    government_id_url: "" as string | null,
   });
-  const [governmentIdFile, setGovernmentIdFile] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
@@ -398,32 +396,8 @@ function SignupForm() {
           return;
         }
 
-        if (!governmentIdFile) {
-          toast.error("Government ID is required for account verification");
-          return;
-        }
-
         setBusy(true);
         try {
-          // Upload government ID to Supabase storage
-          const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
-          const fileExt = governmentIdFile.name.split('.').pop();
-          const fileName = `${parsed.data.email.replace(/[@.]/g, '_')}_gov_id_${Date.now()}.${fileExt}`;
-          const filePath = `government-ids/${fileName}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from(STORAGE_BUCKET)
-            .upload(filePath, governmentIdFile);
-
-          if (uploadError) {
-            toast.error(`Failed to upload government ID: ${uploadError.message}`);
-            return;
-          }
-
-          const { data: { publicUrl } } = supabase.storage
-            .from(STORAGE_BUCKET)
-            .getPublicUrl(filePath);
-
           const normalizedEmail = parsed.data.email.toLowerCase();
           const { data, error: signupError } = await supabase.auth.signUp({
             email: normalizedEmail,
@@ -436,7 +410,6 @@ function SignupForm() {
                 address: parsed.data.address,
                 role: parsed.data.role,
                 municipality: parsed.data.municipality,
-                government_id_url: publicUrl,
               },
             },
           });
@@ -585,41 +558,6 @@ function SignupForm() {
             <SelectItem value="lgu_admin">{t("auth.lguAdmin")}</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="su-gov-id">Government ID *</Label>
-        <div className="relative">
-          <Input 
-            id="su-gov-id" 
-            type="file" 
-            accept="image/*,.pdf"
-            required
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setGovernmentIdFile(file);
-              }
-            }}
-            className="cursor-pointer"
-          />
-          {governmentIdFile && (
-            <button
-              type="button"
-              onClick={() => {
-                setGovernmentIdFile(null);
-                const input = document.getElementById('su-gov-id') as HTMLInputElement;
-                if (input) input.value = '';
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-        {governmentIdFile && (
-          <p className="text-xs text-muted-foreground mt-1">Selected: {governmentIdFile.name}</p>
-        )}
-        <p className="text-xs text-muted-foreground">Required for account verification by LGU</p>
       </div>
       <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
         {busy ? t("auth.creatingAccount") : isCooldownActive ? "Please wait…" : t("auth.createAccount")}

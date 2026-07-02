@@ -25,6 +25,7 @@ import { MessageNotification } from "@/components/MessageNotification";
 import { AnnouncementNotification } from "@/components/AnnouncementNotification";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "@/hooks/use-language";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import "@/lib/i18n";
 
 function NotFoundComponent() {
@@ -113,6 +114,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const [supabaseUnavailable, setSupabaseUnavailable] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -141,24 +143,38 @@ function RootComponent() {
     };
 
     detectAuthError();
-    return () => subscription.unsubscribe();
+    
+    // Mark loading as complete after 2.5 seconds
+    const loadingTimer = setTimeout(() => {
+      setLoadingComplete(true);
+    }, 2500);
+    
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(loadingTimer);
+    };
   }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
-          {supabaseUnavailable && (
-            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-800">
-              EcoLoop is temporarily unavailable. Please try again in a few moments.
-            </div>
+          <LoadingScreen />
+          {loadingComplete && (
+            <>
+              {supabaseUnavailable && (
+                <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-800">
+                  EcoLoop is temporarily unavailable. Please try again in a few moments.
+                </div>
+              )}
+              <Shell />
+              <NotificationListener />
+              <MessageNotification />
+              <AnnouncementNotification />
+              <AIChatbot />
+              <Toaster />
+            </>
           )}
-          <Shell />
-          <NotificationListener />
-          <MessageNotification />
-          <AnnouncementNotification />
-          <AIChatbot />
-          <Toaster />
         </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>

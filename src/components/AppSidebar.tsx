@@ -27,14 +27,6 @@ const memberItems = [
 
 const farmerItems: Array<{ to: string; label: string; icon: any }> = [];
 
-const hotelItems = [
-  { to: "/dashboard/hotel", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/marketplace", label: "Produce Marketplace", icon: Store },
-  { to: "/waste-reports", label: "Waste Reports", icon: Recycle },
-  { to: "/waste-collections", label: "Collections", icon: Calendar },
-  { to: "/notifications", label: "Notifications", icon: Bell },
-];
-
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { profile, isLguAdmin, signOut } = useAuth();
@@ -45,7 +37,6 @@ export function AppSidebar() {
   const isActive = (p: string) => path === p;
 
   const isFarmer = profile?.primary_role === "farmer";
-  const isHotel = profile?.primary_role === "restaurant";
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -132,26 +123,6 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {isHotel && hotelItems.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-green-700 font-semibold">Hotel Portal</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {hotelItems.map((it) => (
-                  <SidebarMenuItem key={it.to}>
-                    <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                      <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
-                        <it.icon className="h-4 w-4" />
-                        <span>{it.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

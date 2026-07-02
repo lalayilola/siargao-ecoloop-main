@@ -95,47 +95,54 @@ export function TransactionHistoryPage() {
 
     setLoading(true);
     try {
-      // Load trades
-      const { data: tradesData, error: tradesError } = await supabase
-        .from("trades" as any)
-        .select("*")
-        .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
-        .order("created_at", { ascending: false });
+      // Run all queries in parallel for better performance
+      const [tradesResult, purchasesAsBuyerResult, purchasesAsSellerResult] = await Promise.all([
+        supabase
+          .from("trades" as any)
+          .select("*")
+          .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("purchase_requests" as any)
+          .select(`
+            *,
+            marketplace_listings!inner (
+              user_id,
+              title,
+              image,
+              kind,
+              kg,
+              barangay
+            )
+          `)
+          .eq("buyer_user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("purchase_requests" as any)
+          .select(`
+            *,
+            marketplace_listings!inner (
+              user_id,
+              title,
+              image,
+              kind,
+              kg,
+              barangay
+            )
+          `)
+          .eq("marketplace_listings.user_id", user.id)
+          .order("created_at", { ascending: false })
+      ]).catch(err => {
+        console.error("Promise.all error:", err);
+        throw err;
+      });
 
-      // Load purchase requests with marketplace listing info
-      // Load as buyer
-      const { data: purchasesAsBuyer, error: buyerError } = await supabase
-        .from("purchase_requests" as any)
-        .select(`
-          *,
-          marketplace_listings!inner (
-            user_id,
-            title,
-            image,
-            kind,
-            kg,
-            barangay
-          )
-        `)
-        .eq("buyer_user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      // Load as seller (marketplace listing owner)
-      const { data: purchasesAsSeller, error: sellerError } = await supabase
-        .from("purchase_requests" as any)
-        .select(`
-          *,
-          marketplace_listings!inner (
-            user_id,
-            title,
-            image,
-            kind,
-            kg,
-            barangay
-          )
-        `)
-        .eq("marketplace_listings.user_id", user.id)
-        .order("created_at", { ascending: false });
+      const tradesData = tradesResult?.data;
+      const tradesError = tradesResult?.error;
+      const purchasesAsBuyer = purchasesAsBuyerResult?.data;
+      const buyerError = purchasesAsBuyerResult?.error;
+      const purchasesAsSeller = purchasesAsSellerResult?.data;
+      const sellerError = purchasesAsSellerResult?.error;
 
       // Combine and deduplicate purchase requests
       const purchaseMap = new Map();
@@ -174,24 +181,21 @@ export function TransactionHistoryPage() {
       }
 
       // Transform trades to transactions
-      const tradeTransactions: Transaction[] = (tradesData || []).map((t: any) => {
-        console.log("Trade data:", t);
-        return {
-          id: t.id,
-          type: 'trade' as const,
-          status: t.status,
-          created_at: t.created_at,
-          item_name: t.from_gives,
-          quantity: undefined,
-          location: undefined,
-          buyer_name: t.to_name,
-          seller_name: t.from_name,
-          from_name: t.from_name,
-          from_user_id: t.from_user_id,
-          to_user_id: t.to_user_id,
-          notes: t.trade_date,
-        };
-      });
+      const tradeTransactions: Transaction[] = (tradesData || []).map((t: any) => ({
+        id: t.id,
+        type: 'trade' as const,
+        status: t.status,
+        created_at: t.created_at,
+        item_name: t.from_gives,
+        quantity: undefined,
+        location: undefined,
+        buyer_name: t.to_name,
+        seller_name: t.from_name,
+        from_name: t.from_name,
+        from_user_id: t.from_user_id,
+        to_user_id: t.to_user_id,
+        notes: t.trade_date,
+      }));
 
       // Transform purchases to transactions
       const purchaseTransactions: Transaction[] = (purchasesData || []).map((p: any) => {
@@ -243,7 +247,8 @@ export function TransactionHistoryPage() {
         successRate,
       });
     } catch (error) {
-      toast.error("Error loading transactions");
+      console.error("Error loading transactions:", error);
+      toast.error(`Error loading transactions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
