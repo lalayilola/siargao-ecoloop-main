@@ -13,7 +13,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CircularEconomyWorkflow } from "@/components/CircularEconomyWorkflow";
+import { CircularEconomyWorkflow } from "@/components/common/CircularEconomyWorkflow";
 import { Database } from "@/integrations/supabase/types";
 
 export function HotelDashboard() {

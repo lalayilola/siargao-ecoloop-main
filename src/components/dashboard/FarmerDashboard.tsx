@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
-import { CircularEconomyWorkflow } from "@/components/CircularEconomyWorkflow";
+import { CircularEconomyWorkflow } from "@/components/common/CircularEconomyWorkflow";
 
 type MarketplaceListing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
 type Trade = Database["public"]["Tables"]["trades"]["Row"];
