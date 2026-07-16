@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MarketplaceView } from "@/components/MarketplaceView";
+import { MarketplaceView } from "@/components/marketplace/MarketplaceView";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
   head: () => ({

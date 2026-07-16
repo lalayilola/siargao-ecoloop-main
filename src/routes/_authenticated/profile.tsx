@@ -4,19 +4,16 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
-import { Container, PageHero } from "@/components/Section";
+import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
-import farmerBg from "@/assets/farmers-ecobg.jpg";
-import restaurantBg from "@/assets/restaurant-food.jpg";
-import localBg from "@/assets/siargao-locals.jpg";
-import lguBg from "@/assets/LGU BG.jpg";
-import { ChatMessenger } from "@/components/ChatMessenger";
+import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle, Palette } from "lucide-react";
+import { ChatMessenger } from "@/components/messaging/ChatMessenger";
+import { ThemeCustomizer } from "@/components/common/ThemeCustomizer";
 import type { Database } from "@/integrations/supabase/types";
 import { Link } from "@tanstack/react-router";
 
@@ -246,14 +243,6 @@ function ProfilePage() {
     }
   };
 
-  const bgImage = otherUserProfile?.primary_role === "farmer"
-    ? farmerBg
-    : otherUserProfile?.primary_role === "restaurant"
-    ? restaurantBg
-    : otherUserProfile?.primary_role === "lgu_admin"
-    ? lguBg
-    : localBg;
-
   const displayProfile = otherUserProfile || profile;
   const isOwnProfile = !otherUserId || otherUserId === user?.id;
 
@@ -262,7 +251,6 @@ function ProfilePage() {
       <PageHero
         eyebrow={isOwnProfile ? t("profile.myAccount") : t("profile.userProfile")}
         title={isOwnProfile ? t("profile.yourProfile") : `${displayProfile?.full_name}'s profile`}
-        bgImage={bgImage}
       />
       <Container className="py-10">
         {!isOwnProfile && (
@@ -468,6 +456,16 @@ function ProfilePage() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="border-t border-primary/20 pt-6 mt-6">
+                <h3 className="text-lg font-semibold mb-4">Theme Customization</h3>
+                <ThemeCustomizer trigger={
+                  <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
+                    <Palette className="h-4 w-4 mr-2" />
+                    Customize Theme
+                  </Button>
+                } />
               </div>
 
               <div className="border-t border-primary/20 pt-6 mt-6">

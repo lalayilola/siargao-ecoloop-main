@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Container } from "@/components/Section";
+import { Container } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/dashboard-announcements")(
 
 type Announcement = {
   id: string;
+  lgu_admin_id: string;
   title: string;
   content: string;
   category: string;
@@ -59,7 +60,7 @@ function AnnouncementsManagement() {
 
       if (error) throw error;
 
-      const myPosts = allAnnouncements?.filter(a => a.lgu_admin_id === user.id) || [];
+      const myPosts = allAnnouncements?.filter(a => a.lgu_admin_id === user?.id) || [];
       setAnnouncements(allAnnouncements || []);
       setMyAnnouncements(myPosts);
     } catch (error: any) {
@@ -341,7 +342,7 @@ function AnnouncementsManagement() {
                       )}
                     </div>
                   </div>
-                  {announcement.lgu_admin_id === user.id && (
+                  {announcement.lgu_admin_id === user?.id && (
                     <div className="flex items-center gap-2">
                       {announcement.status === "draft" && (
                         <Button size="sm" onClick={() => handlePublish(announcement.id)}>Publish</Button>

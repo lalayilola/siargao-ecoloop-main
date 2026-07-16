@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProduceInventoryView } from "@/components/ProduceInventoryView";
+import { ProduceInventoryView } from "@/components/waste/ProduceInventoryView";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
   head: () => ({

@@ -12,21 +12,22 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { AppSidebar } from "@/components/AppSidebar";
-import { AIChatbot } from "@/components/AIChatbot";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import { AIChatbot } from "@/components/common/AIChatbot";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
-import { NotificationListener } from "@/components/NotificationListener";
-import { MessageNotification } from "@/components/MessageNotification";
-import { AnnouncementNotification } from "@/components/AnnouncementNotification";
+import { NotificationListener } from "@/components/notifications/NotificationListener";
+import { MessageNotification } from "@/components/messaging/MessageNotification";
+import { AnnouncementNotification } from "@/components/notifications/AnnouncementNotification";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "@/hooks/use-language";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 import "@/lib/i18n";
+import { registerServiceWorker } from "@/lib/register-sw";
 
 function NotFoundComponent() {
   return (
@@ -83,6 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "EcoLoop Siargao — Food Waste Exchange & Sustainable Farming" },
       { name: "description", content: "A circular economy platform connecting Siargao farmers, restaurants, residents, and LGUs to turn food waste into local harvest." },
       { name: "author", content: "EcoLoop Siargao" },
+      { name: "theme-color", content: "#2E7D32" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "EcoLoop" },
       { property: "og:title", content: "EcoLoop Siargao" },
       { property: "og:description", content: "Turn food waste into harvest. A community platform for sustainable farming in Siargao." },
       { property: "og:type", content: "website" },
@@ -93,6 +98,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Figtree:wght@400;500;600&display=swap" },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "apple-touch-icon", href: "/icon-192x192.svg" },
+      { rel: "icon", type: "image/svg+xml", href: "/icon-192x192.svg" },
     ],
   }),
   shellComponent: RootShell,
@@ -117,6 +125,9 @@ function RootComponent() {
   const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
+    // Register service worker for PWA
+    registerServiceWorker();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
@@ -143,12 +154,12 @@ function RootComponent() {
     };
 
     detectAuthError();
-    
+
     // Mark loading as complete after 2.5 seconds
     const loadingTimer = setTimeout(() => {
       setLoadingComplete(true);
     }, 2500);
-    
+
     return () => {
       subscription.unsubscribe();
       clearTimeout(loadingTimer);

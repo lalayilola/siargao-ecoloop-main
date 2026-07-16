@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EcoPointsView } from "@/components/EcoPointsView";
+import { EcoPointsView } from "@/components/common/EcoPointsView";
 
 export const Route = createFileRoute("/_authenticated/eco-points")({
   head: () => ({

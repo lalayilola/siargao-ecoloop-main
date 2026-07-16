@@ -3,9 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
-export type AppRole = "farmer" | "restaurant" | "resident" | "lgu_admin" | "super_admin";
+export type AppRole = "farmer" | "restaurant" | "hotel_restaurant" | "resident" | "lgu_admin" | "super_admin";
 
 export type Municipality = "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen";
+
+const normalizeRole = (role?: string | null): AppRole | null => {
+  if (!role) return null;
+  if (role === "hotel_restaurant") return "restaurant";
+  if (role === "super_admin") return "super_admin";
+  if (role === "lgu_admin") return "lgu_admin";
+  if (role === "farmer") return "farmer";
+  if (role === "restaurant") return "restaurant";
+  if (role === "resident") return "resident";
+  return null;
+};
 
 export type Profile = {
   id: string;
@@ -19,6 +30,7 @@ export type Profile = {
   municipality: Municipality;
   is_super_admin: boolean;
   government_id_url: string | null;
+  theme_preferences?: any;
 };
 
 type AuthCtx = {
@@ -53,11 +65,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", u.id),
       ]);
 
-      const metadataRole = (u.user_metadata?.role ?? u.app_metadata?.role) as AppRole | undefined;
-      const dbRoles = ((rs as { role: AppRole }[]) ?? []).map((r) => r.role);
+      const metadataRole = normalizeRole((u.user_metadata?.role ?? u.app_metadata?.role) as string | undefined);
+      const dbRoles = ((rs as { role: string }[]) ?? [])
+        .map((r) => normalizeRole(r.role))
+        .filter((r): r is AppRole => r !== null);
       const derivedRoles = Array.from(new Set([...(metadataRole ? [metadataRole] : []), ...dbRoles]));
 
-      setProfile((prof as Profile | null) ?? null);
+      const normalizedProfile = prof
+        ? {
+            ...(prof as Profile),
+            primary_role: normalizeRole((prof as any).primary_role) ?? (prof as Profile).primary_role,
+          }
+        : null;
+
+      setProfile(normalizedProfile);
       setRoles(derivedRoles);
     } catch (error) {
       console.error("Unable to load auth profile:", getSupabaseErrorMessage(error));

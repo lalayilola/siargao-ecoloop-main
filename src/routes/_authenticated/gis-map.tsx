@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GISMapView } from "@/components/GISMapView";
+import { GISMapView } from "@/components/planning/GISMapView";
 
 export const Route = createFileRoute("/_authenticated/gis-map")({
   head: () => ({

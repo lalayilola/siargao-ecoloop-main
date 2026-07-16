@@ -2,14 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Container, PageHero } from "@/components/Section";
+import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Eye, EyeOff, AlertCircle, Leaf } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
+import logo from "@/assets/finalogo.png";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -225,7 +226,7 @@ function LoginPage() {
                 disabled={googleBusy}
                 onClick={handleGoogleSignIn}
               >
-                <Leaf className="mr-2 h-4 w-4" />
+                <img src={logo} alt="EcoLoop Siargao" className="mr-2 h-4 w-4 object-contain" />
                 {googleBusy ? "Connecting..." : "Continue with Google"}
               </Button>
 

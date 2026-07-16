@@ -1,7 +1,33 @@
 export function getSupabaseErrorMessage(error: unknown, fallback = "EcoLoop is temporarily unavailable. Please try again in a moment.") {
   if (!error) return fallback;
 
-  const message = error instanceof Error ? error.message : typeof error === "string" ? error : String(error);
+  let message = "";
+
+  if (error instanceof Error) {
+    message = error.message;
+  } else if (typeof error === "string") {
+    message = error;
+  } else if (typeof error === "object" && error !== null) {
+    const err = error as Record<string, unknown>;
+    if (typeof err.message === "string" && err.message.trim().length > 0) {
+      message = err.message;
+    } else if (typeof err.error_description === "string" && err.error_description.trim().length > 0) {
+      message = err.error_description;
+    } else if (typeof err.hint === "string" && err.hint.trim().length > 0) {
+      message = err.hint;
+    } else if (typeof err.details === "string" && err.details.trim().length > 0) {
+      message = err.details;
+    } else {
+      try {
+        message = JSON.stringify(err);
+      } catch {
+        message = String(error);
+      }
+    }
+  } else {
+    message = String(error);
+  }
+
   const normalized = message.toLowerCase();
 
   if (

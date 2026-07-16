@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { confirmUserEmail } from "@/lib/api/auth.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
-import { Container, PageHero } from "@/components/Section";
+import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Leaf, Eye, EyeOff, Upload, X, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Upload, X, AlertCircle } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
+import { LocationPicker } from "@/components/auth/LocationPicker";
+import logo from "@/assets/finalogo.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -72,29 +74,48 @@ function AuthPage() {
 
   return (
     <>
-      <PageHero
-        eyebrow={t("auth.hero.eyebrow")}
-        title={t("auth.hero.title")}
-        sub={t("auth.hero.subtitle")}
-      />
-      <Container className="py-12">
-        <div className="mx-auto max-w-md">
-          <Card className="p-6">
-            <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">{t("auth.signIn")}</TabsTrigger>
-                <TabsTrigger value="signup">{t("auth.createAccount")}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="login"><LoginForm /></TabsContent>
-              <TabsContent value="signup"><SignupForm /></TabsContent>
-            </Tabs>
-            <div className="my-5 flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-            </div>
-            <GoogleButton />
-          </Card>
-        </div>
-      </Container>
+      <div className="min-h-screen animate-gradient">
+        <Container className="py-12">
+          <div className="mx-auto max-w-md text-center mb-8">
+            <h1 className="font-display text-4xl font-bold text-white">{t("auth.hero.title")}</h1>
+          </div>
+          <div className="mx-auto max-w-md">
+            <Card className="p-6">
+              <Tabs defaultValue="login">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">{t("auth.signIn")}</TabsTrigger>
+                  <TabsTrigger value="signup">{t("auth.createAccount")}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="login"><LoginForm /></TabsContent>
+                <TabsContent value="signup"><SignupForm /></TabsContent>
+              </Tabs>
+              <div className="my-5 flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+              </div>
+              <GoogleButton />
+            </Card>
+          </div>
+        </Container>
+      </div>
+      <style>{`
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        .animate-gradient {
+          background: linear-gradient(-45deg, #16A34A, #22C55E, #4ADE80, #86EFAC, #10B981, #16A34A);
+          background-size: 400% 400%;
+          animation: gradient 15s ease infinite;
+        }
+      `}</style>
     </>
   );
 }
@@ -125,7 +146,13 @@ function GoogleButton() {
         }
       }}
     >
-      <Leaf className="mr-2 h-4 w-4" /> {t("auth.continueWithGoogle")}
+      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      {t("auth.continueWithGoogle")}
     </Button>
   );
 }
@@ -164,6 +191,8 @@ function LoginForm() {
   const [showIdUploadModal, setShowIdUploadModal] = useState(false);
   const [governmentIdFile, setGovernmentIdFile] = useState<File | null>(null);
   const [uploadingId, setUploadingId] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
 
   useEffect(() => {
@@ -186,6 +215,14 @@ function LoginForm() {
       setShowIdUploadModal(true);
     }
   }, [user, profile]);
+
+  // Check if user has accepted terms
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const termsAccepted = window.localStorage.getItem("ecoloop.terms.accepted");
+      setAcceptedTerms(termsAccepted === "true");
+    }
+  }, []);
 
   const handleIdUpload = async () => {
     if (!governmentIdFile || !user || !user.email) return;
@@ -229,6 +266,14 @@ function LoginForm() {
     }
   };
 
+  const handleAcceptTerms = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("ecoloop.terms.accepted", "true");
+      setAcceptedTerms(true);
+      setShowTermsModal(false);
+    }
+  };
+
   return (
     <>
       <form
@@ -239,6 +284,10 @@ function LoginForm() {
             if (isCooldownActive) {
               toast.error("Too many requests. Please wait a few minutes and try again.");
             }
+            return;
+          }
+          if (!acceptedTerms) {
+            setShowTermsModal(true);
             return;
           }
           setBusy(true);
@@ -304,7 +353,7 @@ function LoginForm() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="gov-id-upload">Upload Government ID</Label>
-              <Input 
+              <Input
                 id="gov-id-upload"
                 type="file"
                 accept="image/*,.pdf"
@@ -320,14 +369,14 @@ function LoginForm() {
               )}
             </div>
             <div className="flex gap-3">
-              <Button 
+              <Button
                 onClick={handleIdUpload}
                 disabled={!governmentIdFile || uploadingId}
                 className="flex-1"
               >
                 {uploadingId ? "Uploading..." : "Upload ID"}
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => setShowIdUploadModal(false)}
                 disabled={uploadingId}
@@ -338,6 +387,76 @@ function LoginForm() {
             <p className="text-xs text-muted-foreground">
               Note: You will not be able to create listings, buy products, or participate in marketplace transactions until your ID is verified by the LGU.
             </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showTermsModal} onOpenChange={setShowTermsModal}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Terms and Conditions</DialogTitle>
+            <DialogDescription>
+              Please	read and accept our terms and conditions to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4 text-sm">
+            <div className="space-y-2">
+              <h4 className="font-semibold">1. Acceptance of Terms</h4>
+              <p className="text-muted-foreground">
+                By accessing and using EcoLoop Siargao, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">2. User Responsibilities</h4>
+              <p className="text-muted-foreground">
+                Users must provide accurate and complete information during registration. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">3. Marketplace Activities</h4>
+              <p className="text-muted-foreground">
+                Farmers, restaurants, and residents must comply with all local regulations regarding food safety and waste management. All listings must be accurate and truthful.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">4. Prohibited Activities</h4>
+              <p className="text-muted-foreground">
+                Users may not engage in fraudulent activities, misrepresent products, or violate any applicable laws. The platform reserves the right to suspend or terminate accounts that violate these terms.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">5. Privacy and Data</h4>
+              <p className="text-muted-foreground">
+                Your personal information will be processed in accordance with our Privacy Policy. By using EcoLoop, you consent to the collection and use of your data as described.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">6. LGU Verification</h4>
+              <p className="text-muted-foreground">
+                Certain activities may require verification by your Local Government Unit. You agree to provide valid government-issued identification when requested.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">7. Modifications</h4>
+              <p className="text-muted-foreground">
+                EcoLoop reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={handleAcceptTerms}
+              className="flex-1"
+            >
+              I Accept
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowTermsModal(false)}
+              className="flex-1"
+            >
+              Decline
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -360,9 +479,19 @@ function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handleAcceptTerms = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("ecoloop.terms.accepted", "true");
+      setAcceptedTerms(true);
+      setShowTermsModal(false);
+    }
+  };
 
   useEffect(() => {
     if (!cooldownUntil) return;
@@ -379,14 +508,20 @@ function SignupForm() {
   }, [cooldownUntil]);
 
   return (
-    <form
-      className="space-y-3 pt-4"
-      onSubmit={async (e) => {
+    <>
+      <form
+        className="space-y-3 pt-4"
+        onSubmit={async (e) => {
         e.preventDefault();
         if (busy || isCooldownActive) {
           if (isCooldownActive) {
             toast.error("Too many requests. Please wait a few minutes and try again.");
           }
+          return;
+        }
+
+        if (!acceptedTerms) {
+          setShowTermsModal(true);
           return;
         }
 
@@ -563,5 +698,76 @@ function SignupForm() {
         {busy ? t("auth.creatingAccount") : isCooldownActive ? "Please wait…" : t("auth.createAccount")}
       </Button>
     </form>
+
+    <Dialog open={showTermsModal} onOpenChange={setShowTermsModal}>
+      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Terms and Conditions</DialogTitle>
+          <DialogDescription>
+            Please read and accept our terms and conditions to continue.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4 text-sm">
+          <div className="space-y-2">
+            <h4 className="font-semibold">1. Acceptance of Terms</h4>
+            <p className="text-muted-foreground">
+              By accessing and using EcoLoop Siargao, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">2. User Responsibilities</h4>
+            <p className="text-muted-foreground">
+              Users must provide accurate and complete information during registration. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">3. Marketplace Activities</h4>
+            <p className="text-muted-foreground">
+              Farmers, restaurants, and residents must comply with all local regulations regarding food safety and waste management. All listings must be accurate and truthful.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">4. Prohibited Activities</h4>
+            <p className="text-muted-foreground">
+              Users may not engage in fraudulent activities, misrepresent products, or violate any applicable laws. The platform reserves the right to suspend or terminate accounts that violate these terms.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">5. Privacy and Data</h4>
+            <p className="text-muted-foreground">
+              Your personal information will be processed in accordance with our Privacy Policy. By using EcoLoop, you consent to the collection and use of your data as described.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">6. LGU Verification</h4>
+            <p className="text-muted-foreground">
+              Certain activities may require verification by your Local Government Unit. You agree to provide valid government-issued identification when requested.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">7. Modifications</h4>
+            <p className="text-muted-foreground">
+              EcoLoop reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={handleAcceptTerms}
+            className="flex-1"
+          >
+            I Accept
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowTermsModal(false)}
+            className="flex-1"
+          >
+            Decline
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Container, PageHero } from "@/components/Section";
+import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,17 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+
+type ProduceRow = {
+  id: string;
+  farmer_id: string;
+  farmer_name: string;
+  product_name: string;
+  category: string;
+  quantity_kg: number;
+  price_per_kg: number;
+  created_at: string;
+};
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "LGU Monitoring Dashboard — EcoLoop Siargao" }] }),
@@ -28,7 +39,10 @@ type UserProfileRow = {
 };
 type ListingRow = {
   id: string;
+  user_id: string;
   kind: "produce" | "waste" | "compost";
+  title: string;
+  category: string | null;
   price: string | null;
   municipality: string | null;
 };
@@ -104,6 +118,10 @@ function DashboardPage() {
   const [membersPreview, setMembersPreview] = useState<MemberSummary[]>([]);
   const [transactionsPreview, setTransactionsPreview] = useState<TransactionSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vegetableSalesData, setVegetableSalesData] = useState<Array<{ name: string; value: number }>>([]);
+  const [timePeriod, setTimePeriod] = useState<'daily' | 'monthly'>('monthly');
+  const [foodWasteData, setFoodWasteData] = useState<Array<{ name: string; value: number }>>([]);
+  const [compostSalesData, setCompostSalesData] = useState<Array<{ name: string; value: number }>>([]);
 
   useEffect(() => {
     if (!user || !profile?.municipality) {
@@ -133,12 +151,13 @@ function DashboardPage() {
     const loadMonitoringData = async () => {
       try {
         const municipality = profile.municipality;
-        const [profilesResult, listingsResult, purchaseResult, tradeResult, wasteReportResult] = await Promise.all([
+        const [profilesResult, listingsResult, purchaseResult, tradeResult, wasteReportResult, produceResult] = await Promise.all([
           supabase.from("profiles").select("*").eq("municipality", municipality),
           supabase.from("marketplace_listings").select("*"),
           supabase.from("purchase_requests").select("*"),
           supabase.from("trade_requests").select("*"),
           supabase.from("food_waste_reports").select("*"),
+          supabase.from("produce").select("*"),
         ]);
 
         const profiles = (profilesResult.data || []) as UserProfileRow[];
@@ -146,6 +165,7 @@ function DashboardPage() {
         const purchases = (purchaseResult.data || []) as PurchaseRow[];
         const trades = (tradeResult.data || []) as TradeRow[];
         const wasteReports = (wasteReportResult.data || []) as Array<{ id: string; restaurant_id: string; quantity_kg: number; status: string }>;
+        const produce = (produceResult.data || []) as ProduceRow[];
         
         const municipalityListings = listings.filter((listing) => {
           if (listing.municipality === municipality) return true;
@@ -199,6 +219,95 @@ function DashboardPage() {
           ...municipalityPurchases.filter((purchase) => purchase.status === "pending"),
           ...municipalityTrades.filter((trade) => trade.status === "pending"),
         ].length;
+
+        // Process vegetable sales data
+        const completedProducePurchases = municipalityPurchases.filter((purchase) => purchase.status === "completed");
+        const vegetableSalesMap = new Map<string, number>();
+
+        // Filter by time period
+        const now = new Date();
+        const timeFilter = (purchase: PurchaseRow) => {
+          const purchaseDate = new Date(purchase.created_at);
+          if (timePeriod === 'daily') {
+            // Last 7 days
+            const daysAgo = 7;
+            const cutoff = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+            return purchaseDate >= cutoff;
+          } else {
+            // Last 30 days (monthly view)
+            const daysAgo = 30;
+            const cutoff = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+            return purchaseDate >= cutoff;
+          }
+        };
+
+        const timeFilteredPurchases = completedProducePurchases.filter(timeFilter);
+
+        // Debug: log purchases and listings
+        console.log('Total municipality purchases:', municipalityPurchases.length);
+        console.log('Completed produce purchases:', completedProducePurchases.length);
+        console.log('Time filtered purchases:', timeFilteredPurchases.length);
+        console.log('Total listings:', listings.length);
+        console.log('Municipality listings:', municipalityListings.length);
+
+        timeFilteredPurchases.forEach((purchase) => {
+          const listing = listings.find((item) => item.id === purchase.listing_id);
+          console.log('Purchase listing match:', purchase.listing_id, listing ? 'Found' : 'Not found');
+          if (listing && listing.kind === "produce") {
+            const productName = listing.title || listing.category || "Unknown";
+            const quantity = Number(purchase.quantity_kg || 0);
+            console.log('Adding to sales:', productName, quantity);
+            vegetableSalesMap.set(productName, (vegetableSalesMap.get(productName) || 0) + quantity);
+          }
+        });
+
+        const vegetableSalesData = Array.from(vegetableSalesMap.entries())
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 10);
+
+        console.log('Final vegetable sales data:', vegetableSalesData);
+        setVegetableSalesData(vegetableSalesData);
+
+        // Process food waste data by restaurant
+        const restaurantWasteMap = new Map<string, number>();
+        municipalityWasteReports.forEach((report) => {
+          const restaurant = profiles.find((member) => member.id === report.restaurant_id);
+          if (restaurant && restaurant.primary_role === "restaurant") {
+            const restaurantName = restaurant.full_name;
+            const quantity = Number(report.quantity_kg || 0);
+            restaurantWasteMap.set(restaurantName, (restaurantWasteMap.get(restaurantName) || 0) + quantity);
+          }
+        });
+
+        const foodWasteData = Array.from(restaurantWasteMap.entries())
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 10);
+
+        console.log('Food waste data:', foodWasteData);
+        setFoodWasteData(foodWasteData);
+
+        // Process compost sales data
+        const completedCompostPurchases = municipalityPurchases.filter((purchase) => purchase.status === "completed");
+        const compostSalesMap = new Map<string, number>();
+
+        completedCompostPurchases.forEach((purchase) => {
+          const listing = listings.find((item) => item.id === purchase.listing_id);
+          if (listing && listing.kind === "compost") {
+            const productName = listing.title || listing.category || "Unknown";
+            const quantity = Number(purchase.quantity_kg || 0);
+            compostSalesMap.set(productName, (compostSalesMap.get(productName) || 0) + quantity);
+          }
+        });
+
+        const compostSalesData = Array.from(compostSalesMap.entries())
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 10);
+
+        console.log('Compost sales data:', compostSalesData);
+        setCompostSalesData(compostSalesData);
 
         setMonitoringStats({
           municipalityLabel: municipality.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
@@ -258,7 +367,7 @@ function DashboardPage() {
 
     void loadMessageNotifications();
     void loadMonitoringData();
-  }, [profile?.municipality, user]);
+  }, [profile?.municipality, user, timePeriod]);
 
   if (!isLguAdmin) {
     return (
@@ -386,6 +495,109 @@ function DashboardPage() {
             </div>
           </Card>
         </div>
+
+        <Card className="mt-8 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold">Vegetable Sales by Type</h3>
+              <p className="text-sm text-muted-foreground">Top 10 vegetables sold in {monitoringStats.municipalityLabel}</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant={timePeriod === 'daily' ? 'default' : 'outline'}
+                onClick={() => setTimePeriod('daily')}
+              >
+                Daily
+              </Button>
+              <Button
+                size="sm"
+                variant={timePeriod === 'monthly' ? 'default' : 'outline'}
+                onClick={() => setTimePeriod('monthly')}
+              >
+                Monthly
+              </Button>
+            </div>
+          </div>
+          <div className="mt-4 h-72">
+            {vegetableSalesData.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                No vegetable sales data available
+              </div>
+            ) : (
+              <ResponsiveContainer>
+                <BarChart data={vegetableSalesData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--color-popover)", borderRadius: 12, border: "1px solid var(--color-border)" }}
+                    formatter={(value: number) => [`${value.toFixed(2)} kg`, 'Quantity']}
+                  />
+                  <Bar dataKey="value" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </Card>
+
+        <Card className="mt-8 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold">Food Waste by Restaurant</h3>
+              <p className="text-sm text-muted-foreground">Top 10 restaurants by food waste submitted in {monitoringStats.municipalityLabel}</p>
+            </div>
+          </div>
+          <div className="mt-4 h-72">
+            {foodWasteData.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                No food waste data available
+              </div>
+            ) : (
+              <ResponsiveContainer>
+                <BarChart data={foodWasteData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--color-popover)", borderRadius: 12, border: "1px solid var(--color-border)" }}
+                    formatter={(value: number) => [`${value.toFixed(2)} kg`, 'Quantity']}
+                  />
+                  <Bar dataKey="value" fill="var(--color-chart-3)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </Card>
+
+        <Card className="mt-8 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold">Compost Sales by Product</h3>
+              <p className="text-sm text-muted-foreground">Top 10 compost products sold in {monitoringStats.municipalityLabel}</p>
+            </div>
+          </div>
+          <div className="mt-4 h-72">
+            {compostSalesData.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                No compost sales data available
+              </div>
+            ) : (
+              <ResponsiveContainer>
+                <BarChart data={compostSalesData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--color-popover)", borderRadius: 12, border: "1px solid var(--color-border)" }}
+                    formatter={(value: number) => [`${value.toFixed(2)} kg`, 'Quantity']}
+                  />
+                  <Bar dataKey="value" fill="var(--color-chart-4)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </Card>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <Card className="p-6">

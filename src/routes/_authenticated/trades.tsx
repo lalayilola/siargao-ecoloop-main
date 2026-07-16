@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, PageHero } from "@/components/Section";
+import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { roleMeta } from "@/data/mock";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TransactionDetails } from "@/components/TransactionDetails";
+import { TransactionDetails } from "@/components/common/TransactionDetails";
 
 const statusColor: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-700 border-yellow-300",

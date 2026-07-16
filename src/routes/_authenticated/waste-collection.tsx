@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WasteCollectionView } from "@/components/WasteCollectionView";
+import { WasteCollectionView } from "@/components/waste/WasteCollectionView";
 
 export const Route = createFileRoute("/_authenticated/waste-collection")({
   head: () => ({

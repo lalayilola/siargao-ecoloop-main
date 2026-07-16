@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, PageHero } from "@/components/Section";
+import { Container } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Recycle, Sprout, Users, Leaf } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
+import restaurantBg from "@/assets/restaurant.jpg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -35,11 +36,22 @@ function AboutPage() {
 
   return (
     <>
-      <PageHero
-        eyebrow={t("about.hero.eyebrow")}
-        title={t("about.hero.title")}
-        sub={t("about.hero.subtitle")}
-      />
+      {/* Hero Section with Background */}
+      <section className="relative overflow-hidden py-20">
+        <div className="absolute inset-0">
+          <img src={restaurantBg} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+        <Container className="relative">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="font-display text-3xl font-semibold sm:text-4xl text-white">{t("about.hero.eyebrow")}</h1>
+            <h2 className="mt-4 font-display text-4xl font-bold sm:text-5xl text-white">{t("about.hero.title")}</h2>
+            <p className="mt-4 text-lg text-white/90">
+              {t("about.hero.subtitle")}
+            </p>
+          </div>
+        </Container>
+      </section>
       <Container className="grid gap-10 py-16 md:grid-cols-2">
         <div>
           <h2 className="font-display text-2xl font-semibold">{t("about.mission.title")}</h2>

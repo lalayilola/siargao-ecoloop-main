@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessagesView } from "@/components/MessagesView";
+import { MessagesView } from "@/components/messaging/MessagesView";
 
 export const Route = createFileRoute("/_authenticated/messages")({
   head: () => ({

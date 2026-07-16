@@ -60,7 +60,7 @@ const resources = {
       // Home Page
       home: {
         hero: {
-          badge: "A circular economy for Siargao",
+          badge: "A circular food system in Siargao",
           title: "Turn food waste into island harvest.",
           subtitle: "EcoLoop Siargao connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the island green and the loop closed.",
           joinLoop: "Join the loop",
@@ -97,7 +97,7 @@ const resources = {
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "A social feed of available crops, waste and trades from your barangay.",
           marketplaces: "Marketplaces",
-          marketplacesDesc: "Two markets — food waste and fresh produce — with photos, weight, price and location.",
+          marketplacesDesc: "Three markets — fresh produce, compost/fertilizer, and food waste — with photos, weight, price and location.",
           barter: "Barter & Trades",
           barterDesc: "Swap waste, produce and meals without cash. Track every trade end-to-end.",
           smartSearch: "Smart Search",
@@ -113,7 +113,7 @@ const resources = {
           title: "Ready to close the loop on your block?",
           subtitle: "Register your farm, kitchen or household and start trading today — no cash, just community.",
           getStarted: "Get started",
-          browseEcoFeed: "Browse the EcoFeed"
+          browseMarketplace: "Browse the Marketplace"
         }
       },
       // About Page
@@ -180,7 +180,7 @@ const resources = {
         hero: {
           eyebrow: "EcoLoop Account",
           title: "Sign in or join the loop.",
-          subtitle: "Members can post in the EcoFeed, list waste and produce, request trades, and track community impact."
+          subtitle: "A circular economy platform connecting Siargao's farmers, restaurants, residents, and LGUs to turn waste into harvest."
         },
         signIn: "Sign in",
         createAccount: "Create account",
@@ -284,7 +284,7 @@ const resources = {
           post: "01 · Post",
           postDesc: "Share what you have or need — food waste, fresh harvest, or future supply.",
           match: "02 · Match",
-          matchDesc: "Browse the EcoFeed or use Smart Search to find a partner nearby.",
+          matchDesc: "Browse the Marketplace or use Smart Search to find a partner nearby.",
           exchange: "03 · Exchange",
           exchangeDesc: "Coordinate pickup, barter or sale through the trade request flow.",
           track: "04 · Track",
@@ -360,7 +360,7 @@ const resources = {
       // Home Page
       home: {
         hero: {
-          badge: "Isang circular economy para sa Siargao",
+          badge: "Isang circular food system para sa Siargao",
           title: "Ibalik ang pagkain sa ani ng isla.",
           subtitle: "Ang EcoLoop Siargao ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang isla na berde at ang loop na sarado.",
           joinLoop: "Sumali sa loop",
@@ -397,7 +397,7 @@ const resources = {
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "Isang social feed ng available na crops, waste at trades mula sa iyong barangay.",
           marketplaces: "Marketplaces",
-          marketplacesDesc: "Dalawang market — pagkain at sariwang produkto — na may mga litrato, timbang, presyo at lokasyon.",
+          marketplacesDesc: "Tatlong market — sariwang produkto, compost/fertilizer, at pagkain — na may mga litrato, timbang, presyo at lokasyon.",
           barter: "Barter & Trades",
           barterDesc: "I-swap ang waste, produce at mga meal nang walang cash. I-track ang bawat trade end-to-end.",
           smartSearch: "Smart Search",
@@ -413,7 +413,7 @@ const resources = {
           title: "Handa na ba na sarado ang loop sa iyong block?",
           subtitle: "Magrehistro ng iyong farm, kusina o household at magsimula sa trading ngayon — walang cash, komunidad lang.",
           getStarted: "Magsimula",
-          browseEcoFeed: "Browse ang EcoFeed"
+          browseMarketplace: "Browse ang Marketplace"
         }
       },
       // About Page
@@ -486,7 +486,7 @@ const resources = {
           post: "01 · I-post",
           postDesc: "Ibahagi ang mayroon ka o kailangan mo — pagkain, sariwang ani, o future supply.",
           match: "02 · I-match",
-          matchDesc: "Browse ang EcoFeed o gamitin ang Smart Search para makahanap ng partner malapit.",
+          matchDesc: "Browse ang Marketplace o gamitin ang Smart Search para makahanap ng partner malapit.",
           exchange: "03 · Magpalitan",
           exchangeDesc: "I-coordinate ang pickup, barter o pagbebenta sa pamamagitan ng trade request flow.",
           track: "04 · I-track",
@@ -660,7 +660,7 @@ const resources = {
       // Home Page
       home: {
         hero: {
-          badge: "Usa ka circular economy alang sa Siargao",
+          badge: "Usa ka circular food system alang sa Siargao",
           title: "Ibalik ang pagkaon sa ani sa isla.",
           subtitle: "Ang EcoLoop Siargao nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa isla nga berde ug ang loop nga sarado.",
           joinLoop: "Sali sa loop",
@@ -697,7 +697,7 @@ const resources = {
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "Usa ka social feed sa available nga crops, waste ug trades gikan sa imong barangay.",
           marketplaces: "Marketplaces",
-          marketplacesDesc: "Duha ka market — pagkaon ug bag-ong produkto — nga may mga litrato, timbang, presyo ug lokasyon.",
+          marketplacesDesc: "Tulo ka market — bag-ong produkto, compost/fertilizer, ug pagkaon — nga may mga litrato, timbang, presyo ug lokasyon.",
           barter: "Barter & Trades",
           barterDesc: "I-swap ang waste, produce ug mga meal nga walay cash. I-track ang matag trade end-to-end.",
           smartSearch: "Smart Search",
@@ -713,7 +713,7 @@ const resources = {
           title: "Andam na ba nga sarado ang loop sa imong block?",
           subtitle: "Magrehistro sa imong farm, kusina o household ug magsugod sa trading karun — walay cash, komunidad lang.",
           getStarted: "Magsugod",
-          browseEcoFeed: "Browse ang EcoFeed"
+          browseMarketplace: "Browse ang Marketplace"
         }
       },
       // About Page
@@ -786,7 +786,7 @@ const resources = {
           post: "01 · I-post",
           postDesc: "Ibahagi ang naa nimo o kinahanglan nimo — pagkaon, bag-ong ani, o future supply.",
           match: "02 · I-match",
-          matchDesc: "Browse ang EcoFeed o gamit ang Smart Search aron makapangita og partner duol.",
+          matchDesc: "Browse ang Marketplace o gamit ang Smart Search aron makapangita og partner duol.",
           exchange: "03 · Magpalitan",
           exchangeDesc: "I-coordinate ang pickup, barter o pagbaligya pinaagi sa trade request flow.",
           track: "04 · I-track",

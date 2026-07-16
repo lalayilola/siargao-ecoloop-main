@@ -27,6 +27,7 @@ import { Route as AuthenticatedWasteCollectionRouteImport } from './routes/_auth
 import { Route as AuthenticatedTradesRouteImport } from './routes/_authenticated/trades'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPlanningRouteImport } from './routes/_authenticated/planning'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
@@ -133,6 +134,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlanningRoute = AuthenticatedPlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/planning': typeof AuthenticatedPlanningRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/trades': typeof AuthenticatedTradesRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/planning': typeof AuthenticatedPlanningRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/trades': typeof AuthenticatedTradesRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/planning': typeof AuthenticatedPlanningRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/trades': typeof AuthenticatedTradesRoute
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/messages'
     | '/notifications'
+    | '/planning'
     | '/profile'
     | '/requests'
     | '/trades'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/messages'
     | '/notifications'
+    | '/planning'
     | '/profile'
     | '/requests'
     | '/trades'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/_authenticated/marketplace'
     | '/_authenticated/messages'
     | '/_authenticated/notifications'
+    | '/_authenticated/planning'
     | '/_authenticated/profile'
     | '/_authenticated/requests'
     | '/_authenticated/trades'
@@ -560,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planning': {
+      id: '/_authenticated/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof AuthenticatedPlanningRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
@@ -692,6 +711,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPlanningRoute: typeof AuthenticatedPlanningRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedTradesRoute: typeof AuthenticatedTradesRoute
@@ -712,6 +732,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPlanningRoute: AuthenticatedPlanningRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedTradesRoute: AuthenticatedTradesRoute,
