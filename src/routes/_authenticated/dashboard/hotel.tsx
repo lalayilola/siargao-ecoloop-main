@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HotelDashboard } from "@/components/HotelDashboard";
+import { HotelDashboard } from "@/components/dashboard/HotelDashboard";
 
 export const Route = createFileRoute("/_authenticated/dashboard/hotel")({
   head: () => ({

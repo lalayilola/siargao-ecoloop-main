@@ -12,7 +12,7 @@ import heroImage from "@/assets/siargao-spot.jpg";
 import { roleMeta } from "@/data/mock";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { LocationPicker } from "@/components/LocationPicker";
+import { LocationPicker } from "@/components/auth/LocationPicker";
 import { useLanguage } from "@/hooks/use-language";
 
 const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
