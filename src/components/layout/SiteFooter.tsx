@@ -1,13 +1,24 @@
 import { Link } from "@tanstack/react-router";
 import logo from "@/assets/finalogo.png";
 
+const bounceAnimation = `
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+`;
+
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t-2 border-primary/30 bg-gradient-to-b from-secondary/15 via-white/95 to-sand/30 shadow-inner">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <img src={logo} alt="EcoLoop Siargao" className="h-5 w-5 object-contain" />
+            <img src={logo} alt="EcoLoop Siargao" className="h-5 w-5 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
             <span className="font-display text-base font-semibold text-slate-900">EcoLoop Siargao</span>
           </div>
           <p className="mt-3 max-w-xs text-sm text-slate-600/80">
@@ -43,6 +54,7 @@ export function SiteFooter() {
       <div className="border-t border-border/60 py-5 text-center text-xs text-slate-600/80">
         © {new Date().getFullYear()} EcoLoop Siargao · Built for a circular island economy
       </div>
+      <style>{bounceAnimation}</style>
     </footer>
   );
 }

@@ -12,6 +12,17 @@ import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 import logo from "@/assets/finalogo.png";
 
+const bounceAnimation = `
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+`;
+
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
@@ -226,7 +237,7 @@ function LoginPage() {
                 disabled={googleBusy}
                 onClick={handleGoogleSignIn}
               >
-                <img src={logo} alt="EcoLoop Siargao" className="mr-2 h-4 w-4 object-contain" />
+                <img src={logo} alt="EcoLoop Siargao" className="mr-2 h-4 w-4 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
                 {googleBusy ? "Connecting..." : "Continue with Google"}
               </Button>
 
@@ -237,6 +248,7 @@ function LoginPage() {
           </Card>
         </div>
       </Container>
+      <style>{bounceAnimation}</style>
     </>
   );
 }

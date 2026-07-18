@@ -855,7 +855,7 @@ export function MarketplaceView() {
 
 
 
-  const handlePurchaseRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["purchase_status"]) => {
+  const handlePurchaseRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["trade_status"]) => {
 
     const { data: existingRequest, error: existingRequestError } = await (supabase
 
@@ -1261,7 +1261,7 @@ export function MarketplaceView() {
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-amber-900">Account Verification Required</p>
-                <p className="text-sm text-amber-700">Upload your government ID in your <Link to="/profile" search={{}} className="underline font-medium">profile</Link> to get verified by the LGU. Verification is required to create listings, buy, trade, and send messages.</p>
+                <p className="text-sm text-amber-700">Upload your government ID in your <Link to="/profile" search={{ userId: undefined }} className="underline font-medium">profile</Link> to get verified by the LGU. Verification is required to create listings, buy, trade, and send messages.</p>
               </div>
             </div>
           </div>
@@ -1419,15 +1419,15 @@ export function MarketplaceView() {
 
         {showForm && user && profile?.primary_role !== "resident" && (
 
-          <Card className="mb-6 p-6 border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10 shadow-sm shadow-primary/10">
+          <Card className="mb-6 p-4 border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10 shadow-sm shadow-primary/10">
 
-            <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="mb-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 
               <div>
 
-                <h2 className="font-display text-xl font-semibold text-primary">Create a new listing</h2>
+                <h2 className="font-display text-lg font-semibold text-primary">Create a new listing</h2>
 
-                <p className="text-sm text-slate-600/70">
+                <p className="text-xs text-slate-600/70">
 
                   {profile?.primary_role === "farmer"
 
@@ -1451,492 +1451,248 @@ export function MarketplaceView() {
 
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2">
 
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Listing title" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Listing title" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
-              <Input type="number" value={kg || ""} onChange={(e) => setKg(Number(e.target.value) || 0)} placeholder="Quantity (kg)" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
+              <Input type="number" value={kg || ""} onChange={(e) => setKg(Number(e.target.value) || 0)} placeholder="Quantity (kg)" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
-              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price or terms" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
+              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price or terms" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
-              <Input value={availableAt} onChange={(e) => setAvailableAt(e.target.value)} placeholder="Available date" className="border-primary/30 focus:border-primary focus:ring-primary/50" />
+              <Input value={availableAt} onChange={(e) => setAvailableAt(e.target.value)} placeholder="Available date" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
-              <div className="sm:col-span-2 flex flex-wrap gap-3">
-
+              <div className="col-span-2 flex flex-wrap gap-2">
                 {profile?.primary_role === "restaurant" ? (
-
                   <Button type="button" className={kind === "waste" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("waste")}>♻️ Waste</Button>
-
                 ) : profile?.primary_role === "lgu_admin" ? (
-
                   <Button type="button" className={kind === "compost" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("compost")}>🌱 Compost</Button>
-
                 ) : (
-
-                  <>
-
-                    <Button type="button" className={kind === "produce" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("produce")}>🌾 Produce</Button>
-
-                  </>
-
+                  <Button type="button" className={kind === "produce" ? "bg-primary text-white hover:bg-primary/90" : "text-primary border border-primary/30 hover:bg-primary/10"} onClick={() => setKind("produce")}>🌾 Produce</Button>
                 )}
-
               </div>
 
-              <div className="sm:col-span-2">
-
-                <Label className="mb-2 block text-sm font-medium text-primary">Transaction Type</Label>
-
+              <div>
+                <Label className="mb-1 block text-[10px] font-medium text-primary">Transaction Type</Label>
                 <Select value={transactionType} onValueChange={(value: "sell_only" | "barter_only" | "sell_and_barter") => setTransactionType(value)}>
-
-                  <SelectTrigger className="border-primary/30 focus:border-primary focus:ring-primary/50">
-
+                  <SelectTrigger className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs">
                     <SelectValue placeholder="Select transaction type" />
-
                   </SelectTrigger>
-
                   <SelectContent>
-
                     <SelectItem value="sell_only">Sell Only</SelectItem>
-
                     <SelectItem value="barter_only">Barter Only</SelectItem>
-
                     <SelectItem value="sell_and_barter">Sell and Barter</SelectItem>
-
                   </SelectContent>
-
                 </Select>
+              </div>
 
+              <div>
+                <Label className="mb-1 block text-[10px] font-medium text-primary">Category</Label>
+                <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder={kind === "produce" ? "e.g., Tomatoes" : "e.g., Food Waste"} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
               </div>
 
               {(transactionType === "barter_only" || transactionType === "sell_and_barter") && (
-
-                <div className="sm:col-span-2">
-
-                  <Label className="mb-2 block text-sm font-medium text-primary">Acceptable Exchanges</Label>
-
-                  <div className="grid gap-2 sm:grid-cols-2">
-
+                <div className="col-span-2">
+                  <Label className="mb-1 block text-[10px] font-medium text-primary">Acceptable Exchanges</Label>
+                  <div className="flex flex-wrap gap-2">
                     {profile?.primary_role === "farmer" ? (
-
                       <>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="food-waste"
-
                             checked={acceptableExchanges.includes("Food Waste")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Food Waste"]
-
                                 : acceptableExchanges.filter(e => e !== "Food Waste")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="food-waste" className="text-sm">Food Waste</Label>
-
+                          <Label htmlFor="food-waste" className="text-[10px]">Food Waste</Label>
                         </div>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="restaurant-food-waste"
-
                             checked={acceptableExchanges.includes("Restaurant Food Waste")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Restaurant Food Waste"]
-
                                 : acceptableExchanges.filter(e => e !== "Restaurant Food Waste")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="restaurant-food-waste" className="text-sm">Restaurant Food Waste</Label>
-
+                          <Label htmlFor="restaurant-food-waste" className="text-[10px]">Restaurant Food Waste</Label>
                         </div>
-
                       </>
-
                     ) : profile?.primary_role === "restaurant" ? (
-
                       <>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="fresh-vegetables"
-
                             checked={acceptableExchanges.includes("Fresh Vegetables")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Fresh Vegetables"]
-
                                 : acceptableExchanges.filter(e => e !== "Fresh Vegetables")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="fresh-vegetables" className="text-sm">Fresh Vegetables</Label>
-
+                          <Label htmlFor="fresh-vegetables" className="text-[10px]">Fresh Vegetables</Label>
                         </div>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="fruits"
-
                             checked={acceptableExchanges.includes("Fruits")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Fruits"]
-
                                 : acceptableExchanges.filter(e => e !== "Fruits")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="fruits" className="text-sm">Fruits</Label>
-
+                          <Label htmlFor="fruits" className="text-[10px]">Fruits</Label>
                         </div>
-
                       </>
-
                     ) : (
-
                       <>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="fresh-vegetables-resident"
-
                             checked={acceptableExchanges.includes("Fresh Vegetables")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Fresh Vegetables"]
-
                                 : acceptableExchanges.filter(e => e !== "Fresh Vegetables")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="fresh-vegetables-resident" className="text-sm">Fresh Vegetables</Label>
-
+                          <Label htmlFor="fresh-vegetables-resident" className="text-[10px]">Fresh Vegetables</Label>
                         </div>
-
-                        <div className="flex items-center space-x-2">
-
+                        <div className="flex items-center space-x-1">
                           <Checkbox
-
                             id="fruits-resident"
-
                             checked={acceptableExchanges.includes("Fruits")}
-
                             onCheckedChange={(checked) => {
-
                               setAcceptableExchanges(checked 
-
                                 ? [...acceptableExchanges, "Fruits"]
-
                                 : acceptableExchanges.filter(e => e !== "Fruits")
-
                               );
-
                             }}
-
                           />
-
-                          <Label htmlFor="fruits-resident" className="text-sm">Fruits</Label>
-
+                          <Label htmlFor="fruits-resident" className="text-[10px]">Fruits</Label>
                         </div>
-
                       </>
-
                     )}
-
                   </div>
-
                 </div>
-
               )}
-
-              <div className="sm:col-span-2">
-
-                <Label className="mb-2 block text-sm font-medium text-primary">Category</Label>
-
-                <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder={kind === "produce" ? "e.g., Tomatoes, Lettuce" : "e.g., Vegetable Scraps, Food Waste"} className="border-primary/30 focus:border-primary focus:ring-primary/50" />
-
-              </div>
 
             </div>
 
-            <div className="mt-4">
-
-              <label className="mb-2 block text-sm font-medium text-primary">Add photos</label>
-
-              <div className="relative">
-
-                <input
-
-                  type="file"
-
-                  accept="image/*"
-
-                  multiple
-
-                  onChange={(e) => {
-
-                    const newFiles = Array.from(e.target.files || []);
-
-                    setFiles([...files, ...newFiles]);
-
-                  }}
-
-                  className="text-sm border-2 border-dashed border-primary/40 rounded-lg p-4 w-full cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-colors"
-
-                />
-
-                {files.length === 0 && (
-
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-
-                    <div className="text-center text-primary/60">
-
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div>
+                <label className="mb-1 block text-[10px] font-medium text-primary">Add photos</label>
+                <div className="relative border-2 border-dashed border-primary/40 rounded-lg p-3 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const newFiles = Array.from(e.target.files || []);
+                      setFiles([...files, ...newFiles]);
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  {files.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary/60 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-
                       </svg>
-
-                      <p className="text-sm">Click to upload images</p>
-
-                      <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
-
+                      <p className="text-[10px] text-primary/60">Click to upload</p>
                     </div>
-
-                  </div>
-
-                )}
-
-              </div>
-
-              {files.length > 0 && (
-
-                <>
-
-                  <div className="mt-2 flex items-center justify-between">
-
-                    <div className="text-sm text-primary/70 font-medium">
-
-                      {files.length} image{files.length !== 1 ? 's' : ''} selected
-
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-2">
+                      <p className="text-[10px] text-primary/70 font-medium">{files.length} image{files.length !== 1 ? 's' : ''} selected</p>
+                      <p className="text-[9px] text-primary/50">Click to add more</p>
                     </div>
-
-                    <Button
-
-                      type="button"
-
-                      variant="outline"
-
-                      size="sm"
-
-                      onClick={() => (document.querySelector('input[type="file"]') as HTMLElement)?.click()}
-
-                      className="text-xs border-primary/40 text-primary hover:bg-primary/10"
-
-                    >
-
-                      + Add More
-
-                    </Button>
-
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-
+                  )}
+                </div>
+                {files.length > 0 && (
+                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
                     {files.map((file, index) => (
-
                       <div key={index} className="relative group">
-
                         <img
-
                           src={URL.createObjectURL(file)}
-
                           alt={`preview ${index + 1}`}
-
-                          className="h-20 w-full object-cover rounded-md border-2 border-primary/30"
-
+                          className="h-16 w-full object-cover rounded-md border-2 border-primary/30"
                         />
-
                         <button
-
                           onClick={() => setFiles(files.filter((_, i) => i !== index))}
-
                           className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-
                         >
-
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-
                           </svg>
-
                         </button>
-
-                        <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">
-
+                        <div className="absolute bottom-1 left-1 bg-black/50 text-white text-[10px] px-1 py-0.5 rounded">
                           {index + 1}
-
                         </div>
-
                       </div>
-
                     ))}
-
                   </div>
-
-                </>
-
-              )}
-
-            </div>
-
-            <div className="mt-4 space-y-3">
-
-              <div>
-
-                <label className="block text-sm font-medium text-slate-700 mb-1">Location (Type or use map)</label>
-
-                <Input
-
-                  value={listingLocationName}
-
-                  onChange={(e) => setListingLocationName(e.target.value)}
-
-                  placeholder="e.g., Cloud 9, General Luna"
-
-                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
-
-                />
-
+                )}
               </div>
 
-              <div>
-
-                <label className="block text-sm font-medium text-slate-700 mb-1">Address (Optional)</label>
-
-                <Input
-
-                  value={listingLocationAddress}
-
-                  onChange={(e) => setListingLocationAddress(e.target.value)}
-
-                  placeholder="e.g., Near the main beach"
-
-                  className="border-primary/30 focus:border-primary focus:ring-primary/50"
-
-                />
-
+              <div className="space-y-2">
+                <div>
+                  <label className="block text-[10px] font-medium text-slate-700 mb-1">Location</label>
+                  <Input
+                    value={listingLocationName}
+                    onChange={(e) => setListingLocationName(e.target.value)}
+                    placeholder="e.g., Cloud 9"
+                    className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-slate-700 mb-1">Address</label>
+                  <Input
+                    value={listingLocationAddress}
+                    onChange={(e) => setListingLocationAddress(e.target.value)}
+                    placeholder="Optional"
+                    className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs"
+                  />
+                </div>
+                <Button 
+                  variant={selectedLocation ? "secondary" : "outline"} 
+                  onClick={() => setShowLocationPicker(true)}
+                  className="w-full flex items-center gap-2 h-7 text-xs"
+                >
+                  <MapPin className="h-3 w-3" />
+                  {selectedLocation ? "Location Updated from Map" : "Or pick from map"}
+                </Button>
+                {selectedLocation && (
+                  <p className="text-[10px] text-muted-foreground">{selectedLocation.locationName}</p>
+                )}
               </div>
-
-              <Button 
-
-                variant={selectedLocation ? "secondary" : "outline"} 
-
-                onClick={() => setShowLocationPicker(true)}
-
-                className="w-full flex items-center gap-2"
-
-              >
-
-                <MapPin className="h-4 w-4" />
-
-                {selectedLocation ? "Location Updated from Map" : "Or pick from map"}
-
-              </Button>
-
-              {selectedLocation && (
-
-                <p className="text-sm text-muted-foreground mt-2">{selectedLocation.locationName}</p>
-
-              )}
-
             </div>
 
             {showLocationPicker && (
-
-              <div className="mt-4">
-
+              <div className="mt-2">
                 <LocationPicker 
-
                   onLocationSelect={(location) => {
-
                     setListingLocationName(location.locationName);
-
                     setListingLocationAddress(location.locationAddress);
-
                     setSelectedLocation(location);
-
                     setShowLocationPicker(false);
-
                   }}
-
                   initialLocation={selectedLocation ? { latitude: selectedLocation.latitude, longitude: selectedLocation.longitude } : undefined}
-
                 />
-
               </div>
-
             )}
 
-            <div className="mt-4">
-
-              <Button onClick={createListing} disabled={uploading} className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90">
-
-                {uploading ? "Uploading images..." : "Publish listing"}
-
+            <div className="mt-2">
+              <Button onClick={createListing} disabled={uploading} className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 h-8 text-xs">
+                {uploading ? "Uploading..." : "Publish listing"}
               </Button>
-
             </div>
 
           </Card>

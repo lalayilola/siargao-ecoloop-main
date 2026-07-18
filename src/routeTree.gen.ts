@@ -36,7 +36,6 @@ import { Route as AuthenticatedGisMapRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEcoPointsRouteImport } from './routes/_authenticated/eco-points'
 import { Route as AuthenticatedDashboardUsersRouteImport } from './routes/_authenticated/dashboard-users'
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated/dashboard-reports'
-import { Route as AuthenticatedDashboardAnnouncementsRouteImport } from './routes/_authenticated/dashboard-announcements'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAnnouncementsRouteImport } from './routes/_authenticated/announcements'
 import { Route as AuthenticatedDashboardRestaurantRouteImport } from './routes/_authenticated/dashboard/restaurant'
@@ -183,12 +182,6 @@ const AuthenticatedDashboardReportsRoute =
     path: '/dashboard-reports',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardAnnouncementsRoute =
-  AuthenticatedDashboardAnnouncementsRouteImport.update({
-    id: '/dashboard-announcements',
-    path: '/dashboard-announcements',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -233,7 +226,6 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
-  '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/eco-points': typeof AuthenticatedEcoPointsRoute
@@ -267,7 +259,6 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/announcements': typeof AuthenticatedAnnouncementsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
-  '/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/eco-points': typeof AuthenticatedEcoPointsRoute
@@ -303,7 +294,6 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/announcements': typeof AuthenticatedAnnouncementsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
-  '/_authenticated/dashboard-announcements': typeof AuthenticatedDashboardAnnouncementsRoute
   '/_authenticated/dashboard-reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard-users': typeof AuthenticatedDashboardUsersRoute
   '/_authenticated/eco-points': typeof AuthenticatedEcoPointsRoute
@@ -339,7 +329,6 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/announcements'
     | '/dashboard'
-    | '/dashboard-announcements'
     | '/dashboard-reports'
     | '/dashboard-users'
     | '/eco-points'
@@ -373,7 +362,6 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/announcements'
     | '/dashboard'
-    | '/dashboard-announcements'
     | '/dashboard-reports'
     | '/dashboard-users'
     | '/eco-points'
@@ -408,7 +396,6 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_authenticated/announcements'
     | '/_authenticated/dashboard'
-    | '/_authenticated/dashboard-announcements'
     | '/_authenticated/dashboard-reports'
     | '/_authenticated/dashboard-users'
     | '/_authenticated/eco-points'
@@ -635,13 +622,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard-announcements': {
-      id: '/_authenticated/dashboard-announcements'
-      path: '/dashboard-announcements'
-      fullPath: '/dashboard-announcements'
-      preLoaderRoute: typeof AuthenticatedDashboardAnnouncementsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -702,7 +682,6 @@ const AuthenticatedDashboardRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnnouncementsRoute: typeof AuthenticatedAnnouncementsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
-  AuthenticatedDashboardAnnouncementsRoute: typeof AuthenticatedDashboardAnnouncementsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardUsersRoute: typeof AuthenticatedDashboardUsersRoute
   AuthenticatedEcoPointsRoute: typeof AuthenticatedEcoPointsRoute
@@ -722,8 +701,6 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnnouncementsRoute: AuthenticatedAnnouncementsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
-  AuthenticatedDashboardAnnouncementsRoute:
-    AuthenticatedDashboardAnnouncementsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardUsersRoute: AuthenticatedDashboardUsersRoute,
   AuthenticatedEcoPointsRoute: AuthenticatedEcoPointsRoute,

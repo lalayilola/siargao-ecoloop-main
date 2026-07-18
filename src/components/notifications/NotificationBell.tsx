@@ -32,13 +32,15 @@ export function NotificationBell() {
         .order("created_at", { ascending: false })
         .limit(10);
 
+      const notifications = data as Notification[] | null;
+
       if (error) {
         console.error("Error loading notifications:", error);
         return;
       }
 
-      setNotifications(data ?? []);
-      setUnreadCount(data?.filter(n => !n.read_at).length ?? 0);
+      setNotifications(notifications ?? []);
+      setUnreadCount(notifications?.filter(n => !n.read_at).length ?? 0);
     };
 
     loadNotifications();
@@ -74,8 +76,8 @@ export function NotificationBell() {
   }, [user]);
 
   const markAsRead = async (notificationId: string) => {
-    const { error } = await supabase
-      .from("notifications")
+    const { error } = await (supabase
+      .from("notifications") as any)
       .update({ read_at: new Date().toISOString() })
       .eq("id", notificationId);
 
@@ -91,8 +93,8 @@ export function NotificationBell() {
   };
 
   const markAllAsRead = async () => {
-    const { error } = await supabase
-      .from("notifications")
+    const { error } = await (supabase
+      .from("notifications") as any)
       .update({ read_at: new Date().toISOString() })
       .eq("user_id", user?.id)
       .is("read_at", null);
@@ -125,6 +127,31 @@ export function NotificationBell() {
     }
   };
 
+  const getNotificationLink = (notification: Notification) => {
+    const titleLower = notification.title.toLowerCase();
+    const typeLower = notification.type?.toLowerCase() || "";
+
+    // Check for message notifications
+    if (typeLower === "message" || titleLower.includes("message") || titleLower.includes("sent you")) {
+      return "/messages";
+    }
+    // Check for purchase/trade notifications - override existing link
+    else if (
+      typeLower === "purchase_request" ||
+      typeLower === "trade_request" ||
+      titleLower.includes("purchase") ||
+      titleLower.includes("trade") ||
+      titleLower.includes("transaction")
+    ) {
+      return "/trades";
+    }
+    // Default to existing link if available
+    else if (notification.link) {
+      return notification.link;
+    }
+    return null;
+  };
+
   if (!user) return null;
 
   return (
@@ -154,44 +181,47 @@ export function NotificationBell() {
               No notifications yet
             </div>
           ) : (
-            notifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                className="flex flex-col items-start p-3 cursor-pointer"
-                onClick={() => {
-                  if (!notification.read_at) {
-                    markAsRead(notification.id);
-                  }
-                  if (notification.link) {
-                    window.location.href = notification.link;
-                  }
-                }}
-              >
-                <div className="flex items-start justify-between w-full gap-2">
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{notification.title}</p>
-                    <p className="text-xs text-slate-600 mt-1">{notification.message}</p>
-                    <p className="text-xs text-slate-400 mt-1">
-                      {new Date(notification.created_at).toLocaleDateString()}
-                    </p>
+            notifications.map((notification) => {
+              const link = getNotificationLink(notification);
+              return (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex flex-col items-start p-3 cursor-pointer"
+                  onClick={async () => {
+                    if (!notification.read_at) {
+                      await markAsRead(notification.id);
+                    }
+                    if (link) {
+                      window.location.href = link;
+                    }
+                  }}
+                >
+                  <div className="flex items-start justify-between w-full gap-2">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{notification.title}</p>
+                      <p className="text-xs text-slate-600 mt-1">{notification.message}</p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {new Date(notification.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteNotification(notification.id);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 flex-shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteNotification(notification.id);
-                    }}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-                {!notification.read_at && (
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2" />
-                )}
-              </DropdownMenuItem>
-            ))
+                  {!notification.read_at && (
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2" />
+                  )}
+                </DropdownMenuItem>
+              );
+            })
           )}
         </ScrollArea>
       </DropdownMenuContent>

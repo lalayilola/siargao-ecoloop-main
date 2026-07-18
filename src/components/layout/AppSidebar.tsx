@@ -19,10 +19,21 @@ import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import logo from "@/assets/finalogo.png";
 
+const bounceAnimation = `
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+`;
+
 const memberItems = [
   { to: "/marketplace", label: "Marketplace", icon: Store },
   { to: "/planning", label: "Planning & Forecast", icon: Calendar },
-  { to: "/requests", label: "My Requests", icon: ArrowLeftRight },
+  { to: "/requests", label: "Transactions", icon: ArrowLeftRight },
   { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/announcements", label: "Announcements", icon: Megaphone },
 ];
@@ -57,8 +68,8 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center justify-between px-4 py-4">
           <Link to="/" onClick={handleLinkClick} className="flex items-center gap-3 rounded-b-3xl relative z-10">
-            <img src={logo} alt="EcoLoop Siargao" className="h-16 w-16 object-contain" />
-            <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden animate-bounce">
+            <img src={logo} alt="EcoLoop Siargao" className="h-16 w-16 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
+            <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
               EcoLoop <span className="text-primary">Siargao</span>
             </span>
           </Link>
@@ -104,14 +115,6 @@ export function AppSidebar() {
                     <Link to="/dashboard-users" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <UserIcon />
                       <span>Members Dashboard</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActive("/dashboard-announcements")}>
-                    <Link to="/dashboard-announcements" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
-                      <Megaphone />
-                      <span>Announcements</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -192,6 +195,7 @@ export function AppSidebar() {
           <span className="group-data-[collapsible=icon]:hidden">Sign out</span>
         </Button>
       </SidebarFooter>
+      <style>{bounceAnimation}</style>
     </Sidebar>
   );
 }

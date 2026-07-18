@@ -5,12 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Megaphone, ThumbsUp, Heart, MessageCircle, Filter, Search, Calendar, Tag, AlertCircle } from "lucide-react";
+import { Megaphone, ThumbsUp, Heart, MessageCircle, Filter, Search, Calendar, Tag, AlertCircle, Plus, Edit, Trash2, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/announcements")({
   head: () => ({ meta: [{ title: "Announcements — EcoLoop Siargao" }] }),
@@ -28,6 +30,8 @@ type Announcement = {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  image_url?: string | null;
+  images?: string | null;
 };
 
 type Reaction = {
@@ -48,7 +52,7 @@ type Comment = {
 };
 
 function UserAnnouncements() {
-  const { user, profile } = useAuth();
+  const { user, profile, isLguAdmin } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -59,6 +63,16 @@ function UserAnnouncements() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    category: "general",
+    importance: "normal",
+  });
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -133,7 +147,7 @@ function UserAnnouncements() {
             announcement_id: announcementId,
             user_id: user.id,
             reaction_type: reactionType,
-          });
+          } as any);
 
         if (error) throw error;
       }
@@ -155,7 +169,7 @@ function UserAnnouncements() {
           announcement_id: selectedAnnouncement.id,
           user_id: user.id,
           content: newComment.trim(),
-        });
+        } as any);
 
       if (error) throw error;
       toast.success("Comment added successfully");
@@ -164,6 +178,209 @@ function UserAnnouncements() {
     } catch (error: any) {
       toast.error(`Failed to add comment: ${error.message}`);
     }
+  };
+
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !isLguAdmin) return;
+
+    try {
+      let imageUrl = null;
+      let images: string[] = [];
+
+      // Upload images if selected
+      if (selectedImages.length > 0) {
+        const uploadPromises = selectedImages.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random()}.${fileExt}`;
+          const filePath = `announcement-images/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('announcement-images')
+            .upload(filePath, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('announcement-images')
+            .getPublicUrl(filePath);
+
+          return publicUrl;
+        });
+
+        images = await Promise.all(uploadPromises);
+        imageUrl = images[0]; // Keep backward compatibility
+      }
+
+      const { error } = await supabase
+        .from("announcements")
+        .insert({
+          lgu_admin_id: user.id,
+          title: formData.title,
+          content: formData.content,
+          category: formData.category,
+          importance: formData.importance,
+          status: "published",
+          published_at: new Date().toISOString(),
+          image_url: imageUrl,
+          images: images.length > 0 ? JSON.stringify(images) : null,
+        } as any);
+
+      if (error) throw error;
+      toast.success("Announcement published successfully");
+      setIsCreateDialogOpen(false);
+      setFormData({ title: "", content: "", category: "general", importance: "normal" });
+      setSelectedImages([]);
+      setImagePreviews([]);
+      loadAnnouncements();
+    } catch (error: any) {
+      toast.error(`Failed to publish announcement: ${error.message}`);
+    }
+  };
+
+  const handleEditAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !isLguAdmin || !editingAnnouncement) return;
+
+    try {
+      let imageUrl = editingAnnouncement.image_url;
+      let images: string[] = [];
+
+      // Parse existing images
+      if (editingAnnouncement.images) {
+        try {
+          images = JSON.parse(editingAnnouncement.images);
+        } catch (e) {
+          images = editingAnnouncement.image_url ? [editingAnnouncement.image_url] : [];
+        }
+      } else if (editingAnnouncement.image_url) {
+        images = [editingAnnouncement.image_url];
+      }
+
+      // Upload new images if selected
+      if (selectedImages.length > 0) {
+        const uploadPromises = selectedImages.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random()}.${fileExt}`;
+          const filePath = `announcement-images/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('announcement-images')
+            .upload(filePath, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('announcement-images')
+            .getPublicUrl(filePath);
+
+          return publicUrl;
+        });
+
+        const newImages = await Promise.all(uploadPromises);
+        images = [...images, ...newImages];
+        imageUrl = images[0]; // Keep backward compatibility
+      }
+
+      const { error } = await (supabase.from("announcements") as any)
+        .update({
+          title: formData.title,
+          content: formData.content,
+          category: formData.category,
+          importance: formData.importance,
+          image_url: imageUrl,
+          images: images.length > 0 ? JSON.stringify(images) : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", editingAnnouncement.id);
+
+      if (error) throw error;
+      toast.success("Announcement updated successfully");
+      setEditingAnnouncement(null);
+      setFormData({ title: "", content: "", category: "general", importance: "normal" });
+      setSelectedImages([]);
+      setImagePreviews([]);
+      loadAnnouncements();
+    } catch (error: any) {
+      toast.error(`Failed to update announcement: ${error.message}`);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!user || !isLguAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from("announcements")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      toast.success("Announcement deleted successfully");
+      loadAnnouncements();
+    } catch (error: any) {
+      toast.error(`Failed to delete announcement: ${error.message}`);
+    }
+  };
+
+  const openEditDialog = (announcement: Announcement) => {
+    setEditingAnnouncement(announcement);
+    setFormData({
+      title: announcement.title,
+      content: announcement.content,
+      category: announcement.category,
+      importance: announcement.importance,
+    });
+    // Parse existing images for preview
+    let previews: string[] = [];
+    if (announcement.images) {
+      try {
+        previews = JSON.parse(announcement.images as string);
+      } catch (e) {
+        previews = announcement.image_url ? [announcement.image_url] : [];
+      }
+    } else if (announcement.image_url) {
+      previews = [announcement.image_url];
+    }
+    setImagePreviews(previews);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    Array.from(files).forEach((file) => {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select only image files');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB');
+        return;
+      }
+
+      newFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    });
+
+    setSelectedImages([...selectedImages, ...newFiles]);
+    setImagePreviews([...imagePreviews, ...newPreviews]);
+  };
+
+  const clearImage = (index: number) => {
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    setImagePreviews(imagePreviews.filter((_, i) => i !== index));
+  };
+
+  const clearAllImages = () => {
+    setSelectedImages([]);
+    setImagePreviews([]);
   };
 
   const getUserReaction = (announcementId: string) => {
@@ -224,9 +441,246 @@ function UserAnnouncements() {
       <PageHero
         eyebrow="Community Announcements"
         title="Stay informed with LGU updates."
-        sub="View announcements from the Local Government Unit, react to important updates, and engage with community discussions."
+        sub={isLguAdmin ? "Create, edit, publish, and manage announcements for the community." : "View announcements from the Local Government Unit, react to important updates, and engage with community discussions."}
       />
       <Container className="py-12">
+        {/* Create Announcement Button - LGU Admin Only */}
+        {isLguAdmin && (
+          <div className="mb-8 flex justify-end">
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Create Announcement
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Create New Announcement</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreateAnnouncement} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Title</label>
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Announcement title"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Content</label>
+                    <Textarea
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      placeholder="Announcement content"
+                      rows={6}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Images (optional)</label>
+                    <div className="mt-2">
+                      {imagePreviews.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {imagePreviews.map((preview, index) => (
+                            <div key={index} className="relative inline-block">
+                              <img
+                                src={preview}
+                                alt={`Preview ${index + 1}`}
+                                className="h-24 w-24 object-cover rounded-lg border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  clearImage(index);
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        id="announcement-image-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('announcement-image-upload')?.click()}
+                        className="w-full"
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        {imagePreviews.length > 0 ? "Add more images" : "Upload images"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Category</label>
+                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="emergency">Emergency</SelectItem>
+                          <SelectItem value="event">Event</SelectItem>
+                          <SelectItem value="policy">Policy</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Importance</label>
+                      <Select value={formData.importance} onValueChange={(value) => setFormData({ ...formData, importance: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="important">Important</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => {
+                      setIsCreateDialogOpen(false);
+                      clearAllImages();
+                    }}>Cancel</Button>
+                    <Button type="submit">Publish</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
+
+        {/* Edit Announcement Dialog - LGU Admin Only */}
+        {isLguAdmin && editingAnnouncement && (
+          <Dialog open={!!editingAnnouncement} onOpenChange={(open) => { if (!open) setEditingAnnouncement(null); }}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Announcement</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleEditAnnouncement} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Title</label>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Announcement title"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Content</label>
+                  <Textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    placeholder="Announcement content"
+                    rows={6}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Images (optional)</label>
+                  <div className="mt-2">
+                    {imagePreviews.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={index} className="relative inline-block">
+                            <img
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              className="h-24 w-24 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                clearImage(index);
+                              }}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageSelect}
+                      className="hidden"
+                      id="edit-announcement-image-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('edit-announcement-image-upload')?.click()}
+                      className="w-full"
+                    >
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      {imagePreviews.length > 0 ? "Add more images" : "Upload images"}
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Category</label>
+                    <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="emergency">Emergency</SelectItem>
+                        <SelectItem value="event">Event</SelectItem>
+                        <SelectItem value="policy">Policy</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Importance</label>
+                    <Select value={formData.importance} onValueChange={(value) => setFormData({ ...formData, importance: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="important">Important</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => {
+                    setEditingAnnouncement(null);
+                    clearAllImages();
+                  }}>Cancel</Button>
+                  <Button type="submit">Update</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+
         {/* Filters */}
         <Card className="p-6 mb-8">
           <div className="flex flex-wrap gap-4 items-center">
@@ -289,13 +743,52 @@ function UserAnnouncements() {
                       <Badge className={getCategoryColor(announcement.category)}>{announcement.category}</Badge>
                       <Badge className={getImportanceColor(announcement.importance)}>{announcement.importance}</Badge>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(announcement.published_at || announcement.created_at).toLocaleDateString()}
+                    <div className="flex items-center gap-2">
+                      {isLguAdmin && (
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline" onClick={() => openEditDialog(announcement)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleDeleteAnnouncement(announcement.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(announcement.published_at || announcement.created_at).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
 
                   <h3 className="font-display text-2xl font-semibold mb-3">{announcement.title}</h3>
+                  {(() => {
+                    let images: string[] = [];
+                    if (announcement.images) {
+                      try {
+                        images = JSON.parse(announcement.images as string);
+                      } catch (e) {
+                        images = announcement.image_url ? [announcement.image_url] : [];
+                      }
+                    } else if (announcement.image_url) {
+                      images = [announcement.image_url];
+                    }
+                    if (images.length > 0) {
+                      return (
+                        <div className={`grid gap-2 mb-4 ${images.length === 1 ? 'grid-cols-1' : images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                          {images.map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={img}
+                              alt={`${announcement.title} ${idx + 1}`}
+                              className="w-full max-h-96 object-cover rounded-lg"
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                   <p className="text-muted-foreground mb-6 whitespace-pre-wrap">{announcement.content}</p>
 
                   <div className="flex items-center justify-between border-t pt-4">

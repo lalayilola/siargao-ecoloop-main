@@ -15,7 +15,7 @@ const resources = {
         joinEcoLoop: "Join EcoLoop",
         myProfile: "My profile",
         openApp: "Open app",
-        myRequests: "My requests",
+        myRequests: "Transactions",
         signOut: "Sign out",
         account: "Account"
       },
@@ -315,7 +315,7 @@ const resources = {
         joinEcoLoop: "Sumali sa EcoLoop",
         myProfile: "Ang aking profile",
         openApp: "Buksan ang app",
-        myRequests: "Ang aking mga hiling",
+        myRequests: "Mga Transaksyon",
         signOut: "Mag-sign out",
         account: "Account"
       },
@@ -615,7 +615,7 @@ const resources = {
         joinEcoLoop: "Sali sa EcoLoop",
         myProfile: "Akong profile",
         openApp: "Ablii ang app",
-        myRequests: "Akong mga hangyo",
+        myRequests: "Mga Transaksyon",
         signOut: "Mag-sign out",
         account: "Account"
       },

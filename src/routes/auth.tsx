@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { confirmUserEmail } from "@/lib/api/auth.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Container, PageHero } from "@/components/layout/Section";
@@ -162,6 +161,12 @@ async function signInOrCreateAccount(email: string, password: string) {
 
   const signInResult = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
   if (!signInResult.error) {
+    // Check if email is verified
+    if (!signInResult.data.user?.email_confirmed_at) {
+      // Sign out the user since email is not verified
+      await supabase.auth.signOut();
+      return { ok: false, createdAccount: false, error: new Error("Email not verified"), reason: "email_not_verified" as const };
+    }
     return { ok: true, createdAccount: false, error: null as null, reason: "signed_in" as const };
   }
 
@@ -183,6 +188,7 @@ async function signInOrCreateAccount(email: string, password: string) {
 function LoginForm() {
   const { t } = useLanguage();
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -301,6 +307,9 @@ function LoginForm() {
                 toast.error("Too many sign-in attempts. Please wait a few minutes and try again.");
               } else if (result.reason === "invalid_credentials") {
                 toast.error("Incorrect email or password. If you do not have an account yet, please use Create account.");
+              } else if (result.reason === "email_not_verified") {
+                toast.error("Please verify your email before signing in.");
+                navigate({ to: "/verify-email" });
               } else {
                 toast.error(getSupabaseErrorMessage(result.error, t("auth.signInFailed")));
               }
@@ -466,6 +475,7 @@ function LoginForm() {
 
 function SignupForm() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -534,6 +544,7 @@ function SignupForm() {
         setBusy(true);
         try {
           const normalizedEmail = parsed.data.email.toLowerCase();
+          console.log("Attempting signup for:", normalizedEmail);
           const { data, error: signupError } = await supabase.auth.signUp({
             email: normalizedEmail,
             password: parsed.data.password,
@@ -546,11 +557,15 @@ function SignupForm() {
                 role: parsed.data.role,
                 municipality: parsed.data.municipality,
               },
+              emailRedirectTo: `${window.location.origin}/verify-email`,
             },
           });
 
+          console.log("Signup result:", { data, error: signupError });
+
           if (signupError) {
             const message = signupError.message || String(signupError);
+            console.error("Signup error:", message);
             if (isRateLimitMessage(message)) {
               const until = activateAuthCooldown();
               setCooldownUntil(until);
@@ -561,69 +576,26 @@ function SignupForm() {
             return;
           }
 
+          // Email verification required - redirect to verification page
+          if (data?.user && !data.session) {
+            console.log("User created, email verification required");
+            toast.success("Account created! Please check your email to verify your account.");
+            navigate({ to: "/verify-email" });
+            return;
+          }
+
+          // If session exists (auto-sign-in), still require verification
           if (data?.session) {
-            if (parsed.data.role === "lgu_admin") {
-              toast.success(t("auth.lguAccountCreated"));
-            } else {
-              toast.success(t("auth.accountCreated"));
-            }
+            console.log("Session created, but email verification required");
+            toast.success("Account created! Please check your email to verify your account.");
+            navigate({ to: "/verify-email" });
             return;
           }
 
-          if (data?.user) {
-            try {
-              await confirmUserEmail({ data: { userId: data.user.id } });
-            } catch (err) {
-              toast.error(`${t("auth.unableToConfirmEmail")}: ${err instanceof Error ? err.message : "Unknown error"}`);
-              return;
-            }
-
-            const { error: loginError } = await supabase.auth.signInWithPassword({
-              email: normalizedEmail,
-              password: parsed.data.password,
-            });
-            if (loginError) {
-              const message = loginError.message || "";
-              if (isRateLimitMessage(message)) {
-                const until = activateAuthCooldown();
-                setCooldownUntil(until);
-                toast.error("Too many requests. Please wait a few minutes and try again.");
-              } else {
-                toast.error(getSupabaseErrorMessage(loginError, `${message}${loginError.code ? ` (${loginError.code})` : ""}`));
-              }
-              return;
-            }
-
-            if (parsed.data.role === "lgu_admin") {
-              toast.success(t("auth.lguAccountCreated"));
-            } else {
-              toast.success(t("auth.accountCreated"));
-            }
-            return;
-          }
-
-          const { error: loginError } = await supabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password: parsed.data.password,
-          });
-          if (loginError) {
-            const message = loginError.message || "";
-            if (isRateLimitMessage(message)) {
-              const until = activateAuthCooldown();
-              setCooldownUntil(until);
-              toast.error("Too many requests. Please wait a few minutes and try again.");
-            } else {
-              toast.error(getSupabaseErrorMessage(loginError, `${message}${loginError.code ? ` (${loginError.code})` : ""}`));
-            }
-            return;
-          }
-
-          if (parsed.data.role === "lgu_admin") {
-            toast.success(t("auth.lguAccountCreated"));
-          } else {
-            toast.success(t("auth.accountCreated"));
-          }
+          console.error("Unexpected signup state");
+          toast.error("Unable to create account. Please try again.");
         } catch (error) {
+          console.error("Signup exception:", error);
           toast.error(getSupabaseErrorMessage(error, t("auth.signUpFailed")));
         } finally {
           setBusy(false);
