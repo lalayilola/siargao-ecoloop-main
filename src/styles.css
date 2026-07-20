@@ -104,9 +104,9 @@
 
   --color-chart-5: var(--chart-5);
 
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
 
-  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
 }
 
@@ -266,6 +266,8 @@
 
     -webkit-font-smoothing: antialiased;
 
+    -moz-osx-font-smoothing: grayscale;
+
     background-image:
 
       radial-gradient(circle at top left, rgba(34, 197, 94, 0.15), transparent 25%),
@@ -280,13 +282,51 @@
 
     font-size: calc(1rem * var(--font-size-multiplier, 1));
 
+    line-height: 1.6;
+
+    letter-spacing: -0.01em;
+
+  }
+
+  p {
+
+    line-height: 1.7;
+
+    letter-spacing: -0.005em;
+
+  }
+
+  button {
+
+    font-weight: 500;
+
   }
 
   h1, h2, h3, h4 {
 
     font-family: var(--font-display);
 
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+
+    line-height: 1.2;
+
+  }
+
+  h1 {
+
+    font-weight: 800;
+
+  }
+
+  h2 {
+
+    font-weight: 700;
+
+  }
+
+  h3, h4 {
+
+    font-weight: 600;
 
   }
 

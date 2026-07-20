@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Loader2, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
+import aiIcon from "@/assets/ai.png";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -137,19 +138,19 @@ export function AIChatbot() {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 rounded-full w-14 h-14 bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 z-40"
-        title="Chat with EcoLoop Assistant"
+        className="fixed bottom-6 right-6 bg-transparent text-white shadow-none hover:shadow-none transition-all hover:scale-110 z-40 p-0"
+        title="Chat with Siargao EcoLoop Assistant"
         size="icon"
       >
-        <MessageCircle className="h-6 w-6" />
+        <img src={aiIcon} alt="AI" className="h-16 w-16" />
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="w-full max-w-md h-[600px] flex flex-col p-0">
-          <DialogHeader className="border-b border-slate-200/60 p-4 bg-gradient-to-r from-primary/10 to-secondary/10">
-            <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-primary" />
-              EcoLoop Assistant
+        <DialogContent className="w-full max-w-md h-[600px] flex flex-col p-0 border border-slate-200 rounded-2xl overflow-hidden">
+          <DialogHeader className="p-4 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600">
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <img src={aiIcon} alt="AI" className="h-8 w-8" />
+              Siargao EcoLoop Assistant
             </DialogTitle>
           </DialogHeader>
 

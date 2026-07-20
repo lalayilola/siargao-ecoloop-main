@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -124,9 +124,8 @@ export function NotificationsView() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Notifications"
-        title="Your Notifications"
+      <PremiumHero
+        title="Notifications"
         sub="Stay updated on your activities, requests, and community interactions."
       />
       <Container className="py-12">

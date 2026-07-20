@@ -27,6 +27,7 @@ export type Profile = {
   primary_role: AppRole;
   lgu_approved: boolean;
   profile_picture_url: string | null;
+  cover_photo_url: string | null;
   municipality: Municipality;
   is_super_admin: boolean;
   government_id_url: string | null;

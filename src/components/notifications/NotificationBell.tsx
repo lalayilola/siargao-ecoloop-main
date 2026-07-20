@@ -155,17 +155,47 @@ export function NotificationBell() {
   if (!user) return null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative border border-primary/20 text-slate-700 hover:bg-secondary/10 hover:text-primary">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs">
-              {unreadCount}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
+    <>
+      <style>{`
+        @keyframes bellShake {
+          0%, 100% { transform: rotate(0deg); }
+          10% { transform: rotate(-8deg); }
+          20% { transform: rotate(8deg); }
+          30% { transform: rotate(-6deg); }
+          40% { transform: rotate(6deg); }
+          50% { transform: rotate(-4deg); }
+          60% { transform: rotate(4deg); }
+          70% { transform: rotate(-2deg); }
+          80% { transform: rotate(2deg); }
+          90% { transform: rotate(-1deg); }
+        }
+        @keyframes badgePulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+          50% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        .bell-shake {
+          animation: bellShake 0.6s ease-in-out;
+        }
+        .badge-pulse {
+          animation: badgePulse 2s ease-in-out infinite;
+        }
+      `}</style>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`relative border border-primary/20 text-slate-700 hover:bg-secondary/10 hover:text-primary ${unreadCount > 0 ? 'bell-shake' : ''}`}
+            style={unreadCount > 0 ? { animationIterationCount: 'infinite', animationDuration: '20s', animationDelay: '0s' } : {}}
+          >
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <Badge className={`absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs ${unreadCount > 0 ? 'badge-pulse' : ''}`}>
+                {unreadCount}
+              </Badge>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <div className="flex items-center justify-between p-2 border-b">
           <span className="font-semibold text-sm">Notifications</span>
@@ -226,5 +256,6 @@ export function NotificationBell() {
         </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
+    </>
   );
 }

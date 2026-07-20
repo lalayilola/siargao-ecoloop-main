@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, ArrowUpDown, Package, ShoppingCart, ArrowLeftRight, Calendar, MapPin, TrendingUp, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { Search, Filter, ArrowUpDown, Package, ShoppingCart, ArrowLeftRight, Calendar, MapPin, TrendingUp, CheckCircle, Clock, XCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -281,185 +281,262 @@ export function TransactionHistoryPage() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Transaction History"
-        title="Track every exchange, end-to-end."
+      <PremiumHero
+        title="Transaction History"
         sub="View your complete transaction history including purchases, trades, and exchanges with detailed status tracking."
       />
       <Container className="py-12">
         {/* Analytics Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="p-5">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+          <Card className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Package className="h-5 w-5" />
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30">
+                <Package className="h-7 w-7" />
               </span>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <TrendingUp className="h-5 w-5 text-emerald-600" />
             </div>
-            <div className="mt-4 font-display text-3xl font-semibold">{analytics.totalTransactions}</div>
-            <div className="text-sm text-muted-foreground">Total Transactions</div>
+            <div className="mt-5 font-display text-4xl font-bold text-slate-900">{analytics.totalTransactions}</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">Total Transactions</div>
           </Card>
-          <Card className="p-5">
+          <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-green-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-green-100 text-green-700">
-                <CheckCircle className="h-5 w-5" />
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30">
+                <CheckCircle className="h-7 w-7" />
               </span>
-              <span className="text-xs text-green-600 font-medium">{analytics.successRate}%</span>
+              <span className="text-sm font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">{analytics.successRate}%</span>
             </div>
-            <div className="mt-4 font-display text-3xl font-semibold">{analytics.completedTransactions}</div>
-            <div className="text-sm text-muted-foreground">Completed</div>
+            <div className="mt-5 font-display text-4xl font-bold text-slate-900">{analytics.completedTransactions}</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">Completed</div>
           </Card>
-          <Card className="p-5">
+          <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-100 text-blue-700">
-                <ArrowLeftRight className="h-5 w-5" />
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30">
+                <ArrowLeftRight className="h-7 w-7" />
               </span>
             </div>
-            <div className="mt-4 font-display text-3xl font-semibold">{analytics.totalTrades}</div>
-            <div className="text-sm text-muted-foreground">Trades</div>
+            <div className="mt-5 font-display text-4xl font-bold text-slate-900">{analytics.totalTrades}</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">Trades</div>
           </Card>
-          <Card className="p-5">
+          <Card className="p-6 bg-gradient-to-br from-purple-50 to-violet-50 border-purple-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-purple-100 text-purple-700">
-                <ShoppingCart className="h-5 w-5" />
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30">
+                <ShoppingCart className="h-7 w-7" />
               </span>
             </div>
-            <div className="mt-4 font-display text-3xl font-semibold">{analytics.totalPurchases}</div>
-            <div className="text-sm text-muted-foreground">Purchases</div>
+            <div className="mt-5 font-display text-4xl font-bold text-slate-900">{analytics.totalPurchases}</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">Purchases</div>
           </Card>
         </div>
 
         {/* Search and Filters */}
-        <Card className="mb-6 p-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex flex-col gap-6">
+            <div className="relative w-full">
+              <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search transactions..." 
-                className="pl-9"
+                placeholder="Search transactions by product, seller, or buyer..." 
+                className="h-14 pl-12 pr-4 text-base rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
               />
             </div>
-            <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="mr-1 h-4 w-4" /> Filters
-              </Button>
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                <SelectTrigger className="w-[140px]">
-                  <ArrowUpDown className="mr-2 h-4 w-4" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date_desc">Newest</SelectItem>
-                  <SelectItem value="date_asc">Oldest</SelectItem>
-                  <SelectItem value="status">Status</SelectItem>
-                </SelectContent>
-              </Select>
+            
+            {/* Filter Chips */}
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-600">Sort:</span>
+                <div className="flex gap-2">
+                  {[
+                    { id: 'date_desc', label: 'Newest' },
+                    { id: 'date_asc', label: 'Oldest' },
+                    { id: 'status', label: 'Status' }
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setSortBy(option.id as any)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        sortBy === option.id
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-600">Type:</span>
+                <div className="flex gap-2">
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'trade', label: 'Trades' },
+                    { id: 'purchase', label: 'Purchases' }
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setFilterType(option.id as any)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        filterType === option.id
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-600">Status:</span>
+                <div className="flex gap-2">
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'pending', label: 'Pending' },
+                    { id: 'approved', label: 'Approved' },
+                    { id: 'in_progress', label: 'In Progress' },
+                    { id: 'completed', label: 'Completed' },
+                    { id: 'cancelled', label: 'Cancelled' },
+                    { id: 'rejected', label: 'Rejected' }
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setFilterStatus(option.id as any)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        filterStatus === option.id
+                          ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-md shadow-purple-500/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-
-          {showFilters && (
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium">Transaction Type</label>
-                <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="trade">Trades</SelectItem>
-                    <SelectItem value="purchase">Purchases</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium">Status</label>
-                <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
         </Card>
 
         {/* Transaction List */}
         {loading ? (
-          <Card className="p-8 text-center text-sm text-muted-foreground">
-            Loading transactions...
+          <Card className="p-12 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-8 w-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+              <p className="text-slate-600 font-medium">Loading transactions...</p>
+            </div>
           </Card>
         ) : filteredTransactions.length === 0 ? (
-          <Card className="p-8 text-center text-sm text-muted-foreground">
-            No transactions found
+          <Card className="p-12 text-center">
+            <Package className="mx-auto h-12 w-12 text-slate-300 mb-4" />
+            <p className="text-slate-600 font-medium">No transactions found</p>
+            <p className="text-sm text-slate-400 mt-1">Try adjusting your filters or search terms</p>
           </Card>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-5">
             {paginatedTransactions.map((transaction) => (
-              <Card key={transaction.id} className="p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Badge variant="outline" className={statusColor[transaction.status]}>
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {transaction.status}
-                      </Badge>
-                      <Badge variant="outline" className="bg-slate-100 text-slate-700 border-slate-300">
-                        {transaction.type === 'trade' ? 'Trade' : 'Purchase'}
-                      </Badge>
-                    </div>
-                    <h3 className="font-display text-lg font-semibold">{transaction.item_name}</h3>
-                    <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(transaction.created_at).toLocaleDateString()}
+              <Card 
+                key={transaction.id} 
+				className="p-0 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-slate-200 hover:border-emerald-300"
+              >
+                <div className="flex flex-col sm:flex-row">
+                  {/* Product Thumbnail */}
+                  <div className="sm:w-48 sm:h-40 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center p-4 border-b sm:border-b-0 sm:border-r border-slate-200">
+                    {transaction.item_image ? (
+                      <img 
+                        src={transaction.item_image} 
+                        alt={transaction.item_name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center">
+                        <Package className="h-8 w-8 text-emerald-600" />
                       </div>
-                      {transaction.quantity && (
-                        <div className="flex items-center gap-1">
-                          <Package className="h-4 w-4" />
-                          {transaction.quantity} kg
+                    )}
+                  </div>
+                  
+                  {/* Card Content */}
+                  <div className="flex-1 p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1">
+                        {/* Status and Type Badges */}
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                          <Badge className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            transaction.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' :
+                            transaction.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                            transaction.status === 'approved' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                            transaction.status === 'in_progress' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                            transaction.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-200' :
+                            transaction.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                            'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}>
+                            <StatusIcon className="h-3 w-3 mr-1" />
+                            {transaction.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </Badge>
+                          <Badge className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            transaction.type === 'trade' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0' 
+                              : 'bg-gradient-to-r from-purple-500 to-violet-600 text-white border-0'
+                          }`}>
+                            {transaction.type === 'trade' ? 'Trade' : 'Purchase'}
+                          </Badge>
                         </div>
-                      )}
-                      {transaction.location && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {transaction.location}
+                        
+                        {/* Product Name */}
+                        <h3 className="font-display text-xl font-semibold text-slate-900 mb-4">{transaction.item_name}</h3>
+                        
+                        {/* Metadata Pills */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                            <Calendar className="h-3.5 w-3.5" />
+                            {new Date(transaction.created_at).toLocaleDateString()}
+                          </div>
+                          {transaction.quantity && (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">
+                              <Package className="h-3.5 w-3.5" />
+                              {transaction.quantity} kg
+                            </div>
+                          )}
+                          {transaction.location && (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                              <MapPin className="h-3.5 w-3.5" />
+                              {transaction.location}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="mt-3 text-sm">
-                      <span className="text-muted-foreground">
-                        {transaction.type === 'trade' ? 'Trade between' : 'Purchase from'}{' '}
-                        <span className="font-medium text-slate-900">
-                          {transaction.seller_name || transaction.from_name}
-                        </span>
-                        {transaction.buyer_name && ` and ${transaction.buyer_name}`}
-                      </span>
+                        
+                        {/* Seller/Buyer Info */}
+                        <div className="text-sm">
+                          <span className="text-slate-500">
+                            {transaction.type === 'trade' ? 'Trade between' : 'Purchase from'}{' '}
+                            <span className="font-semibold text-slate-900">
+                              {transaction.seller_name || transaction.from_name}
+                            </span>
+                            {transaction.buyer_name && (
+                              <span className="text-slate-500">
+                                {' and '}
+                                <span className="font-semibold text-slate-900">{transaction.buyer_name}</span>
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* View Details Button */}
+                      <div className="flex sm:flex-col items-start sm:items-center gap-3">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="rounded-full px-5 py-2.5 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 transition-all duration-200 group"
+                          onClick={() => setSelectedTransaction(transaction)}
+                        >
+                          View Details
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="rounded-full"
-                    onClick={() => setSelectedTransaction(transaction)}
-                  >
-                    View Details
-                  </Button>
                 </div>
               </Card>
             ))}
@@ -468,10 +545,10 @@ export function TransactionHistoryPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <Card className="p-4 mt-6">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} transactions
+          <Card className="p-6 mt-8 bg-white/80 backdrop-blur-sm border-slate-200">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-slate-600 font-medium">
+                Showing <span className="text-slate-900 font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-slate-900 font-semibold">{Math.min(currentPage * itemsPerPage, filteredTransactions.length)}</span> of <span className="text-slate-900 font-semibold">{filteredTransactions.length}</span> transactions
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -479,25 +556,33 @@ export function TransactionHistoryPage() {
                   variant="outline"
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
+                  className="rounded-full px-4 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:border-slate-300 disabled:hover:text-slate-700 transition-all"
                 >
                   Previous
                 </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    size="sm"
-                    variant={currentPage === page ? "default" : "outline"}
-                    onClick={() => setCurrentPage(page)}
-                    className="w-10"
-                  >
-                    {page}
-                  </Button>
-                ))}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      size="sm"
+                      variant={currentPage === page ? "default" : "outline"}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-full transition-all ${
+                        currentPage === page
+                          ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40'
+                          : 'border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700'
+                      }`}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
+                  className="rounded-full px-4 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:border-slate-300 disabled:hover:text-slate-700 transition-all"
                 >
                   Next
                 </Button>

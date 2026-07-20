@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -722,9 +722,8 @@ export function PlanningForecastDashboard() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Planning & Forecast"
-        title="Plan Ahead, Reduce Waste"
+      <PremiumHero
+        title="Planning & Forecast"
         sub="Coordinate future harvests, distributions, and waste management with role-based forecasting tools."
       />
       <Container className="py-12">

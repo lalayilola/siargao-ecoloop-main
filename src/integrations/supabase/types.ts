@@ -21,6 +21,7 @@ export interface Database {
           municipality: Database['public']['Enums']['municipality']
           is_super_admin: boolean
           profile_picture_url: string | null
+          cover_photo_url: string | null
           created_at: string
           updated_at: string
         }
@@ -35,6 +36,7 @@ export interface Database {
           municipality?: Database['public']['Enums']['municipality']
           is_super_admin?: boolean
           profile_picture_url?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -49,6 +51,7 @@ export interface Database {
           municipality?: Database['public']['Enums']['municipality']
           is_super_admin?: boolean
           profile_picture_url?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           updated_at?: string
         }

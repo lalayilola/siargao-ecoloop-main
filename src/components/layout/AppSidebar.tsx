@@ -18,6 +18,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import logo from "@/assets/finalogo.png";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const bounceAnimation = `
   @keyframes bounce {
@@ -42,10 +44,12 @@ const farmerItems: Array<{ to: string; label: string; icon: any }> = [];
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const { profile, isLguAdmin, signOut } = useAuth();
+  const { profile, isLguAdmin, signOut, user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isMobile, setOpenMobile } = useSidebar();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
 
   const isActive = (p: string) => path === p;
 
@@ -56,6 +60,124 @@ export function AppSidebar() {
       setOpenMobile(false);
     }
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Load unread message count
+    const loadUnreadMessages = async () => {
+      const { data: convData } = await supabase
+        .from("conversations")
+        .select(`
+          messages (
+            id,
+            sender_id,
+            read_at
+          )
+        `)
+        .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`);
+
+      let unreadCount = 0;
+      if (convData) {
+        for (const conv of convData) {
+          const unreadInConv = conv.messages?.filter((m: any) => 
+            m.sender_id !== user.id && !m.read_at
+          ).length || 0;
+          unreadCount += unreadInConv;
+        }
+      }
+      setUnreadMessages(unreadCount);
+    };
+
+    // Load unread announcement count
+    const loadUnreadAnnouncements = async () => {
+      const { data: announcements } = await supabase
+        .from("announcements")
+        .select("id, published_at")
+        .eq("status", "published")
+        .order("published_at", { ascending: false });
+
+      if (!announcements) {
+        setUnreadAnnouncements(0);
+        return;
+      }
+
+      // Get read announcement IDs from localStorage
+      const readAnnouncements = JSON.parse(localStorage.getItem(`read_announcements_${user.id}`) || '[]');
+      const unreadCount = announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
+      setUnreadAnnouncements(unreadCount);
+    };
+
+    loadUnreadMessages();
+    loadUnreadAnnouncements();
+
+    // Set up real-time subscription for messages
+    const messagesChannel = supabase
+      .channel("messages-sidebar")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+        },
+        () => {
+          loadUnreadMessages();
+        }
+      )
+      .subscribe();
+
+    // Set up real-time subscription for announcements
+    const announcementsChannel = supabase
+      .channel("announcements-sidebar")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "announcements",
+        },
+        () => {
+          loadUnreadAnnouncements();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(announcementsChannel);
+    };
+  }, [user]);
+
+  // Mark messages as read when visiting messages page
+  useEffect(() => {
+    if (path === "/messages" && unreadMessages > 0) {
+      // The MessagesView component handles marking messages as read
+      setUnreadMessages(0);
+    }
+  }, [path, unreadMessages]);
+
+  // Mark announcements as read when visiting announcements page
+  useEffect(() => {
+    if (path === "/announcements" && unreadAnnouncements > 0 && user) {
+      // Mark all current announcements as read
+      const markAnnouncementsAsRead = async () => {
+        const { data: announcements } = await supabase
+          .from("announcements")
+          .select("id")
+          .eq("status", "published");
+
+        if (announcements) {
+          const announcementIds = announcements.map((a: any) => a.id);
+          const readAnnouncements = JSON.parse(localStorage.getItem(`read_announcements_${user.id}`) || '[]');
+          const updatedReadAnnouncements = [...new Set([...readAnnouncements, ...announcementIds])];
+          localStorage.setItem(`read_announcements_${user.id}`, JSON.stringify(updatedReadAnnouncements));
+          setUnreadAnnouncements(0);
+        }
+      };
+      markAnnouncementsAsRead();
+    }
+  }, [path, unreadAnnouncements, user]);
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
@@ -68,9 +190,9 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center justify-between px-4 py-4">
           <Link to="/" onClick={handleLinkClick} className="flex items-center gap-3 rounded-b-3xl relative z-10">
-            <img src={logo} alt="EcoLoop Siargao" className="h-16 w-16 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
+            <img src={logo} alt="Siargao EcoLoop" className="h-16 w-16 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
             <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
-              EcoLoop <span className="text-primary">Siargao</span>
+              Siargao <span className="text-primary">EcoLoop</span>
             </span>
           </Link>
           <NotificationBell />
@@ -82,16 +204,20 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-green-700 font-semibold tracking-wide">Community</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {memberItems.map((it) => (
-                <SidebarMenuItem key={it.to}>
-                  <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                    <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
-                      <it.icon className="h-4 w-4" />
-                      <span>{it.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {memberItems.map((it) => {
+                const isUnread = (it.to === "/messages" && unreadMessages > 0) || 
+                                 (it.to === "/announcements" && unreadAnnouncements > 0);
+                return (
+                  <SidebarMenuItem key={it.to}>
+                    <SidebarMenuButton asChild isActive={isActive(it.to)}>
+                      <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                        <it.icon className="h-4 w-4" />
+                        <span className={isUnread ? "text-red-600 font-semibold" : ""}>{it.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

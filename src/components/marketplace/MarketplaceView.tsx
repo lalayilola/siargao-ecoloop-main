@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -68,8 +68,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { Label } from "@/components/ui/label";
 
-import { TradeRequestModal } from "@/components/marketplace/TradeRequestModal";
-
 import { BuyRequestModal } from "@/components/marketplace/BuyRequestModal";
 
 import { Badge } from "@/components/ui/badge";
@@ -81,10 +79,6 @@ import { LocationPicker } from "@/components/auth/LocationPicker";
 
 
 type Listing = Database["public"]["Tables"]["marketplace_listings"]["Row"];
-
-type Trade = Database["public"]["Tables"]["trades"]["Row"];
-
-type TradeRequest = Database["public"]["Tables"]["trade_requests"]["Row"];
 
 type PurchaseRequest = Database["public"]["Tables"]["purchase_requests"]["Row"];
 
@@ -222,17 +216,6 @@ const canBuyListing = (listing: Listing, role: AppRole | null | undefined, lguAp
 
 
 
-const canTradeListing = (listing: Listing, role: AppRole | null | undefined, lguApproved: boolean) => {
-
-  if (!role) return false;
-  if (!lguApproved) return false;
-
-  return role === "restaurant" && listing.kind === "produce";
-
-};
-
-
-
 export function MarketplaceView() {
 
   const [q, setQ] = useState("");
@@ -265,25 +248,19 @@ export function MarketplaceView() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const [showTradeModal, setShowTradeModal] = useState(false);
-
   const [showBuyModal, setShowBuyModal] = useState(false);
-
-  const [filterTransactionType, setFilterTransactionType] = useState<"sell_only" | "barter_only" | "sell_and_barter" | "all">("all");
 
   const [filterCategory, setFilterCategory] = useState("");
 
   const [filterBarangay, setFilterBarangay] = useState("");
 
-  const [transactionType, setTransactionType] = useState<"sell_only" | "barter_only" | "sell_and_barter">("sell_and_barter");
+  const [transactionType, setTransactionType] = useState<"sell_only">("sell_only");
 
   const [acceptableExchanges, setAcceptableExchanges] = useState<string[]>([]);
 
   const [category, setCategory] = useState("");
 
   const [userListings, setUserListings] = useState<Listing[]>([]);
-
-  const [incomingTradeRequests, setIncomingTradeRequests] = useState<TradeRequest[]>([]);
 
   const [incomingPurchaseRequests, setIncomingPurchaseRequests] = useState<PurchaseRequest[]>([]);
 
@@ -325,9 +302,81 @@ export function MarketplaceView() {
 
   const { user, profile } = useAuth();
 
-
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    freshProduceListings: 0,
+    foodWasteListings: 0,
+    compostListings: 0,
+    verifiedSellers: 0,
+    activeBuyers: 0,
+    completedTransactions: 0,
+    wasteDiverted: 0,
+  });
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
+
+  useEffect(() => {
+    const loadStatistics = async () => {
+      try {
+        const municipality = profile?.municipality;
+        
+        // Build base query
+        let listingsQuery = supabase.from("marketplace_listings").select("*");
+        if (municipality) {
+          listingsQuery = listingsQuery.eq("municipality", municipality);
+        }
+        
+        const { data: listings } = await listingsQuery;
+        
+        // Calculate statistics
+        const totalListings = listings?.length || 0;
+        const freshProduceListings = listings?.filter(l => l.kind === "produce").length || 0;
+        const foodWasteListings = listings?.filter(l => l.kind === "waste").length || 0;
+        const compostListings = listings?.filter(l => l.kind === "compost").length || 0;
+        
+        // Get verified sellers
+        let profilesQuery = supabase.from("profiles").select("*");
+        if (municipality) {
+          profilesQuery = profilesQuery.eq("municipality", municipality);
+        }
+        const { data: profiles } = await profilesQuery;
+        const verifiedSellers = profiles?.filter(p => p.lgu_approved).length || 0;
+        
+        // Get active buyers (users who have made purchase requests)
+        let purchaseRequestsQuery = supabase.from("purchase_requests").select("*");
+        if (municipality) {
+          purchaseRequestsQuery = purchaseRequestsQuery.eq("municipality", municipality);
+        }
+        const { data: purchaseRequests } = await purchaseRequestsQuery;
+        const activeBuyers = new Set(purchaseRequests?.map(pr => pr.buyer_id)).size;
+        
+        // Get completed transactions
+        const completedTransactions = purchaseRequests?.filter(pr => pr.status === "completed").length || 0;
+        
+        // Calculate waste diverted (sum of kg from completed waste transactions)
+        const wasteDiverted = purchaseRequests
+          ?.filter(pr => pr.status === "completed" && pr.kind === "waste")
+          .reduce((sum, pr) => sum + (pr.quantity_kg || 0), 0) || 0;
+        
+        setStats({
+          totalListings,
+          freshProduceListings,
+          foodWasteListings,
+          compostListings,
+          verifiedSellers,
+          activeBuyers,
+          completedTransactions,
+          wasteDiverted,
+        });
+        setLastRefresh(new Date());
+      } catch (error) {
+        console.error("Error loading statistics:", error);
+      }
+    };
+
+    loadStatistics();
+  }, [profile?.municipality]);
 
 
 
@@ -447,8 +496,6 @@ export function MarketplaceView() {
 
     if (!user || userListings.length === 0) {
 
-      setIncomingTradeRequests([]);
-
       setIncomingPurchaseRequests([]);
 
       return;
@@ -463,35 +510,9 @@ export function MarketplaceView() {
 
       if (listingIds.length === 0) {
 
-        setIncomingTradeRequests([]);
-
         setIncomingPurchaseRequests([]);
 
         return;
-
-      }
-
-
-
-      const { data: tradeData, error: tradeError } = await supabase
-
-        .from("trade_requests")
-
-        .select("*")
-
-        .in("listing_id", listingIds)
-
-        .order("created_at", { ascending: false });
-
-
-
-      if (tradeError) {
-
-        console.error("Error loading trade requests:", tradeError);
-
-      } else {
-
-        setIncomingTradeRequests(tradeData ?? []);
 
       }
 
@@ -677,7 +698,7 @@ export function MarketplaceView() {
 
         municipality: profile.municipality || "general_luna",
 
-        transaction_type: "sell_and_barter",
+        transaction_type: "sell_only",
 
         acceptable_exchanges: [],
 
@@ -739,7 +760,7 @@ export function MarketplaceView() {
 
     setFiles([]);
 
-    setTransactionType("sell_and_barter");
+    setTransactionType("sell_only");
 
     setAcceptableExchanges([]);
 
@@ -756,100 +777,6 @@ export function MarketplaceView() {
     setSelectedLocation(null);
 
     toast.success("Listing created.");
-
-  };
-
-
-
-  const requestListing = async (listing: Listing) => {
-
-    if (!user || !profile) {
-
-      toast.error("Sign in to request this listing.");
-
-      return;
-
-    }
-
-
-
-    const { error } = await (supabase.from("trades") as any).insert({
-
-      from_user_id: user.id,
-
-      from_role: profile.primary_role,
-
-      from_name: profile.full_name,
-
-      from_gives: `Requesting ${listing.title}`,
-
-      to_user_id: null,
-
-      to_role: listing.role,
-
-      to_name: listing.seller,
-
-      to_gives: listing.title,
-
-      status: "pending",
-
-      trade_date: "Today",
-
-    });
-
-
-
-    if (error) {
-
-      toast.error(`Could not request trade: ${error.message}`);
-
-      return;
-
-    }
-
-
-
-    toast.success("Trade request sent.");
-
-  };
-
-
-
-  const handleTradeRequestStatus = async (requestId: string, status: Database["public"]["Enums"]["trade_status"]) => {
-
-    const { error } = await (supabase
-
-      .from("trade_requests") as any)
-
-      .update({ status })
-
-      .eq("id", requestId);
-
-
-
-    if (error) {
-
-      toast.error(`Could not update trade request: ${error.message}`);
-
-      return;
-
-    }
-
-
-
-    setIncomingTradeRequests((prev) =>
-
-      prev.map((request) =>
-
-        request.id === requestId ? { ...request, status } : request
-
-      )
-
-    );
-
-
-
-    toast.success(`Trade request ${status}.`);
 
   };
 
@@ -916,56 +843,47 @@ export function MarketplaceView() {
 
 
     if ((status === "accepted" || status === "completed") && updatedRequest) {
-
       const shouldDeduct = !(["accepted", "completed"].includes(existingRequest?.status ?? ""));
 
       if (shouldDeduct) {
-
         const listing = listings.find((item) => item.id === updatedRequest.listing_id) ?? userListings.find((item) => item.id === updatedRequest.listing_id);
 
         if (listing) {
-
           const requestedQty = Math.max(1, Number(updatedRequest?.quantity_kg ?? existingRequest?.quantity_kg ?? 1) || 1);
-
           const currentKg = Number(listing.kg ?? 0);
-
           const nextKg = Math.max(0, currentKg - requestedQty);
 
-
-
           const { error: stockError } = await (supabase
-
             .from("marketplace_listings") as any)
-
             .update({ kg: nextKg, updated_at: new Date().toISOString() })
-
             .eq("id", listing.id);
 
-
-
           if (stockError) {
-
             toast.error(`Could not update stock: ${stockError.message}`);
-
             return;
-
           }
 
-
-
           setListings((prev) => prev.map((item) => item.id === listing.id ? { ...item, kg: nextKg } : item));
-
           setUserListings((prev) => prev.map((item) => item.id === listing.id ? { ...item, kg: nextKg } : item));
-
           setSelectedListing((prev) => prev?.id === listing.id ? { ...prev, kg: nextKg } : prev);
 
+          // If this is a waste listing and status is completed, add to food waste reports
+          if (listing.kind === "waste" && status === "completed") {
+            const { error: wasteError } = await supabase.from("food_waste_reports").insert({
+              restaurant_id: listing.user_id,
+              quantity_kg: requestedQty,
+              status: "collected",
+              listing_id: listing.id,
+              buyer_user_id: updatedRequest.buyer_user_id,
+            } as any);
+
+            if (wasteError) {
+              console.error("Could not create food waste report:", wasteError);
+            }
+          }
         }
-
       }
-
     }
-
-
 
     toast.success(`Purchase request ${status}.`);
 
@@ -1209,15 +1127,13 @@ export function MarketplaceView() {
 
           )
 
-          .filter((l) => filterTransactionType === "all" || l.transaction_type === filterTransactionType)
-
           .filter((l) => filterUserRole === "all" || l.role === filterUserRole)
 
           .filter((l) => !filterCategory || l.category?.toLowerCase().includes(filterCategory.toLowerCase()))
 
           .filter((l) => !filterBarangay || l.barangay?.toLowerCase().includes(filterBarangay.toLowerCase())),
 
-    [listings, q, filterTransactionType, filterUserRole, filterCategory, filterBarangay, profile?.primary_role, user?.id],
+    [listings, q, filterUserRole, filterCategory, filterBarangay, profile?.primary_role, user?.id],
 
   );
 
@@ -1231,27 +1147,119 @@ export function MarketplaceView() {
 
       ? "Buy restaurant food waste."
 
-      : "Buy or barter fresh produce from local farmers. Or list food waste so it gets composted instead of landfilled.";
+      : "Buy fresh produce from local farmers. Or list food waste so it gets composted instead of landfilled.";
 
 
+
+  const getGreeting = () => {
+    const role = profile?.primary_role;
+    const municipality = profile?.municipality || "your area";
+    const name = profile?.full_name || "there";
+    
+    if (role === "lgu_admin") {
+      return `Welcome back, ${municipality} LGU 👋`;
+    } else if (role === "farmer") {
+      return `Welcome back, ${name} 👋`;
+    } else if (role === "restaurant") {
+      return `Welcome back, ${name} 👋`;
+    } else if (role === "resident") {
+      return `Welcome back, ${name} 👋`;
+    }
+    return `Welcome back, ${name} 👋`;
+  };
+
+  const getDescription = () => {
+    const role = profile?.primary_role;
+    const municipality = profile?.municipality || "your municipality";
+    
+    if (role === "lgu_admin") {
+      return `Monitor marketplace activity and discover sustainable opportunities across ${municipality}.`;
+    } else if (role === "farmer") {
+      return `Manage your produce listings and connect with buyers across ${municipality}.`;
+    } else if (role === "restaurant") {
+      return `List food waste for collection and source fresh produce across ${municipality}.`;
+    } else if (role === "resident") {
+      return `Browse fresh produce and sustainable opportunities across ${municipality}.`;
+    }
+    return `Monitor your marketplace activity and discover sustainable opportunities across ${municipality}.`;
+  };
+
+  const getQuickActions = () => {
+    const role = profile?.primary_role;
+    
+    if (role === "lgu_admin") {
+      return [
+        { label: "Members Dashboard", to: "/dashboard" },
+        { label: "Reports", to: "/reports" },
+      ];
+    } else if (role === "farmer") {
+      return [
+        { label: "New Listing", action: () => { setKind("produce"); setShowForm(true); } },
+        { label: "Manage Listings", to: "/listings" },
+      ];
+    } else if (role === "restaurant") {
+      return [
+        { label: "New Listing", action: () => { setKind("waste"); setShowForm(true); } },
+        { label: "Manage Listings", to: "/listings" },
+      ];
+    } else if (role === "resident") {
+      return [
+        { label: "Browse Listings", to: "#listings" },
+        { label: "View Transactions", to: "/trades" },
+      ];
+    }
+    return [];
+  };
+
+  const formatRefreshTime = () => {
+    const now = new Date();
+    const diff = now.getTime() - lastRefresh.getTime();
+    const seconds = Math.floor(diff / 1000);
+    
+    if (seconds < 60) return "Updated just now";
+    if (seconds < 3600) return `Updated ${Math.floor(seconds / 60)} min ago`;
+    return `Updated ${Math.floor(seconds / 3600)} hours ago`;
+  };
 
   return (
-
     <>
-
-      <PageHero
-
-        eyebrow="Marketplace"
-
-        title="Two markets, one circular system."
-
-        sub={heroSub}
-
-        bgImage={marketBg}
-
+      <PremiumHero
+        title="Marketplace"
+        sub="Find fresh produce, food waste, and compost from verified sellers across Siargao."
+        action={
+          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary/60" />
+              <Input 
+                value={q} 
+                onChange={(e) => setQ(e.target.value)} 
+                placeholder="Search products, sellers, or municipalities..." 
+                className="h-14 pl-12 rounded-full border-primary/30 focus:border-primary focus:ring-primary/50 bg-white/90 backdrop-blur-sm shadow-lg"
+              />
+            </div>
+            {user && profile?.primary_role !== "resident" && profile?.lgu_approved && (
+              <Button 
+                size="lg" 
+                className="h-14 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white hover:from-primary/90 hover:to-emerald-600/90 px-8 shadow-lg"
+                onClick={() => {
+                  setShowForm((value) => !value);
+                  if (profile?.primary_role === "lgu_admin") {
+                    setKind("compost");
+                  } else if (profile?.primary_role === "restaurant") {
+                    setKind("waste");
+                  } else {
+                    setKind("produce");
+                  }
+                }}
+              >
+                <Plus className="mr-2 h-5 w-5" /> New Listing
+              </Button>
+            )}
+          </div>
+        }
       />
 
-      <Container className="py-12">
+      <Container className="py-8">
 
         {user && profile && !profile.lgu_approved && (
           <div className="mb-6 rounded-3xl border-2 border-amber-400 bg-amber-50 p-4 shadow-sm">
@@ -1261,60 +1269,16 @@ export function MarketplaceView() {
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-amber-900">Account Verification Required</p>
-                <p className="text-sm text-amber-700">Upload your government ID in your <Link to="/profile" search={{ userId: undefined }} className="underline font-medium">profile</Link> to get verified by the LGU. Verification is required to create listings, buy, trade, and send messages.</p>
+                <p className="text-sm text-amber-700">Upload your government ID in your <Link to="/profile" search={{ userId: undefined }} className="underline font-medium">profile</Link> to get verified by the LGU. Verification is required to create listings, buy, and send messages.</p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-primary/20 bg-secondary/10 p-6 shadow-sm shadow-primary/10 sm:flex-row sm:items-center sm:justify-between">
-
-          <div className="relative w-full max-w-md">
-
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/60" />
-
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search crops, barangay or vendor" className="pl-9 border-primary/30 focus:border-primary focus:ring-primary/50" />
-
-          </div>
-
-          <div className="flex gap-2">
-
-            <Button size="sm" variant="outline" className="rounded-full border-primary/40 text-primary hover:bg-primary/10" onClick={() => setShowFilters(!showFilters)}>
-
-              <Filter className="mr-1 h-4 w-4" /> Filters
-
-            </Button>
-
-            {user && profile?.primary_role !== "resident" && profile?.lgu_approved && (
-
-              <Button size="sm" className="rounded-full bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" onClick={() => {
-
-                setShowForm((value) => !value);
-
-                if (profile?.primary_role === "lgu_admin") {
-
-                  setKind("compost");
-
-                } else if (profile?.primary_role === "restaurant") {
-
-                  setKind("waste");
-
-                } else {
-
-                  setKind("produce");
-
-                }
-
-              }}>
-
-                <Plus className="mr-1 h-4 w-4" /> New listing
-
-              </Button>
-
-            )}
-
-          </div>
-
+        <div className="mb-6 flex items-center justify-between">
+          <Button size="sm" variant="outline" className="rounded-full border-primary/40 text-primary hover:bg-primary/10" onClick={() => setShowFilters(!showFilters)}>
+            <Filter className="mr-1 h-4 w-4" /> Filters
+          </Button>
         </div>
 
 
@@ -1323,35 +1287,7 @@ export function MarketplaceView() {
 
           <Card className="mb-6 p-4 border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10 shadow-sm shadow-primary/10">
 
-            <div className="grid gap-4 sm:grid-cols-4">
-
-              <div>
-
-                <Label className="mb-2 block text-sm font-medium text-primary">Transaction Type</Label>
-
-                <Select value={filterTransactionType} onValueChange={(value: "sell_only" | "barter_only" | "sell_and_barter" | "all") => setFilterTransactionType(value)}>
-
-                  <SelectTrigger className="border-primary/30 focus:border-primary focus:ring-primary/50">
-
-                    <SelectValue placeholder="All types" />
-
-                  </SelectTrigger>
-
-                  <SelectContent>
-
-                    <SelectItem value="all">All Types</SelectItem>
-
-                    <SelectItem value="sell_only">Sell Only</SelectItem>
-
-                    <SelectItem value="barter_only">Barter Only</SelectItem>
-
-                    <SelectItem value="sell_and_barter">Sell & Barter</SelectItem>
-
-                  </SelectContent>
-
-                </Select>
-
-              </div>
+            <div className="grid gap-4 sm:grid-cols-3">
 
               <div>
 
@@ -1409,7 +1345,7 @@ export function MarketplaceView() {
 
           <Card className="mb-6 border-2 border-primary/30 p-4 text-center text-sm bg-secondary/10 text-slate-700">
 
-            You're browsing as a guest. <Link to="/auth" className="text-primary underline hover:text-primary/80 font-medium">Sign in</Link> to message vendors, request trades and post your own listings.
+            You're browsing as a guest. <Link to="/auth" className="text-primary underline hover:text-primary/80 font-medium">Sign in</Link> to message vendors and post your own listings.
 
           </Card>
 
@@ -1457,7 +1393,7 @@ export function MarketplaceView() {
 
               <Input type="number" value={kg || ""} onChange={(e) => setKg(Number(e.target.value) || 0)} placeholder="Quantity (kg)" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
-              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price or terms" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
+              <Input value={price} onChange={(e) => setPrice(e.target.value)} placeholder={kind === "waste" ? "" : "Price"} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
               <Input value={availableAt} onChange={(e) => setAvailableAt(e.target.value)} placeholder="Available date" className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
 
@@ -1471,120 +1407,10 @@ export function MarketplaceView() {
                 )}
               </div>
 
-              <div>
-                <Label className="mb-1 block text-[10px] font-medium text-primary">Transaction Type</Label>
-                <Select value={transactionType} onValueChange={(value: "sell_only" | "barter_only" | "sell_and_barter") => setTransactionType(value)}>
-                  <SelectTrigger className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs">
-                    <SelectValue placeholder="Select transaction type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sell_only">Sell Only</SelectItem>
-                    <SelectItem value="barter_only">Barter Only</SelectItem>
-                    <SelectItem value="sell_and_barter">Sell and Barter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
+              <div className="col-span-2">
                 <Label className="mb-1 block text-[10px] font-medium text-primary">Category</Label>
                 <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder={kind === "produce" ? "e.g., Tomatoes" : "e.g., Food Waste"} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-8 text-xs" />
               </div>
-
-              {(transactionType === "barter_only" || transactionType === "sell_and_barter") && (
-                <div className="col-span-2">
-                  <Label className="mb-1 block text-[10px] font-medium text-primary">Acceptable Exchanges</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {profile?.primary_role === "farmer" ? (
-                      <>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="food-waste"
-                            checked={acceptableExchanges.includes("Food Waste")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Food Waste"]
-                                : acceptableExchanges.filter(e => e !== "Food Waste")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="food-waste" className="text-[10px]">Food Waste</Label>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="restaurant-food-waste"
-                            checked={acceptableExchanges.includes("Restaurant Food Waste")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Restaurant Food Waste"]
-                                : acceptableExchanges.filter(e => e !== "Restaurant Food Waste")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="restaurant-food-waste" className="text-[10px]">Restaurant Food Waste</Label>
-                        </div>
-                      </>
-                    ) : profile?.primary_role === "restaurant" ? (
-                      <>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="fresh-vegetables"
-                            checked={acceptableExchanges.includes("Fresh Vegetables")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Fresh Vegetables"]
-                                : acceptableExchanges.filter(e => e !== "Fresh Vegetables")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="fresh-vegetables" className="text-[10px]">Fresh Vegetables</Label>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="fruits"
-                            checked={acceptableExchanges.includes("Fruits")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Fruits"]
-                                : acceptableExchanges.filter(e => e !== "Fruits")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="fruits" className="text-[10px]">Fruits</Label>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="fresh-vegetables-resident"
-                            checked={acceptableExchanges.includes("Fresh Vegetables")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Fresh Vegetables"]
-                                : acceptableExchanges.filter(e => e !== "Fresh Vegetables")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="fresh-vegetables-resident" className="text-[10px]">Fresh Vegetables</Label>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Checkbox
-                            id="fruits-resident"
-                            checked={acceptableExchanges.includes("Fruits")}
-                            onCheckedChange={(checked) => {
-                              setAcceptableExchanges(checked 
-                                ? [...acceptableExchanges, "Fruits"]
-                                : acceptableExchanges.filter(e => e !== "Fruits")
-                              );
-                            }}
-                          />
-                          <Label htmlFor="fruits-resident" className="text-[10px]">Fruits</Label>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
 
             </div>
 
@@ -1749,14 +1575,6 @@ export function MarketplaceView() {
 
                   }}
 
-                  onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
-
-                    setSelectedListing(l);
-
-                    setShowTradeModal(true);
-
-                  } : undefined}
-
                   onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                     setSelectedListing(l);
@@ -1798,14 +1616,6 @@ export function MarketplaceView() {
                     setShowDetailModal(true);
 
                   }}
-
-                  onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
-
-                    setSelectedListing(l);
-
-                    setShowTradeModal(true);
-
-                  } : undefined}
 
                   onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
@@ -1851,14 +1661,6 @@ export function MarketplaceView() {
 
                     }}
 
-                    onTrade={canTradeListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
-
-                      setSelectedListing(l);
-
-                      setShowTradeModal(true);
-
-                    } : undefined}
-
                     onBuy={canBuyListing(l, profile?.primary_role, profile?.lgu_approved || false) ? () => {
 
                       setSelectedListing(l);
@@ -1886,28 +1688,6 @@ export function MarketplaceView() {
         </Tabs>
 
       </Container>
-
-
-
-      <TradeRequestModal
-
-        open={showTradeModal}
-
-        onOpenChange={setShowTradeModal}
-
-        listing={selectedListing}
-
-        userListings={userListings}
-
-        user={user ? { id: user.id, full_name: profile?.full_name || "", primary_role: (profile?.primary_role === "super_admin" ? "lgu_admin" : profile?.primary_role) || "resident" } : null}
-
-        onSuccess={() => {
-
-          toast.success("Trade request sent successfully!");
-
-        }}
-
-      />
 
 
 

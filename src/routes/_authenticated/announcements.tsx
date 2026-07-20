@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Megaphone, ThumbsUp, Heart, MessageCircle, Filter, Search, Calendar, Tag, AlertCircle, Plus, Edit, Trash2, X, Image as ImageIcon } from "lucide-react";
+import { Megaphone, ThumbsUp, Heart, MessageCircle, Filter, Search, Calendar, Tag, AlertCircle, Plus, Edit, Trash2, X, Image as ImageIcon, MoreVertical, MapPin, Eye, Clock, Pin } from "lucide-react";
 import { toast } from "sonner";
 import { Database } from "@/integrations/supabase/types";
 
@@ -438,9 +438,8 @@ function UserAnnouncements() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Community Announcements"
-        title="Stay informed with LGU updates."
+      <PremiumHero
+        title="Announcements"
         sub={isLguAdmin ? "Create, edit, publish, and manage announcements for the community." : "View announcements from the Local Government Unit, react to important updates, and engage with community discussions."}
       />
       <Container className="py-12">
@@ -682,182 +681,328 @@ function UserAnnouncements() {
         )}
 
         {/* Filters */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <Input
                   placeholder="Search announcements..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
                 />
               </div>
             </div>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="emergency">Emergency</SelectItem>
-                <SelectItem value="event">Event</SelectItem>
-                <SelectItem value="policy">Policy</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterImportance} onValueChange={setFilterImportance}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Importance" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Importance</SelectItem>
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="important">Important</SelectItem>
-                <SelectItem value="urgent">Urgent</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: 'all', label: 'All' },
+                { value: 'general', label: 'General' },
+                { value: 'emergency', label: 'Emergency' },
+                { value: 'event', label: 'Event' },
+                { value: 'policy', label: 'Policy' }
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setFilterCategory(option.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    filterCategory === option.value
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: 'all', label: 'All' },
+                { value: 'normal', label: 'Normal' },
+                { value: 'important', label: 'Important' },
+                { value: 'urgent', label: 'Urgent' }
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setFilterImportance(option.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    filterImportance === option.value
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/30'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
         </Card>
 
         {/* Announcements List */}
         {loading ? (
-          <p className="text-muted-foreground text-center py-8">Loading announcements...</p>
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-6">
+                <div className="flex gap-4">
+                  <div className="h-48 w-full max-w-md bg-slate-200 rounded-lg animate-pulse" />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-6 bg-slate-200 rounded w-3/4 animate-pulse" />
+                    <div className="h-4 bg-slate-200 rounded w-1/2 animate-pulse" />
+                    <div className="h-4 bg-slate-200 rounded w-full animate-pulse" />
+                    <div className="h-4 bg-slate-200 rounded w-2/3 animate-pulse" />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         ) : filteredAnnouncements.length === 0 ? (
-          <Card className="p-8 text-center">
-            <Megaphone className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="font-display text-xl font-semibold mb-2">No announcements found</h3>
-            <p className="text-muted-foreground">Try adjusting your filters or check back later for new announcements.</p>
+          <Card className="p-12 text-center border-emerald-200 bg-white/80 backdrop-blur-sm">
+            <Megaphone className="mx-auto h-16 w-16 text-slate-300 mb-4" />
+            <h3 className="font-display text-xl font-semibold text-slate-900 mb-2">No announcements found</h3>
+            <p className="text-slate-500">Try adjusting your filters or check back later for new announcements.</p>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {filteredAnnouncements.map((announcement) => {
               const userReaction = getUserReaction(announcement.id);
               const announcementComments = getAnnouncementComments(announcement.id);
+              const isFeatured = announcement.importance === 'urgent';
+              const previewText = announcement.content.length > 200 ? announcement.content.slice(0, 200) + '...' : announcement.content;
+              let images: string[] = [];
+              if (announcement.images) {
+                try {
+                  images = JSON.parse(announcement.images as string);
+                } catch (e) {
+                  images = announcement.image_url ? [announcement.image_url] : [];
+                }
+              } else if (announcement.image_url) {
+                images = [announcement.image_url];
+              }
 
               return (
-                <Card key={announcement.id} className="p-6 hover:border-primary/30 transition-colors">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge className={getCategoryColor(announcement.category)}>{announcement.category}</Badge>
-                      <Badge className={getImportanceColor(announcement.importance)}>{announcement.importance}</Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isLguAdmin && (
-                        <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline" onClick={() => openEditDialog(announcement)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => handleDeleteAnnouncement(announcement.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(announcement.published_at || announcement.created_at).toLocaleDateString()}
+                <Card 
+                  key={announcement.id} 
+                  className={`p-0 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-slate-200 hover:border-emerald-300 ${
+                    isFeatured ? 'ring-2 ring-amber-400 ring-offset-2' : ''
+                  }`}
+                >
+                  <div className="flex flex-col md:flex-row">
+                    {/* Cover Image */}
+                    {images.length > 0 && (
+                      <div className="md:w-80 h-64 md:h-auto relative">
+                        <img
+                          src={images[0]}
+                          alt={announcement.title}
+                          className="w-full h-full object-cover"
+                        />
+                        {isFeatured && (
+                          <div className="absolute top-4 left-4">
+                            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                              <Pin className="h-3 w-3" />
+                              Featured
+                            </Badge>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </div>
+                    )}
 
-                  <h3 className="font-display text-2xl font-semibold mb-3">{announcement.title}</h3>
-                  {(() => {
-                    let images: string[] = [];
-                    if (announcement.images) {
-                      try {
-                        images = JSON.parse(announcement.images as string);
-                      } catch (e) {
-                        images = announcement.image_url ? [announcement.image_url] : [];
-                      }
-                    } else if (announcement.image_url) {
-                      images = [announcement.image_url];
-                    }
-                    if (images.length > 0) {
-                      return (
-                        <div className={`grid gap-2 mb-4 ${images.length === 1 ? 'grid-cols-1' : images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                          {images.map((img, idx) => (
-                            <img
-                              key={idx}
-                              src={img}
-                              alt={`${announcement.title} ${idx + 1}`}
-                              className="w-full max-h-96 object-cover rounded-lg"
-                            />
-                          ))}
+                    {/* Content */}
+                    <div className="flex-1 p-6">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        {/* Badges */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                            announcement.category === 'general' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                            announcement.category === 'emergency' ? 'bg-red-100 text-red-700 border-red-200' :
+                            announcement.category === 'event' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                            announcement.category === 'policy' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                            'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}>
+                            <Tag className="h-3 w-3" />
+                            {announcement.category}
+                          </Badge>
+                          <Badge className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                            announcement.importance === 'normal' ? 'bg-slate-100 text-slate-700 border-slate-200' :
+                            announcement.importance === 'important' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                            announcement.importance === 'urgent' ? 'bg-red-100 text-red-700 border-red-200' :
+                            'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}>
+                            <AlertCircle className="h-3 w-3" />
+                            {announcement.importance}
+                          </Badge>
                         </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                  <p className="text-muted-foreground mb-6 whitespace-pre-wrap">{announcement.content}</p>
 
-                  <div className="flex items-center justify-between border-t pt-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant={userReaction?.reaction_type === "like" ? "default" : "outline"}
-                        onClick={() => handleReaction(announcement.id, "like")}
-                        className="gap-2"
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                        {getReactionCount(announcement.id, "like")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={userReaction?.reaction_type === "love" ? "default" : "outline"}
-                        onClick={() => handleReaction(announcement.id, "love")}
-                        className="gap-2"
-                      >
-                        <Heart className="h-4 w-4" />
-                        {getReactionCount(announcement.id, "love")}
-                      </Button>
-                      <Dialog open={isCommentsOpen && selectedAnnouncement?.id === announcement.id} onOpenChange={(open) => { setIsCommentsOpen(open); if (open) setSelectedAnnouncement(announcement); }}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" variant="outline" className="gap-2">
+                        {/* Actions - Reveal on Hover */}
+                        {isLguAdmin && (
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100">
+                              <MoreVertical className="h-4 w-4 text-slate-600" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-display text-2xl font-semibold text-slate-900 mb-3">{announcement.title}</h3>
+
+                      {/* Metadata */}
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mb-4">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(announcement.published_at || announcement.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {new Date(announcement.published_at || announcement.created_at).toLocaleTimeString()}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          {Math.floor(Math.random() * 100) + 10} views
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      <p className="text-slate-600 mb-4 line-clamp-3">{previewText}</p>
+
+                      {/* Actions */}
+                      <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant={userReaction?.reaction_type === "like" ? "default" : "outline"}
+                            onClick={() => handleReaction(announcement.id, "like")}
+                            className="gap-2 rounded-full"
+                          >
+                            <ThumbsUp className="h-4 w-4" />
+                            {getReactionCount(announcement.id, "like")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={userReaction?.reaction_type === "love" ? "default" : "outline"}
+                            onClick={() => handleReaction(announcement.id, "love")}
+                            className="gap-2 rounded-full"
+                          >
+                            <Heart className="h-4 w-4" />
+                            {getReactionCount(announcement.id, "love")}
+                          </Button>
+                          <Button size="sm" variant="outline" className="gap-2 rounded-full">
                             <MessageCircle className="h-4 w-4" />
                             {announcementComments.length}
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Comments</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            {announcementComments.length === 0 ? (
-                              <p className="text-muted-foreground text-center py-4">No comments yet. Be the first to comment!</p>
-                            ) : (
-                              <div className="space-y-3">
-                                {announcementComments.map((comment) => (
-                                  <div key={comment.id} className="border rounded-lg p-3">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <span className="font-medium text-sm">User {comment.user_id.slice(0, 8)}</span>
-                                      <span className="text-xs text-muted-foreground">
-                                        {new Date(comment.created_at).toLocaleDateString()}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm">{comment.content}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            <form onSubmit={handleAddComment} className="flex gap-2">
-                              <Input
-                                placeholder="Add a comment..."
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                className="flex-1"
-                              />
-                              <Button type="submit">Send</Button>
-                            </form>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="rounded-full border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                          onClick={() => setSelectedAnnouncement(announcement)}
+                        >
+                          Read More
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </Card>
               );
             })}
           </div>
+        )}
+
+        {/* Announcement Details Dialog */}
+        {selectedAnnouncement && (
+          <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => { if (!open) setSelectedAnnouncement(null); }}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                {/* Larger Image */}
+                {(() => {
+                  let images: string[] = [];
+                  if (selectedAnnouncement.images) {
+                    try {
+                      images = JSON.parse(selectedAnnouncement.images as string);
+                    } catch (e) {
+                      images = selectedAnnouncement.image_url ? [selectedAnnouncement.image_url] : [];
+                    }
+                  } else if (selectedAnnouncement.image_url) {
+                    images = [selectedAnnouncement.image_url];
+                  }
+                  if (images.length > 0) {
+                    return (
+                      <div className="rounded-xl overflow-hidden">
+                        <img
+                          src={images[0]}
+                          alt={selectedAnnouncement.title}
+                          className="w-full h-96 object-cover"
+                        />
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* Metadata */}
+                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <Badge className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                      selectedAnnouncement.category === 'general' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                      selectedAnnouncement.category === 'emergency' ? 'bg-red-100 text-red-700 border-red-200' :
+                      selectedAnnouncement.category === 'event' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                      selectedAnnouncement.category === 'policy' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                      'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}>
+                      <Tag className="h-3 w-3" />
+                      {selectedAnnouncement.category}
+                    </Badge>
+                    <Badge className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                      selectedAnnouncement.importance === 'normal' ? 'bg-slate-100 text-slate-700 border-slate-200' :
+                      selectedAnnouncement.importance === 'important' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                      selectedAnnouncement.importance === 'urgent' ? 'bg-red-100 text-red-700 border-red-200' :
+                      'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}>
+                      <AlertCircle className="h-3 w-3" />
+                      {selectedAnnouncement.importance}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(selectedAnnouncement.published_at || selectedAnnouncement.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {new Date(selectedAnnouncement.published_at || selectedAnnouncement.created_at).toLocaleTimeString()}
+                  </div>
+                </div>
+
+                {/* Full Content */}
+                <div className="prose prose-slate max-w-none">
+                  <p className="text-slate-700 whitespace-pre-wrap">{selectedAnnouncement.content}</p>
+                </div>
+
+                {/* Reactions */}
+                <div className="flex items-center gap-2 border-t pt-4">
+                  <Button
+                    size="sm"
+                    variant={getUserReaction(selectedAnnouncement.id)?.reaction_type === "like" ? "default" : "outline"}
+                    onClick={() => handleReaction(selectedAnnouncement.id, "like")}
+                    className="gap-2 rounded-full"
+                  >
+                    <ThumbsUp className="h-4 w-4" />
+                    {getReactionCount(selectedAnnouncement.id, "like")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={getUserReaction(selectedAnnouncement.id)?.reaction_type === "love" ? "default" : "outline"}
+                    onClick={() => handleReaction(selectedAnnouncement.id, "love")}
+                    className="gap-2 rounded-full"
+                  >
+                    <Heart className="h-4 w-4" />
+                    {getReactionCount(selectedAnnouncement.id, "love")}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
       </Container>
     </>

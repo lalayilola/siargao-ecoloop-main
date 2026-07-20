@@ -1,16 +1,125 @@
 import type { ReactNode } from "react";
 import { Carrot, Apple, Trash, Recycle, Sprout, Leaf, TreePine, Flower } from "lucide-react";
 
+export function PremiumHero({
+  title,
+  sub,
+  action,
+}: {
+  title: string;
+  sub?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <section className="relative overflow-hidden py-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {/* Premium Card with Glassmorphism */}
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ minHeight: '200px' }}>
+          {/* Animated Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-green-600 to-emerald-400 animate-gradient-flow opacity-90">
+            <style>{`
+              @keyframes gradient-flow {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+              }
+              .animate-gradient-flow {
+                background-size: 300% 300%;
+                animation: gradient-flow 18s ease infinite;
+              }
+              @keyframes gradient-border-move {
+                0% { background-position: 0% 0%; }
+                50% { background-position: 100% 100%; }
+                100% { background-position: 0% 0%; }
+              }
+              .animate-border-flow {
+                background-size: 400% 400%;
+                animation: gradient-border-move 20s ease infinite;
+              }
+            `}</style>
+          </div>
+          
+          {/* Glassmorphism Overlay */}
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-md"></div>
+          
+          {/* Animated Gradient Border */}
+          <div className="absolute inset-0 rounded-3xl p-[3px]">
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-400 animate-border-flow opacity-80"></div>
+          </div>
+          
+          {/* Floating eco icons background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <style>{`
+              @keyframes floatUp {
+                0% { transform: translateY(100vh) rotate(0deg) scale(1); opacity: 0; }
+                10% { opacity: 0.06; }
+                90% { opacity: 0.06; }
+                100% { transform: translateY(-100px) rotate(360deg) scale(1.1); opacity: 0; }
+              }
+              .eco-float {
+                position: absolute;
+                animation: floatUp linear infinite;
+                pointer-events: none;
+                will-change: transform, opacity;
+              }
+            `}</style>
+            
+            <span className="eco-float text-green-500/10 text-xl" style={{ left: '5%', animationDuration: '30s', animationDelay: '0s' }}>🍃</span>
+            <span className="eco-float text-green-600/8 text-lg" style={{ left: '15%', animationDuration: '34s', animationDelay: '5s' }}>🍃</span>
+            <span className="eco-float text-emerald-500/10 text-2xl" style={{ left: '25%', animationDuration: '32s', animationDelay: '10s' }}>🍃</span>
+            <span className="eco-float text-green-400/8 text-base" style={{ left: '35%', animationDuration: '36s', animationDelay: '15s' }}>🍃</span>
+            <span className="eco-float text-green-500/10 text-xl" style={{ left: '45%', animationDuration: '31s', animationDelay: '3s' }}>🍃</span>
+            <span className="eco-float text-emerald-600/8 text-lg" style={{ left: '55%', animationDuration: '33s', animationDelay: '8s' }}>🍃</span>
+            <span className="eco-float text-green-500/10 text-2xl" style={{ left: '65%', animationDuration: '35s', animationDelay: '12s' }}>🍃</span>
+            <span className="eco-float text-green-400/8 text-base" style={{ left: '75%', animationDuration: '30s', animationDelay: '18s' }}>🍃</span>
+            <span className="eco-float text-emerald-500/10 text-xl" style={{ left: '85%', animationDuration: '37s', animationDelay: '2s' }}>🍃</span>
+            <span className="eco-float text-green-600/8 text-lg" style={{ left: '95%', animationDuration: '29s', animationDelay: '7s' }}>🍃</span>
+            
+            <span className="eco-float text-blue-400/10 text-lg" style={{ left: '8%', animationDuration: '27s', animationDelay: '4s' }}>💧</span>
+            <span className="eco-float text-cyan-500/8 text-base" style={{ left: '22%', animationDuration: '30s', animationDelay: '9s' }}>💧</span>
+            <span className="eco-float text-blue-500/10 text-xl" style={{ left: '38%', animationDuration: '28s', animationDelay: '14s' }}>💧</span>
+            <span className="eco-float text-cyan-400/8 text-lg" style={{ left: '52%', animationDuration: '32s', animationDelay: '19s' }}>💧</span>
+            <span className="eco-float text-blue-500/10 text-base" style={{ left: '68%', animationDuration: '26s', animationDelay: '1s' }}>💧</span>
+            <span className="eco-float text-cyan-500/8 text-xl" style={{ left: '82%', animationDuration: '29s', animationDelay: '6s' }}>💧</span>
+            
+            <span className="eco-float text-green-600/8 text-xl" style={{ left: '12%', animationDuration: '40s', animationDelay: '6s' }}>♻</span>
+            <span className="eco-float text-emerald-500/8 text-lg" style={{ left: '28%', animationDuration: '42s', animationDelay: '13s' }}>♻</span>
+            <span className="eco-float text-green-500/8 text-xl" style={{ left: '48%', animationDuration: '41s', animationDelay: '20s' }}>♻</span>
+            <span className="eco-float text-emerald-600/8 text-lg" style={{ left: '62%', animationDuration: '39s', animationDelay: '2s' }}>♻</span>
+            <span className="eco-float text-green-500/8 text-xl" style={{ left: '78%', animationDuration: '43s', animationDelay: '16s' }}>♻</span>
+          </div>
+
+          <div className="relative px-8 py-8 sm:px-10 sm:py-10">
+            <div className="flex flex-col items-center text-center">
+              <h1 className="text-5xl font-bold text-white sm:text-6xl" style={{ fontFamily: 'Sora, sans-serif' }}>{title}</h1>
+              {sub && (
+                <p className="mt-4 text-xl text-white/90 sm:text-2xl max-w-3xl" style={{ fontFamily: 'Sora, sans-serif' }}>{sub}</p>
+              )}
+              {action && (
+                <div className="mt-8">
+                  {action}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function PageHero({
   eyebrow,
   title,
   sub,
   bgImage,
+  action,
 }: {
   eyebrow?: string;
   title: string;
   sub?: string;
   bgImage?: string;
+  action?: ReactNode;
 }) {
   return (
     <section
@@ -29,16 +138,62 @@ export function PageHero({
         />
       )}
 
-      {/* Eco-themed decorative elements */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-green-200/40 to-emerald-300/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-br from-lime-200/30 to-green-300/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-      <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-gradient-to-br from-teal-200/25 to-cyan-300/20 rounded-full blur-2xl -translate-y-1/2" />
-      <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-gradient-to-br from-green-100/30 to-emerald-200/25 rounded-full blur-2xl" />
-
-      {/* Vegetable and fruit pattern overlay */}
-      <div className="absolute inset-0 opacity-[0.05]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322c55e' fill-opacity='1'%3E%3Cpath d='M20 30c-5 0-8 4-8 9s3 9 8 9 8-4 8-9-3-9-8-9zm0 14c-3 0-5-2-5-5s2-5 5-5 5 2 5 5-2 5-5 5z'/%3E%3Ccircle cx='90' cy='25' r='10'/%3E%3Cpath d='M60 70c0-8-6-14-14-14s-14 6-14 14 6 14 14 14 14-6 14-14-6-14-14-14z'/%3E%3Cpath d='M95 75c-4 0-7 3-7 7s3 7 7 7 7-3 7-7-3-7-7-7z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-      }} />
+      {/* Floating eco elements animation */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <style>{`
+          @keyframes floatUp {
+            0% {
+              transform: translateY(100vh) rotate(0deg) scale(1);
+              opacity: 0;
+            }
+            10% {
+              opacity: 0.6;
+            }
+            90% {
+              opacity: 0.6;
+            }
+            100% {
+              transform: translateY(-100px) rotate(360deg) scale(1.1);
+              opacity: 0;
+            }
+          }
+          .eco-float {
+            position: absolute;
+            animation: floatUp linear infinite;
+            pointer-events: none;
+            will-change: transform, opacity;
+          }
+        `}</style>
+        
+        {/* Leaves */}
+        <span className="eco-float text-green-500/20 text-2xl" style={{ left: '5%', animationDuration: '25s', animationDelay: '0s' }}>🍃</span>
+        <span className="eco-float text-green-600/15 text-xl" style={{ left: '15%', animationDuration: '30s', animationDelay: '5s' }}>🍃</span>
+        <span className="eco-float text-emerald-500/20 text-3xl" style={{ left: '25%', animationDuration: '28s', animationDelay: '10s' }}>🍃</span>
+        <span className="eco-float text-green-400/15 text-lg" style={{ left: '35%', animationDuration: '32s', animationDelay: '15s' }}>🍃</span>
+        <span className="eco-float text-green-500/20 text-2xl" style={{ left: '45%', animationDuration: '26s', animationDelay: '3s' }}>🍃</span>
+        <span className="eco-float text-emerald-600/15 text-xl" style={{ left: '55%', animationDuration: '29s', animationDelay: '8s' }}>🍃</span>
+        <span className="eco-float text-green-500/20 text-3xl" style={{ left: '65%', animationDuration: '31s', animationDelay: '12s' }}>🍃</span>
+        <span className="eco-float text-green-400/15 text-lg" style={{ left: '75%', animationDuration: '27s', animationDelay: '18s' }}>🍃</span>
+        <span className="eco-float text-emerald-500/20 text-2xl" style={{ left: '85%', animationDuration: '33s', animationDelay: '2s' }}>🍃</span>
+        <span className="eco-float text-green-600/15 text-xl" style={{ left: '95%', animationDuration: '24s', animationDelay: '7s' }}>🍃</span>
+        
+        {/* Water droplets */}
+        <span className="eco-float text-blue-400/20 text-xl" style={{ left: '8%', animationDuration: '22s', animationDelay: '4s' }}>💧</span>
+        <span className="eco-float text-cyan-500/15 text-lg" style={{ left: '22%', animationDuration: '26s', animationDelay: '9s' }}>💧</span>
+        <span className="eco-float text-blue-500/20 text-2xl" style={{ left: '38%', animationDuration: '24s', animationDelay: '14s' }}>💧</span>
+        <span className="eco-float text-cyan-400/15 text-xl" style={{ left: '52%', animationDuration: '28s', animationDelay: '19s' }}>💧</span>
+        <span className="eco-float text-blue-500/20 text-lg" style={{ left: '68%', animationDuration: '23s', animationDelay: '1s' }}>💧</span>
+        <span className="eco-float text-cyan-500/15 text-2xl" style={{ left: '82%', animationDuration: '25s', animationDelay: '6s' }}>💧</span>
+        <span className="eco-float text-blue-400/20 text-xl" style={{ left: '92%', animationDuration: '27s', animationDelay: '11s' }}>💧</span>
+        
+        {/* Recycle symbols */}
+        <span className="eco-float text-green-600/15 text-2xl" style={{ left: '12%', animationDuration: '35s', animationDelay: '6s' }}>♻</span>
+        <span className="eco-float text-emerald-500/15 text-xl" style={{ left: '28%', animationDuration: '38s', animationDelay: '13s' }}>♻</span>
+        <span className="eco-float text-green-500/15 text-2xl" style={{ left: '48%', animationDuration: '36s', animationDelay: '20s' }}>♻</span>
+        <span className="eco-float text-emerald-600/15 text-xl" style={{ left: '62%', animationDuration: '34s', animationDelay: '2s' }}>♻</span>
+        <span className="eco-float text-green-500/15 text-2xl" style={{ left: '78%', animationDuration: '37s', animationDelay: '16s' }}>♻</span>
+        <span className="eco-float text-emerald-500/15 text-xl" style={{ left: '88%', animationDuration: '33s', animationDelay: '9s' }}>♻</span>
+      </div>
 
       <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         {eyebrow && (
@@ -53,6 +208,11 @@ export function PageHero({
           <p className="mt-4 max-w-2xl text-lg text-gray-600 leading-relaxed">
             {sub}
           </p>
+        )}
+        {action && (
+          <div className="mt-6">
+            {action}
+          </div>
         )}
       </div>
     </section>

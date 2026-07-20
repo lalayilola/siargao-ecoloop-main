@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import { Container, PageHero } from "@/components/layout/Section";
+import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 
 import { Card } from "@/components/ui/card";
 
@@ -866,11 +866,9 @@ export function MessagesView() {
 
     <>
 
-      <PageHero
+      <PremiumHero
 
-        eyebrow="Messages"
-
-        title="Your conversations"
+        title="Messages"
 
         sub="Chat with other EcoLoop members about trades, purchases, and more."
 
@@ -881,14 +879,13 @@ export function MessagesView() {
         <div className="grid gap-6 lg:grid-cols-3">
 
           {/* Conversations List */}
+          <Card className="lg:col-span-1 border-2 border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:border-emerald-300 transition-colors">
 
-          <Card className="lg:col-span-1 border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10">
-
-            <div className="p-4 border-b border-primary/20">
+            <div className="p-5 border-b border-slate-200">
 
               <div className="relative">
 
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/60" />
+                <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
 
                 <Input
 
@@ -898,7 +895,7 @@ export function MessagesView() {
 
                   placeholder="Search conversations..."
 
-                  className="pl-9 border-primary/30 focus:border-primary focus:ring-primary/50"
+                  className="h-14 pl-12 pr-4 text-base rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
 
                 />
 
@@ -910,19 +907,30 @@ export function MessagesView() {
 
               {loading ? (
 
-                <div className="p-4 text-center text-sm text-slate-500">Loading conversations...</div>
+                <div className="p-8 space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-4">
+                      <div className="h-14 w-14 rounded-full bg-slate-200 animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-slate-200 rounded w-3/4 animate-pulse" />
+                        <div className="h-3 bg-slate-200 rounded w-1/2 animate-pulse" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
               ) : filteredConversations.length === 0 ? (
 
-                <div className="p-4 text-center text-sm text-slate-500">
-
-                  {searchQuery ? "No conversations found" : "No conversations yet. Start chatting!"}
-
+                <div className="p-8 text-center">
+                  <MessageCircle className="mx-auto h-12 w-12 text-slate-300 mb-4" />
+                  <p className="text-slate-600 font-medium">
+                    {searchQuery ? "No conversations found" : "No conversations yet. Start chatting!"}
+                  </p>
                 </div>
 
               ) : (
 
-                <div className="divide-y divide-primary/10">
+                <div className="divide-y divide-slate-100">
 
                   {filteredConversations.map((conv) => (
 
@@ -930,9 +938,11 @@ export function MessagesView() {
 
                       key={conv.id}
 
-                      className={`p-4 cursor-pointer hover:bg-primary/5 transition-colors ${
+                      className={`p-4 cursor-pointer transition-all duration-200 relative ${
 
-                        selectedConversation?.id === conv.id ? "bg-primary/10" : ""
+                        selectedConversation?.id === conv.id 
+                          ? "bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-l-emerald-500" 
+                          : "hover:bg-slate-50 border-l-4 border-l-transparent"
 
                       }`}
 
@@ -940,31 +950,39 @@ export function MessagesView() {
 
                     >
 
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-4">
 
-                        <Avatar className="h-12 w-12">
+                        <div className="relative">
+                          <Avatar className="h-14 w-14 ring-2 ring-white shadow-md">
 
-                          {conv.other_user?.profile_picture_url ? (
+                            {conv.other_user?.profile_picture_url ? (
 
-                            <AvatarImage src={conv.other_user.profile_picture_url} alt={conv.other_user.full_name} />
+                              <AvatarImage src={conv.other_user.profile_picture_url} alt={conv.other_user.full_name} />
 
-                          ) : (
+                            ) : (
 
-                            <AvatarFallback>{conv.other_user?.full_name?.[0] || "?"}</AvatarFallback>
+                              <AvatarFallback className="bg-gradient-to-br from-emerald-100 to-green-100 text-emerald-700 font-semibold text-lg">
+                                {conv.other_user?.full_name?.[0] || "?"}
+                              </AvatarFallback>
 
-                          )}
+                            )}
 
-                        </Avatar>
+                          </Avatar>
+                          {/* Online Status Indicator */}
+                          <div className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${
+                            (conv.other_user as any)?.is_online ? 'bg-green-500' : 'bg-slate-400'
+                          }`} />
+                        </div>
 
                         <div className="flex-1 min-w-0">
 
-                          <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center justify-between mb-2">
 
-                            <p className="font-medium text-sm text-slate-900 truncate">{conv.other_user?.full_name}</p>
+                            <p className="font-semibold text-base text-slate-900 truncate">{conv.other_user?.full_name}</p>
 
                             {conv.last_message && (
 
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-slate-500 font-medium">
 
                                 {formatDistanceToNow(new Date(conv.last_message.created_at), { addSuffix: true })}
 
@@ -1000,7 +1018,9 @@ export function MessagesView() {
 
                             {conv.unread_count > 0 && (
 
-                              <Badge className="ml-2 bg-primary text-white">{conv.unread_count}</Badge>
+                              <Badge className="ml-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                                {conv.unread_count}
+                              </Badge>
 
                             )}
 
@@ -1026,58 +1046,89 @@ export function MessagesView() {
 
           {/* Chat Area */}
 
-          <Card className="lg:col-span-2 border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10">
+          <Card className="lg:col-span-2 border-2 border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm overflow-hidden hover:border-emerald-300 transition-colors">
 
             {selectedConversation ? (
 
               <div className="h-[600px] flex flex-col">
 
-                <div className="p-4 border-b border-primary/20 flex items-center justify-between">
+                {/* Modern Chat Header */}
+                <div className="p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
 
-                    <Avatar className="h-10 w-10">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12 ring-2 ring-white shadow-md">
 
-                      {selectedConversation.other_user?.profile_picture_url ? (
+                        {selectedConversation.other_user?.profile_picture_url ? (
 
-                        <AvatarImage src={selectedConversation.other_user.profile_picture_url} alt={selectedConversation.other_user.full_name} />
+                          <AvatarImage src={selectedConversation.other_user.profile_picture_url} alt={selectedConversation.other_user.full_name} />
 
-                      ) : (
+                        ) : (
 
-                        <AvatarFallback>{selectedConversation.other_user?.full_name?.[0] || "?"}</AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-br from-emerald-100 to-green-100 text-emerald-700 font-semibold text-lg">
+                            {selectedConversation.other_user?.full_name?.[0] || "?"}
+                          </AvatarFallback>
 
-                      )}
+                        )}
 
-                    </Avatar>
+                      </Avatar>
+                      <div className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
+                        (selectedConversation.other_user as any)?.is_online ? 'bg-green-500' : 'bg-slate-400'
+                      }`} />
+                    </div>
 
                     <div>
 
-                      <p className="font-medium text-slate-900">{selectedConversation.other_user?.full_name}</p>
+                      <p className="font-semibold text-base text-slate-900">{selectedConversation.other_user?.full_name}</p>
 
-                      <p className="text-xs text-slate-500">{selectedConversation.other_user?.primary_role}</p>
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
+                        {(selectedConversation.other_user as any)?.is_online ? (
+                          <><span className="w-2 h-2 rounded-full bg-green-500" /> Online</>
+                        ) : (
+                          <>Last seen {(selectedConversation.other_user as any)?.last_seen ? formatDistanceToNow(new Date((selectedConversation.other_user as any).last_seen), { addSuffix: true }) : 'recently'}</>
+                        )}
+                      </p>
 
                     </div>
 
                   </div>
 
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedConversation(null)}>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="rounded-full hover:bg-slate-100" title="More options">
+                      <MoreVertical className="h-5 w-5 text-slate-600" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedConversation(null)} className="rounded-full hover:bg-red-50 hover:text-red-600">
 
-                    <X className="h-4 w-4" />
+                      <X className="h-5 w-5" />
 
-                  </Button>
+                    </Button>
+                  </div>
 
                 </div>
 
-                <ScrollArea className="flex-1 p-4">
+                <ScrollArea className="flex-1 relative">
+                  {/* Eco-inspired background pattern */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
+                    <div className="absolute top-10 left-10 text-6xl">🍃</div>
+                    <div className="absolute top-32 right-20 text-5xl">🍃</div>
+                    <div className="absolute bottom-40 left-20 text-4xl">🍃</div>
+                    <div className="absolute bottom-20 right-10 text-5xl">🍃</div>
+                    <div className="absolute top-1/2 left-1/3 text-3xl">🍃</div>
+                    <div className="absolute top-20 left-1/2 text-4xl">♻</div>
+                    <div className="absolute bottom-32 right-1/3 text-3xl">♻</div>
+                  </div>
 
-                  <div className="space-y-4">
+                  <div className="p-6 space-y-4 relative z-10">
 
                     {messages.length === 0 ? (
 
-                      <div className="text-center text-sm text-slate-500 py-8">
-
-                        No messages yet. Start the conversation!
-
+                      <div className="flex flex-col items-center justify-center py-16">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mb-6 shadow-lg">
+                          <MessageCircle className="h-12 w-12 text-emerald-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-slate-900 mb-2">Start the conversation</h3>
+                        <p className="text-slate-500 text-center max-w-sm">Send a message to {selectedConversation.other_user?.full_name} to begin chatting about trades, purchases, and more.</p>
                       </div>
 
                     ) : (
@@ -1088,19 +1139,31 @@ export function MessagesView() {
 
                           key={message.id}
 
-                          className={`group flex ${message.sender_id === user?.id ? "justify-end" : "justify-start"} gap-2 items-end`}
+                          className={`group flex ${message.sender_id === user?.id ? "justify-end" : "justify-start"} gap-3 items-end animate-in fade-in slide-in-from-bottom-2 duration-300`}
 
                         >
 
+                          {message.sender_id !== user?.id && (
+                            <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+                              {selectedConversation.other_user?.profile_picture_url ? (
+                                <AvatarImage src={selectedConversation.other_user.profile_picture_url} alt={selectedConversation.other_user.full_name} />
+                              ) : (
+                                <AvatarFallback className="bg-gradient-to-br from-emerald-100 to-green-100 text-emerald-700 font-semibold text-xs">
+                                  {selectedConversation.other_user?.full_name?.[0] || "?"}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                          )}
+
                           <div
 
-                            className={`max-w-[60%] rounded-lg px-3 py-2 ${
+                            className={`max-w-[65%] rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 hover:shadow-md ${
 
                               message.sender_id === user?.id
 
-                                ? "bg-primary text-primary-foreground"
+                                ? "bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-br-lg"
 
-                                : "bg-sand text-slate-900"
+                                : "bg-slate-100 text-slate-900 rounded-bl-lg hover:bg-slate-200"
 
                             }`}
 
@@ -1108,39 +1171,35 @@ export function MessagesView() {
 
                             {(message as any).image_url && (
 
-                              <img
+                              <div className="mb-2 rounded-lg overflow-hidden">
+                                <img
 
-                                src={(message as any).image_url}
+                                  src={(message as any).image_url}
 
-                                alt="Message image"
+                                  alt="Message image"
 
-                                className="max-w-full h-auto rounded-lg mb-2"
+                                  className="max-w-full h-auto rounded-lg"
 
-                              />
+                                />
+                              </div>
 
                             )}
 
-                            {message.content && <p className="text-sm">{message.content}</p>}
+                            {message.content && <p className="text-sm leading-relaxed">{message.content}</p>}
 
-                            <div className="flex items-center justify-between gap-1 mt-1">
+                            <div className="flex items-center justify-end gap-2 mt-2">
 
-                              <span className="text-xs opacity-70">{formatTime(message.created_at)}</span>
+                              <span className="text-xs opacity-80">{formatTime(message.created_at)}</span>
 
-                              <div className="flex items-center gap-1">
-
-                                {message.sender_id === user?.id && message.read_at && (
-
-                                  <CheckCheck className="h-3.5 w-3.5 opacity-70" />
-
-                                )}
-
-                                {message.sender_id === user?.id && !message.read_at && (
-
-                                  <Check className="h-3.5 w-3.5 opacity-70" />
-
-                                )}
-
-                              </div>
+                              {message.sender_id === user?.id && (
+                                <div className="flex items-center gap-0.5">
+                                  {message.read_at ? (
+                                    <CheckCheck className="h-3.5 w-3.5 opacity-80" />
+                                  ) : (
+                                    <Check className="h-3.5 w-3.5 opacity-80" />
+                                  )}
+                                </div>
+                              )}
 
                             </div>
 
@@ -1148,7 +1207,7 @@ export function MessagesView() {
 
                           {message.sender_id === user?.id && (
 
-                            <div className="flex flex-col gap-0.5 pb-1">
+                            <div className="flex flex-col gap-0.5 pb-1 opacity-0 group-hover:opacity-100 transition-opacity">
 
                               <Button
 
@@ -1156,7 +1215,7 @@ export function MessagesView() {
 
                                 variant="ghost"
 
-                                className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600 rounded-full"
 
                                 onClick={() => handleEditMessage(message.id, message.content || "")}
 
@@ -1164,7 +1223,7 @@ export function MessagesView() {
 
                               >
 
-                                <Edit3 className="h-3 w-3" />
+                                <Edit3 className="h-3.5 w-3.5" />
 
                               </Button>
 
@@ -1232,13 +1291,13 @@ export function MessagesView() {
 
                 </ScrollArea>
 
-                <div className="p-4 border-t">
+                <div className="p-5 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-white">
 
                   {imagePreview && (
 
-                    <div className="mb-3 relative inline-block">
+                    <div className="mb-4 relative inline-block">
 
-                      <img src={imagePreview} alt="Preview" className="h-32 w-32 object-cover rounded-lg border border-primary/20" />
+                      <img src={imagePreview} alt="Preview" className="h-32 w-32 object-cover rounded-xl border-2 border-emerald-200 shadow-md" />
 
                       <Button
 
@@ -1248,13 +1307,13 @@ export function MessagesView() {
 
                         variant="destructive"
 
-                        className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full"
+                        className="absolute -top-2 -right-2 h-7 w-7 p-0 rounded-full shadow-lg"
 
                         onClick={clearImage}
 
                       >
 
-                        <X className="h-3 w-3" />
+                        <X className="h-3.5 w-3.5" />
 
                       </Button>
 
@@ -1262,7 +1321,7 @@ export function MessagesView() {
 
                   )}
 
-                  <form onSubmit={handleSendMessage} className="flex gap-2">
+                  <form onSubmit={handleSendMessage} className="flex gap-3 items-center">
 
                     <div className="relative">
 
@@ -1280,37 +1339,39 @@ export function MessagesView() {
 
                       />
 
-                      <Button type="button" size="sm" variant="outline" disabled={sending || uploadingImage}>
+                      <Button type="button" size="sm" variant="outline" disabled={sending || uploadingImage} className="h-12 w-12 rounded-full border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 transition-all">
 
-                        <ImageIcon className="h-4 w-4" />
+                        <Paperclip className="h-5 w-5 text-slate-600" />
 
                       </Button>
 
                     </div>
 
-                    <Input
+                    <div className="flex-1 relative">
+                      <Input
 
-                      value={newMessage}
+                        value={newMessage}
 
-                      onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => setNewMessage(e.target.value)}
 
-                      placeholder="Type a message..."
+                        placeholder="Type a message..."
 
-                      className="flex-1 border-primary/30 focus:border-primary focus:ring-primary/50"
+                        className="h-12 rounded-full border-slate-300 bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
 
-                      disabled={sending || uploadingImage}
+                        disabled={sending || uploadingImage}
 
-                    />
+                      />
+                    </div>
 
-                    <Button type="submit" size="sm" disabled={sending || uploadingImage || (!newMessage.trim() && !selectedImage)}>
+                    <Button type="submit" size="sm" disabled={sending || uploadingImage || (!newMessage.trim() && !selectedImage)} className="h-12 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-md shadow-emerald-500/30 transition-all">
 
                       {uploadingImage ? (
 
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
 
                       ) : (
 
-                        <Send className="h-4 w-4" />
+                        <Send className="h-5 w-5" />
 
                       )}
 
@@ -1324,16 +1385,23 @@ export function MessagesView() {
 
             ) : (
 
-              <div className="h-[600px] flex items-center justify-center">
+              <div className="h-[600px] flex items-center justify-center relative">
+                {/* Eco-inspired background pattern */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
+                  <div className="absolute top-20 left-20 text-7xl">🍃</div>
+                  <div className="absolute top-40 right-32 text-6xl">🍃</div>
+                  <div className="absolute bottom-32 left-32 text-5xl">🍃</div>
+                  <div className="absolute bottom-20 right-20 text-6xl">🍃</div>
+                  <div className="absolute top-1/2 left-1/4 text-4xl">♻</div>
+                  <div className="absolute top-1/3 right-1/4 text-5xl">♻</div>
+                </div>
 
-                <div className="text-center">
-
-                  <MessageCircle className="h-16 w-16 text-primary/30 mx-auto mb-4" />
-
-                  <p className="text-lg font-medium text-slate-900 mb-2">Select a conversation</p>
-
-                  <p className="text-sm text-slate-600">Choose a conversation from the list to start chatting</p>
-
+                <div className="text-center relative z-10">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mb-6 shadow-lg mx-auto">
+                    <MessageCircle className="h-16 w-16 text-emerald-600" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-slate-900 mb-3">Select a conversation</h3>
+                  <p className="text-slate-500 max-w-sm mx-auto">Choose a conversation from the list to start chatting about trades, purchases, and more with EcoLoop members.</p>
                 </div>
 
               </div>

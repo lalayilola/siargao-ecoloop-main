@@ -49,7 +49,7 @@ function Index() {
       barangay: "General Luna",
       kg: 50,
       price: "₱500",
-      transaction_type: "sell_and_barter",
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -62,7 +62,7 @@ function Index() {
       barangay: "Daku Island",
       kg: 100,
       price: null,
-      transaction_type: "barter_only",
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -87,8 +87,8 @@ function Index() {
       role: "farmer",
       barangay: "San Isidro",
       kg: 150,
-      price: "₱300",
-      transaction_type: "sell_and_barter",
+      price: null,
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -101,7 +101,7 @@ function Index() {
       barangay: "General Luna",
       kg: 75,
       price: null,
-      transaction_type: "barter_only",
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -127,7 +127,7 @@ function Index() {
       barangay: "Del Carmen",
       kg: 20,
       price: "₱200",
-      transaction_type: "sell_and_barter",
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -140,7 +140,7 @@ function Index() {
       barangay: "General Luna",
       kg: 40,
       price: null,
-      transaction_type: "barter_only",
+      transaction_type: "sell_only",
       image: null,
       created_at: new Date().toISOString(),
     },
@@ -221,43 +221,44 @@ function Index() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden min-h-[600px] flex items-center">
         <div className="absolute inset-0">
           <img src={hero} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
         </div>
-        <Container className="relative flex flex-col items-center justify-center gap-10 py-20 sm:py-28 text-center">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white border border-white/30">
-              <Recycle className="h-3.5 w-3.5" /> {t("home.hero.badge")}
+        <Container className="relative flex flex-col items-center justify-center gap-12 py-24 sm:py-32 text-center">
+          <div className="max-w-4xl">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-4 py-2 text-xs font-semibold tracking-wider uppercase text-white border border-white/20 shadow-lg">
+              <Recycle className="h-4 w-4" /> {t("home.hero.badge")}
             </span>
-            <h1 className="mt-4 font-serif text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl leading-none uppercase">
-              <div className="bg-gradient-to-r from-green-600 via-white to-green-600 bg-clip-text text-transparent animate-gradient-text">
+            <h1 className="mt-8 font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight uppercase text-white drop-shadow-2xl">
+              <div className="bg-gradient-to-r from-emerald-600 via-white to-emerald-600 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]">
                 Turn food waste into,
               </div>
-              <div className="bg-gradient-to-r from-green-600 via-white to-green-600 bg-clip-text text-transparent animate-gradient-text">
+              <div className="bg-gradient-to-r from-emerald-700 via-white to-emerald-700 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]" style={{ animationDelay: '0.5s' }}>
                 Island harvest.
               </div>
             </h1>
-            <p className="mt-5 max-w-xl text-base text-white sm:text-lg mx-auto text-center">
+            <p className="mt-6 max-w-2xl text-lg sm:text-xl text-white/90 font-light leading-relaxed mx-auto text-center">
               {t("home.hero.subtitle")}
             </p>
-            <div className="mt-7 flex flex-wrap gap-3 justify-center">
-              <Button asChild size="lg" className="rounded-full">
-                <Link to="/auth">{t("home.hero.joinLoop")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <div className="mt-10 flex flex-wrap gap-4 justify-center">
+              <Button asChild size="lg" className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/30 px-8 py-6 text-base font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <Link to="/auth">{t("home.hero.joinLoop")} <ArrowRight className="ml-2 h-5 w-5" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full">
+              <Button asChild size="lg" variant="outline" className="rounded-full bg-white/10 backdrop-blur-md border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/50 px-8 py-6 text-base font-semibold transition-all duration-300 hover:scale-105">
                 <Link to="/how-it-works">{t("home.hero.seeHowItWorks")}</Link>
               </Button>
             </div>
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 mx-auto">
+            <dl className="mt-16 grid max-w-2xl grid-cols-3 gap-8 mx-auto">
               {[
                 { k: loading ? "..." : `${stats.wasteCollected.toLocaleString()} kg`, v: t("home.hero.wasteCollected") },
                 { k: loading ? "..." : `${stats.divertedPercentage}%`, v: t("home.hero.divertedFromLandfill") },
                 { k: loading ? "..." : stats.activeMembers.toLocaleString(), v: t("home.hero.activeMembers") },
               ].map((s) => (
-                <div key={s.v}>
-                  <dt className="font-display text-2xl font-semibold text-white">{s.k}</dt>
-                  <dd className="text-xs text-white">{s.v}</dd>
+                <div key={s.v} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl">
+                  <dt className="font-display text-3xl font-bold text-white">{s.k}</dt>
+                  <dd className="text-xs uppercase tracking-wider text-white/80 mt-2">{s.v}</dd>
                 </div>
               ))}
             </dl>
@@ -266,47 +267,49 @@ function Index() {
       </section>
 
       {/* MARKETPLACE CAROUSEL */}
-      <Container className="py-20">
-        <div className="text-center mb-10">
-          <span className="text-xs font-medium uppercase tracking-wider text-primary">Marketplace</span>
-          <h2 className="mt-2 font-display text-3xl font-semibold sm:text-4xl">
-            Fresh from the Community
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Browse the latest listings from farmers, restaurants, and community members
-          </p>
-        </div>
-        
-        <div className="relative overflow-hidden">
-          <div className="flex gap-6 animate-scroll">
-            {listings.length > 0 ? (
-              <>
-                {listings.map((listing) => (
-                  <div key={listing.id} className="flex-shrink-0 w-80">
-                    <ListingCard item={listing} />
-                  </div>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {listings.map((listing) => (
-                  <div key={`${listing.id}-duplicate`} className="flex-shrink-0 w-80">
-                    <ListingCard item={listing} />
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="text-center text-muted-foreground py-10">
-                No listings available yet. Be the first to post!
-              </div>
-            )}
+      <section className="relative py-24 bg-gradient-to-b from-emerald-50/50 to-white">
+        <Container>
+          <div className="text-center mb-16">
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-emerald-600 mb-4">Marketplace</span>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+              Fresh from the Community
+            </h2>
+            <p className="max-w-2xl mx-auto text-lg text-gray-600 font-light leading-relaxed">
+              Browse the latest listings from farmers, restaurants, and community members
+            </p>
           </div>
-        </div>
-        
-        <div className="mt-8 text-center">
-          <Button asChild size="lg" className="rounded-full">
-            <Link to="/marketplace">View All Listings <ArrowRight className="ml-2 h-4 w-4" /></Link>
-          </Button>
-        </div>
-      </Container>
+          
+          <div className="relative overflow-hidden">
+            <div className="flex gap-8 animate-scroll px-4">
+              {listings.length > 0 ? (
+                <>
+                  {listings.map((listing) => (
+                    <div key={listing.id} className="flex-shrink-0 w-96">
+                      <ListingCard item={listing} />
+                    </div>
+                  ))}
+                  {/* Duplicate for seamless loop */}
+                  {listings.map((listing) => (
+                    <div key={`${listing.id}-duplicate`} className="flex-shrink-0 w-96">
+                      <ListingCard item={listing} />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="text-center text-gray-500 py-10">
+                  No listings available yet. Be the first to post!
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button asChild size="lg" className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-600/30 px-8 py-6 text-base font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+              <Link to="/marketplace">View All Listings <ArrowRight className="ml-2 h-5 w-5" /></Link>
+            </Button>
+          </div>
+        </Container>
+      </section>
 
       <style>{`
         @keyframes scroll {
@@ -328,26 +331,29 @@ function Index() {
       `}</style>
 
       {/* WHO IT'S FOR */}
-      <section className="relative overflow-hidden py-20">
-        <div className="absolute inset-0">
-          <img src={hero2} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-black/50" />
+      <section className="relative overflow-hidden py-24 bg-gradient-to-br from-emerald-900 via-emerald-800 to-green-900">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-400 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         <Container className="relative">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-semibold sm:text-4xl text-white">{t("home.roles.title")}</h2>
-            <p className="mt-3 text-white/90">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-emerald-300 mb-4">Built For Everyone</span>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white mb-6">
+              {t("home.roles.title")}
+            </h2>
+            <p className="text-lg text-emerald-100/80 font-light leading-relaxed">
               {t("home.roles.subtitle")}
             </p>
           </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {roles.map((r) => (
-              <Card key={r.titleKey} className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 transition-all">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/20 text-white">
-                  <r.icon className="h-5 w-5" />
+              <Card key={r.titleKey} className="p-8 bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 rounded-3xl">
+                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-lg shadow-emerald-500/30">
+                  <r.icon className="h-7 w-7" />
                 </span>
-                <h3 className="mt-4 font-display text-lg font-semibold">{t(r.titleKey)}</h3>
-                <p className="mt-2 text-sm text-white/80">{t(r.bodyKey)}</p>
+                <h3 className="mt-6 font-serif text-xl font-semibold">{t(r.titleKey)}</h3>
+                <p className="mt-3 text-sm text-emerald-100/70 leading-relaxed">{t(r.bodyKey)}</p>
               </Card>
             ))}
           </div>
@@ -355,27 +361,34 @@ function Index() {
       </section>
 
       {/* FEATURES GRID */}
-      <section className="bg-gradient-to-b from-secondary/30 to-background py-20">
-        <Container>
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <h2 className="font-display text-3xl font-semibold sm:text-4xl">{t("home.features.title")}</h2>
-              <p className="mt-3 max-w-xl text-muted-foreground">
+      <section className="relative py-24 bg-gradient-to-b from-white to-emerald-50/30">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 right-20 w-64 h-64 bg-emerald-200 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-64 h-64 bg-green-200 rounded-full blur-3xl" />
+        </div>
+        <Container className="relative">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-16">
+            <div className="max-w-2xl">
+              <span className="inline-block text-xs font-bold uppercase tracking-widest text-emerald-600 mb-4">Features</span>
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+                {t("home.features.title")}
+              </h2>
+              <p className="text-lg text-gray-600 font-light leading-relaxed">
                 {t("home.features.subtitle")}
               </p>
             </div>
-            <Button asChild variant="ghost" className="hidden md:inline-flex">
-              <Link to="/features">{t("home.features.allFeatures")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Button asChild variant="ghost" className="hidden md:inline-flex text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-300">
+              <Link to="/features">{t("home.features.allFeatures")} <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => (
-              <Card key={f.titleKey} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-primary/20">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
-                  <f.icon className="h-6 w-6" />
+              <Card key={f.titleKey} className="p-8 bg-white/80 backdrop-blur-sm border border-gray-100 shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:shadow-emerald-200/50 transition-all duration-300 hover:-translate-y-2 rounded-3xl group">
+                <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                  <f.icon className="h-8 w-8" />
                 </div>
-                <h3 className="mt-4 font-display text-lg font-semibold">{t(f.titleKey)}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t(f.bodyKey)}</p>
+                <h3 className="mt-6 font-serif text-xl font-semibold text-gray-900">{t(f.titleKey)}</h3>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">{t(f.bodyKey)}</p>
               </Card>
             ))}
           </div>
@@ -383,28 +396,34 @@ function Index() {
       </section>
 
       {/* CTA */}
-      <Container className="pb-20">
-        <div className="overflow-hidden rounded-3xl bg-primary p-10 text-primary-foreground sm:p-14">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-            <div>
-              <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-                {t("home.cta.title")}
-              </h2>
-              <p className="mt-3 max-w-xl text-primary-foreground/85">
-                {t("home.cta.subtitle")}
-              </p>
+      <section className="relative py-24">
+        <Container>
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-600 via-green-600 to-emerald-700 p-12 sm:p-16 text-white shadow-2xl shadow-emerald-600/30">
+            <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-400 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="secondary" className="rounded-full">
-                <Link to="/auth">{t("home.cta.getStarted")}</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                <Link to="/marketplace">{t("home.cta.browseMarketplace")}</Link>
-              </Button>
+            <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+              <div>
+                <h2 className="font-serif text-4xl sm:text-5xl font-bold mb-6">
+                  {t("home.cta.title")}
+                </h2>
+                <p className="text-lg text-emerald-100 font-light leading-relaxed max-w-2xl">
+                  {t("home.cta.subtitle")}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <Button asChild size="lg" variant="secondary" className="rounded-full bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-6 text-base font-semibold shadow-xl shadow-white/20 transition-all duration-300 hover:scale-105">
+                  <Link to="/auth">{t("home.cta.getStarted")}</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-full border-2 border-white/40 bg-white/10 text-white hover:bg-white/20 hover:border-white/60 px-8 py-6 text-base font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105">
+                  <Link to="/marketplace">{t("home.cta.browseMarketplace")}</Link>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </Container>
+        </Container>
+      </section>
     </>
   );
 }
