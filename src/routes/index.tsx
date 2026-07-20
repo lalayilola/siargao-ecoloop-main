@@ -10,6 +10,7 @@ import hero from "@/assets/homepage.jpg";
 import hero2 from "@/assets/hero2.jpg";
 import compost from "@/assets/compost.jpg";
 import produce from "@/assets/produce.jpg";
+import heroAnimation from "@/assets/hero-animation.mp4";
 import { getListings } from "@/lib/api/marketplace.functions";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 
@@ -223,7 +224,16 @@ function Index() {
       {/* HERO */}
       <section className="relative overflow-hidden min-h-[600px] flex items-center">
         <div className="absolute inset-0">
-          <img src={hero} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="h-full w-full object-cover"
+          >
+            <source src={heroAnimation} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
         </div>
         <Container className="relative flex flex-col items-center justify-center gap-12 py-24 sm:py-32 text-center">
