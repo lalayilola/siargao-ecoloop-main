@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 
-import { Recycle, Leaf, Users, Handshake, TrendingUp, ShieldAlert, FileText, UserCheck, BarChart3, Store, Truck, Calendar, Globe, ArrowRightLeft, RefreshCw, ArrowRight, Activity, CheckCircle, AlertTriangle, Droplets } from "lucide-react";
+import { Recycle, Leaf, Users, Handshake, TrendingUp, FileText, UserCheck, BarChart3, Store, Truck, Calendar, Globe, ArrowRightLeft, RefreshCw, ArrowRight, Activity, CheckCircle, AlertTriangle, Droplets } from "lucide-react";
 
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 
@@ -488,37 +488,6 @@ function DashboardPage() {
 
 
 
-  if (!isLguAdmin) {
-
-    return (
-
-      <Container className="py-12">
-
-        <Card className="mx-auto max-w-xl p-8 text-center">
-
-          <ShieldAlert className="mx-auto h-10 w-10 text-primary" />
-
-          <h2 className="mt-3 font-display text-2xl font-semibold">LGU access only</h2>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-
-            {profile?.primary_role === "lgu_admin"
-
-              ? "Your LGU account is awaiting approval from an EcoLoop administrator."
-
-              : "This dashboard is reserved for verified Local Government Unit accounts."}
-
-          </p>
-
-          <Button asChild className="mt-5"><Link to="/marketplace">Back to Marketplace</Link></Button>
-
-        </Card>
-
-      </Container>
-
-    );
-
-  }
 
 
 
