@@ -192,11 +192,16 @@ export function ListingCard({
           Available: {item.kg} kg
         </Badge>
 
-        {/* Verified seller badge */}
-        <div className="flex items-center gap-1 text-xs text-emerald-600">
+        {/* Seller name - clickable to view profile */}
+        <Link
+          to="/profile"
+          search={{ userId: item.user_id }}
+          className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+          onClick={(event) => event.stopPropagation()}
+        >
           <CheckCircle className="h-3 w-3" />
-          <span className="font-medium">Verified Seller</span>
-        </div>
+          <span>{item.seller}</span>
+        </Link>
 
         {/* View Details CTA */}
         <Button

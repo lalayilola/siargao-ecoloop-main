@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 
 import { useEffect, useState } from "react";
 
@@ -46,9 +46,11 @@ export const Route = createFileRoute("/verify-email")({
 
 function VerifyEmailPage() {
 
-  const { user, loading } = useAuth();
+  const { user, loading, refresh } = useAuth();
 
   const navigate = useNavigate();
+
+  const search = useSearch({ from: "/verify-email" });
 
   const [email, setEmail] = useState("");
 
@@ -56,11 +58,75 @@ function VerifyEmailPage() {
 
   const [isVerified, setIsVerified] = useState(false);
 
+  const [verifying, setVerifying] = useState(false);
+
 
 
   useEffect(() => {
 
-    if (!loading && user && user.email_confirmed_at) {
+    // Handle email verification from URL tokens
+
+    const verifyEmailFromTokens = async () => {
+
+      const { access_token, refresh_token } = search as { access_token?: string; refresh_token?: string };
+
+
+
+      if (access_token && refresh_token) {
+
+        setVerifying(true);
+
+        try {
+
+          const { error } = await supabase.auth.setSession({
+
+            access_token,
+
+            refresh_token,
+
+          });
+
+
+
+          if (error) {
+
+            toast.error(getSupabaseErrorMessage(error, "Failed to verify email"));
+
+          } else {
+
+            // Refresh auth state to get updated user data
+
+            await refresh();
+
+            toast.success("Email verified successfully!");
+
+          }
+
+        } catch (error) {
+
+          toast.error(getSupabaseErrorMessage(error, "Failed to verify email"));
+
+        } finally {
+
+          setVerifying(false);
+
+        }
+
+      }
+
+    };
+
+
+
+    verifyEmailFromTokens();
+
+  }, [search, refresh]);
+
+
+
+  useEffect(() => {
+
+    if (!loading && !verifying && user && user.email_confirmed_at) {
 
       setIsVerified(true);
 
@@ -76,7 +142,7 @@ function VerifyEmailPage() {
 
     }
 
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, verifying]);
 
 
 
@@ -142,19 +208,13 @@ function VerifyEmailPage() {
 
     return (
 
-      <>
-
-        <PageHero
-
-          eyebrow="Email Verification"
-
-          title="Checking Verification Status..."
-
-        />
+      <div className="min-h-screen animate-gradient">
 
         <Container className="py-12">
 
           <div className="mx-auto max-w-md text-center">
+
+            <h1 className="font-display text-4xl font-bold text-white mb-8">Checking Verification Status...</h1>
 
             <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
 
@@ -162,7 +222,7 @@ function VerifyEmailPage() {
 
         </Container>
 
-      </>
+      </div>
 
     );
 
@@ -174,17 +234,15 @@ function VerifyEmailPage() {
 
     return (
 
-      <>
-
-        <PageHero
-
-          eyebrow="Email Verified"
-
-          title="Your Account is Active!"
-
-        />
+      <div className="min-h-screen animate-gradient">
 
         <Container className="py-12">
+
+          <div className="mx-auto max-w-md text-center mb-8">
+
+            <h1 className="font-display text-4xl font-bold text-white">Your Account is Active!</h1>
+
+          </div>
 
           <div className="mx-auto max-w-md">
 
@@ -214,7 +272,7 @@ function VerifyEmailPage() {
 
         </Container>
 
-      </>
+      </div>
 
     );
 
@@ -234,21 +292,19 @@ function VerifyEmailPage() {
 
     <>
 
-      <PageHero
+      <div className="min-h-screen animate-gradient">
 
-        eyebrow="Email Verification"
+        <Container className="py-12">
 
-        title="Verify Your Email"
+          <div className="mx-auto max-w-md text-center mb-8">
 
-        sub="Please check your inbox and click the verification link to activate your account."
+            <h1 className="font-display text-4xl font-bold text-white">Verify Your Email</h1>
 
-      />
+          </div>
 
-      <Container className="py-12">
+          <div className="mx-auto max-w-md">
 
-        <div className="mx-auto max-w-md">
-
-          <Card className="p-6">
+            <Card className="p-6">
 
             <div className="space-y-4">
 
@@ -398,7 +454,9 @@ function VerifyEmailPage() {
 
         </div>
 
-      </Container>
+        </Container>
+
+      </div>
 
     </>
 

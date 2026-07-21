@@ -175,8 +175,23 @@ function RegisterPage() {
         toast.success("Registration successful! Please check your email to verify your account.");
         navigate({ to: "/verify-email" as any });
       } else if (data?.session) {
-        toast.success("Account created successfully!");
-        navigate({ to: "/dashboard" });
+        // User was auto-confirmed by Supabase, but we still require email verification for new users
+        // Sign out the user and send verification email
+        await supabase.auth.signOut();
+        
+        // Send verification email
+        if (data.user?.email) {
+          await supabase.auth.resend({
+            type: 'signup',
+            email: data.user.email,
+            options: {
+              emailRedirectTo: `${window.location.origin}/verify-email`,
+            },
+          });
+        }
+        
+        toast.success("Registration successful! Please check your email to verify your account.");
+        navigate({ to: "/verify-email" as any });
       }
     } catch (error) {
       toast.error(getSupabaseErrorMessage(error, "Sign up failed"));
@@ -207,14 +222,13 @@ function RegisterPage() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Join EcoLoop"
-        title="Create Your Account"
-        sub="Register to start trading, buying, and contributing to Siargao's circular food economy."
-      />
-      <Container className="py-12">
-        <div className="mx-auto max-w-md">
-          <Card className="p-6">
+      <div className="min-h-screen animate-gradient">
+        <Container className="py-12">
+          <div className="mx-auto max-w-md text-center mb-8">
+            <h1 className="font-display text-4xl font-bold text-white">Create Your Account</h1>
+          </div>
+          <div className="mx-auto max-w-md">
+            <Card className="p-6">
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -370,8 +384,9 @@ function RegisterPage() {
               </p>
             </form>
           </Card>
-        </div>
-      </Container>
+          </div>
+        </Container>
+      </div>
       <style>{bounceAnimation}</style>
     </>
   );

@@ -326,25 +326,20 @@ export function ChatMessenger({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] h-[600px] flex flex-col p-0">
         <DialogHeader className="px-4 py-3 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                {otherUserPictureUrl ? (
-                  <AvatarImage src={otherUserPictureUrl} alt={otherUserName} />
-                ) : (
-                  <AvatarFallback>{otherUserName?.[0] || "?"}</AvatarFallback>
-                )}
-              </Avatar>
-              <div>
-                <DialogTitle className="text-sm font-medium">{otherUserName || "Conversation"}</DialogTitle>
-                <DialogDescription className="text-xs">
-                  {tradeRequestId ? "Trade Request" : purchaseRequestId ? "Purchase Request" : listingId ? "Marketplace Listing" : "Direct Message"}
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              {otherUserPictureUrl ? (
+                <AvatarImage src={otherUserPictureUrl} alt={otherUserName} />
+              ) : (
+                <AvatarFallback>{otherUserName?.[0] || "?"}</AvatarFallback>
+              )}
+            </Avatar>
+            <div>
+              <DialogTitle className="text-sm font-medium">{otherUserName || "Conversation"}</DialogTitle>
+              <DialogDescription className="text-xs">
+                {tradeRequestId ? "Trade Request" : purchaseRequestId ? "Purchase Request" : listingId ? "Marketplace Listing" : "Direct Message"}
+              </DialogDescription>
             </div>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => onOpenChange(false)}>
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </DialogHeader>
         <ScrollArea className="flex-1 p-4">

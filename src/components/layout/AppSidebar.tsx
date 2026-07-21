@@ -202,7 +202,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-green-700 font-semibold tracking-wide">Community</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">Community</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {memberItems.map((it) => {
@@ -230,7 +230,7 @@ export function AppSidebar() {
 
         {isLguAdmin && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-green-700 font-semibold">LGU Admin</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">LGU Admin</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -264,7 +264,7 @@ export function AppSidebar() {
         )}
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-slate-700 font-semibold">Account</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">Account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>

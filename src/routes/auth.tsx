@@ -279,10 +279,14 @@ async function signInOrCreateAccount(email: string, password: string) {
   if (!signInResult.error) {
 
     // Check if email is verified
+    // Existing users (created before July 21, 2026) can bypass email verification
+    const userCreatedAt = signInResult.data.user?.created_at;
+    const legacyCutoffDate = new Date('2026-07-21T00:00:00Z');
+    const isExistingUser = userCreatedAt && new Date(userCreatedAt) < legacyCutoffDate;
 
-    if (!signInResult.data.user?.email_confirmed_at) {
+    if (!signInResult.data.user?.email_confirmed_at && !isExistingUser) {
 
-      // Sign out the user since email is not verified
+      // Sign out the user since email is not verified (only for new users)
 
       await supabase.auth.signOut();
 
