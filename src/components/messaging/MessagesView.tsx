@@ -86,9 +86,9 @@ export function MessagesView() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -130,7 +130,7 @@ export function MessagesView() {
 
           read_at,
 
-          image_url
+          image_urls
 
         )
 
@@ -455,17 +455,13 @@ export function MessagesView() {
         (payload) => {
 
           const updatedMsg = payload.new as Message;
+          console.log('Message updated via subscription:', updatedMsg.id, updatedMsg);
 
-          // Update local messages state
-
+          // Update local messages state with all fields
           setMessages(prev =>
-
             prev.map(msg =>
-
-              msg.id === updatedMsg.id ? { ...msg, read_at: updatedMsg.read_at } : msg
-
+              msg.id === updatedMsg.id ? { ...msg, ...updatedMsg } : msg
             )
-
           );
 
 
@@ -534,74 +530,14 @@ export function MessagesView() {
 
     e.preventDefault();
 
-    if (!selectedConversation || !user || (!newMessage.trim() && !selectedImage)) return;
+    if (!selectedConversation || !user || (!newMessage.trim() && selectedImages.length === 0)) return;
 
 
 
     setSending(true);
 
     try {
-
-      let imageUrl: string | null = null;
-
-
-
-      // Upload image if selected
-
-      if (selectedImage) {
-
-        setUploadingImage(true);
-
-        try {
-
-          const filePath = `messages/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}-${selectedImage.name}`;
-
-          const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, selectedImage);
-
-          
-
-          if (uploadError) throw uploadError;
-
-          
-
-          const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
-
-          imageUrl = publicData.publicUrl;
-
-        } catch (err: any) {
-
-          const msg = err?.message ?? String(err);
-
-          if (msg.includes("Bucket not found") || msg.includes("bucket not found")) {
-
-            toast.error(`Storage bucket "${STORAGE_BUCKET}" not found.`);
-
-          } else if (msg.includes("row-level security")) {
-
-            toast.error("Storage upload blocked by row-level security.");
-
-          } else {
-
-            toast.error(`Could not upload image: ${msg}`);
-
-          }
-
-          setUploadingImage(false);
-
-          setSending(false);
-
-          return;
-
-        } finally {
-
-          setUploadingImage(false);
-
-        }
-
-      }
-
-
-
+      // Send message immediately with text content
       const { data, error } = await supabase
 
         .from("messages")
@@ -614,7 +550,7 @@ export function MessagesView() {
 
           content: newMessage.trim() || "",
 
-          image_url: imageUrl,
+          image_urls: null, // Will be updated after upload
 
         } as any)
 
@@ -644,11 +580,11 @@ export function MessagesView() {
 
       setNewMessage("");
 
-      setSelectedImage(null);
+      const imagesToUpload = [...selectedImages];
+      clearImages();
+      setSending(false);
 
-      setImagePreview(null);
 
-      
 
       // Update conversations list to show new message immediately
 
@@ -675,6 +611,91 @@ export function MessagesView() {
         )
 
       );
+
+
+
+      // Upload images in background and update message
+      if (imagesToUpload.length > 0) {
+        setUploadingImage(true);
+
+        try {
+          const uploadPromises = imagesToUpload.map(async (file) => {
+            // Validate file size (max 5MB)
+            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+            if (file.size > MAX_FILE_SIZE) {
+              throw new Error(`Image ${file.name} is too large. Maximum size is 5MB.`);
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+              throw new Error(`Invalid file type for ${file.name}. Please upload JPEG, PNG, GIF, or WebP images.`);
+            }
+
+            // Sanitize filename
+            const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            const filePath = `messages/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
+
+            const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+            if (uploadError) throw uploadError;
+
+            const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
+            return publicData.publicUrl;
+          });
+
+          const imageUrls = await Promise.all(uploadPromises);
+
+          // Update message with image URLs
+          console.log('Updating message with image URLs:', newMessageData.id, imageUrls);
+          const { error: updateError } = await supabase
+            .from("messages")
+            .update({ image_urls: imageUrls })
+            .eq("id", newMessageData.id);
+
+          if (updateError) {
+            console.error('Failed to update message with image URLs:', updateError);
+            throw updateError;
+          }
+
+          console.log('Message updated successfully, updating local state');
+
+          // Update local state with image URLs
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === newMessageData.id
+                ? { ...msg, image_urls: imageUrls } as any
+                : msg
+            )
+          );
+
+          toast.success("Images uploaded successfully");
+
+        } catch (err: any) {
+          const msg = err?.message ?? String(err);
+          console.error('Image upload error:', err);
+
+          if (msg.includes("Bucket not found") || msg.includes("bucket not found") || msg.includes("no such bucket")) {
+            toast.error(`Storage bucket "${STORAGE_BUCKET}" not found. Please create it in Supabase Storage.`);
+          } else if (msg.includes("row-level security") || msg.includes("violates row-level") || msg.includes("RLS")) {
+            toast.error("Storage upload blocked by row-level security. Check bucket policies.");
+          } else if (msg.includes("Invalid") || msg.includes("invalid")) {
+            toast.error(`Invalid upload: ${msg}`);
+          } else if (msg.includes("duplicate") || msg.includes("already exists")) {
+            toast.error("File already exists. Please try again with a different file.");
+          } else if (msg.includes("quota") || msg.includes("limit") || msg.includes("exceeded")) {
+            toast.error("Storage quota exceeded. Please contact administrator.");
+          } else {
+            toast.error(`Could not upload image: ${msg}`);
+          }
+        } finally {
+          setUploadingImage(false);
+        }
+
+      }
 
 
 
@@ -713,46 +734,49 @@ export function MessagesView() {
 
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length === 0) return;
 
-    const file = e.target.files?.[0];
+    const validFiles: File[] = [];
+    const previews: string[] = [];
 
-    if (file) {
-
+    for (const file of files) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
-
-        toast.error("Image size must be less than 5MB");
-
-        return;
-
+        toast.error(`Image ${file.name} is too large. Maximum size is 5MB.`);
+        continue;
       }
 
       if (!file.type.startsWith("image/")) {
-
-        toast.error("Please select an image file");
-
-        return;
-
+        toast.error(`File ${file.name} is not an image.`);
+        continue;
       }
 
-      setSelectedImage(file);
-
-      setImagePreview(URL.createObjectURL(file));
-
+      validFiles.push(file);
+      previews.push(URL.createObjectURL(file));
     }
 
+    if (validFiles.length > 0) {
+      setSelectedImages(prev => [...prev, ...validFiles]);
+      setImagePreviews(prev => [...prev, ...previews]);
+      toast.success(`Added ${validFiles.length} image(s)`);
+    }
   };
 
-
-
-  const clearImage = () => {
-
-    setSelectedImage(null);
-
-    setImagePreview(null);
-
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => {
+      const newPreviews = prev.filter((_, i) => i !== index);
+      URL.revokeObjectURL(prev[index]);
+      return newPreviews;
+    });
   };
 
-
+  const clearImages = () => {
+    imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
+    setSelectedImages([]);
+    setImagePreviews([]);
+  };
 
   const formatTime = (dateString: string) => {
 
@@ -998,13 +1022,13 @@ export function MessagesView() {
 
                               {conv.last_message
 
-                                ? (conv.last_message as any)?.image_url
+                                ? (conv.last_message as any)?.image_urls && (conv.last_message as any)?.image_urls.length > 0
 
                                   ? (conv.last_message as any)?.content
 
                                     ? `${(conv.last_message as any).content} 📷`
 
-                                    : "📷 Photo"
+                                    : "📷 Photos"
 
                                   : conv.last_message.content
 
@@ -1169,20 +1193,21 @@ export function MessagesView() {
 
                           >
 
-                            {(message as any).image_url && (
-
+                            {console.log('Rendering message:', message.id, (message as any).image_urls)}
+                            {(message as any).image_urls && (message as any).image_urls.length > 0 && (
                               <div className="mb-2 rounded-lg overflow-hidden">
-                                <img
-
-                                  src={(message as any).image_url}
-
-                                  alt="Message image"
-
-                                  className="max-w-full h-auto rounded-lg"
-
-                                />
+                                <div className="grid grid-cols-2 gap-2">
+                                  {(message as any).image_urls.map((url: string, idx: number) => (
+                                    <img
+                                      key={idx}
+                                      src={url}
+                                      alt={`Message image ${idx + 1}`}
+                                      className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                      onClick={() => window.open(url, '_blank')}
+                                    />
+                                  ))}
+                                </div>
                               </div>
-
                             )}
 
                             {message.content && <p className="text-sm leading-relaxed">{message.content}</p>}
@@ -1293,30 +1318,23 @@ export function MessagesView() {
 
                 <div className="p-5 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-white">
 
-                  {imagePreview && (
+                  {imagePreviews.length > 0 && (
 
-                    <div className="mb-4 relative inline-block">
-
-                      <img src={imagePreview} alt="Preview" className="h-32 w-32 object-cover rounded-xl border-2 border-emerald-200 shadow-md" />
-
-                      <Button
-
-                        type="button"
-
-                        size="sm"
-
-                        variant="destructive"
-
-                        className="absolute -top-2 -right-2 h-7 w-7 p-0 rounded-full shadow-lg"
-
-                        onClick={clearImage}
-
-                      >
-
-                        <X className="h-3.5 w-3.5" />
-
-                      </Button>
-
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative inline-block">
+                          <img src={preview} alt={`Preview ${index + 1}`} className="h-20 w-20 object-cover rounded-xl border-2 border-emerald-200 shadow-md" />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full shadow-lg"
+                            onClick={() => handleRemoveImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
 
                   )}
@@ -1330,6 +1348,8 @@ export function MessagesView() {
                         type="file"
 
                         accept="image/*"
+
+                        multiple
 
                         onChange={handleImageSelect}
 
@@ -1363,7 +1383,7 @@ export function MessagesView() {
                       />
                     </div>
 
-                    <Button type="submit" size="sm" disabled={sending || uploadingImage || (!newMessage.trim() && !selectedImage)} className="h-12 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-md shadow-emerald-500/30 transition-all">
+                    <Button type="submit" size="sm" disabled={sending || uploadingImage || (!newMessage.trim() && selectedImages.length === 0)} className="h-12 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-md shadow-emerald-500/30 transition-all">
 
                       {uploadingImage ? (
 

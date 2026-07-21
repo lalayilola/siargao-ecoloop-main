@@ -31,7 +31,6 @@ export type Profile = {
   municipality: Municipality;
   is_super_admin: boolean;
   government_id_url: string | null;
-  theme_preferences?: any;
 };
 
 type AuthCtx = {

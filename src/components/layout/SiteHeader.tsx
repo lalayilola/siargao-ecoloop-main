@@ -1,11 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, X, LogOut, LayoutDashboard, Palette } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSelector } from "@/components/common/LanguageSelector";
 import { useLanguage } from "@/hooks/use-language";
-import { ThemeCustomizer } from "@/components/common/ThemeCustomizer";
 import logo from "@/assets/finalogo.png";
 
 const bounceAnimation = `
@@ -72,11 +71,6 @@ export function SiteHeader() {
           <LanguageSelector />
           {user ? (
             <>
-              <ThemeCustomizer trigger={
-                <Button size="sm" variant="ghost" className="border border-primary/20 text-slate-700 hover:bg-secondary/10 hover:text-primary">
-                  <Palette className="h-4 w-4" />
-                </Button>
-              } />
               <Link to="/profile" search={{ userId: undefined }} className="flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-3 py-1.5 text-slate-700 shadow-sm shadow-primary/5 transition hover:bg-white">
                 <div className="h-8 w-8 rounded-full overflow-hidden bg-secondary/10 border-2 border-primary/40 flex-shrink-0">
                   {profile?.profile_picture_url ? (

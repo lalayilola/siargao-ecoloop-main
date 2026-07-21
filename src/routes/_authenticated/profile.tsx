@@ -11,9 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle, Palette } from "lucide-react";
+import { Upload, MessageCircle, ArrowLeft, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { ChatMessenger } from "@/components/messaging/ChatMessenger";
-import { ThemeCustomizer } from "@/components/common/ThemeCustomizer";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import type { Database } from "@/integrations/supabase/types";
 import { Link } from "@tanstack/react-router";
@@ -634,21 +633,6 @@ function ProfilePage() {
                     </div>
                   )}
                 </div>
-              </div>
-            </Card>
-
-            <Card className="mx-auto max-w-4xl mt-6 border-2 border-primary/25 bg-gradient-to-br from-white to-secondary/10">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🎨</span>
-                  Theme Customization
-                </h2>
-                <ThemeCustomizer trigger={
-                  <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Customize Theme
-                  </Button>
-                } />
               </div>
             </Card>
 

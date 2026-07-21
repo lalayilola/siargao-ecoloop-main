@@ -39,8 +39,22 @@ export function NotificationBell() {
         return;
       }
 
-      setNotifications(notifications ?? []);
-      setUnreadCount(notifications?.filter(n => !n.read_at).length ?? 0);
+      // Filter to only show purchase completion notifications
+      const purchaseNotifications = notifications?.filter(n => {
+        const typeLower = n.type?.toLowerCase() || "";
+        const titleLower = n.title.toLowerCase();
+        return (
+          typeLower === "purchase_request" ||
+          typeLower === "trade_request" ||
+          typeLower === "purchase_completed" ||
+          titleLower.includes("purchase") ||
+          titleLower.includes("trade") ||
+          titleLower.includes("transaction")
+        );
+      }) || [];
+
+      setNotifications(purchaseNotifications);
+      setUnreadCount(purchaseNotifications.filter(n => !n.read_at).length);
     };
 
     loadNotifications();
@@ -58,8 +72,30 @@ export function NotificationBell() {
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setNotifications((prev) => [payload.new as Notification, ...prev].slice(0, 10));
-            setUnreadCount((prev) => prev + 1);
+            const newNotification = payload.new as Notification;
+            const typeLower = newNotification.type?.toLowerCase() || "";
+            const titleLower = newNotification.title.toLowerCase();
+            
+            // Only add if it's a purchase/trade notification
+            const isPurchaseNotification = (
+              typeLower === "purchase_request" ||
+              typeLower === "trade_request" ||
+              typeLower === "purchase_completed" ||
+              titleLower.includes("purchase") ||
+              titleLower.includes("trade") ||
+              titleLower.includes("transaction")
+            );
+            
+            if (isPurchaseNotification) {
+              setNotifications((prev) => {
+                // Check if notification already exists to prevent duplicates
+                if (prev.some(n => n.id === newNotification.id)) {
+                  return prev;
+                }
+                return [newNotification, ...prev].slice(0, 10);
+              });
+              setUnreadCount((prev) => prev + 1);
+            }
           } else if (payload.eventType === "UPDATE") {
             setNotifications((prev) =>
               prev.map((n) => (n.id === payload.new.id ? (payload.new as Notification) : n))

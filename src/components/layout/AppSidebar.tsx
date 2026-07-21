@@ -16,6 +16,7 @@ import {
 import { LayoutDashboard, Newspaper, Store, Calendar, ArrowLeftRight, User as UserIcon, LogOut, Home, MessageCircle, Sprout, TreePine, Recycle, Bell, Megaphone, FileText, Package, ShoppingCart, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import logo from "@/assets/finalogo.png";
 import { useEffect, useState } from "react";
@@ -205,14 +206,19 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {memberItems.map((it) => {
-                const isUnread = (it.to === "/messages" && unreadMessages > 0) || 
-                                 (it.to === "/announcements" && unreadAnnouncements > 0);
+                const unreadCount = it.to === "/messages" ? unreadMessages : 
+                                   it.to === "/announcements" ? unreadAnnouncements : 0;
                 return (
                   <SidebarMenuItem key={it.to}>
                     <SidebarMenuButton asChild isActive={isActive(it.to)}>
                       <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                         <it.icon className="h-4 w-4" />
-                        <span className={isUnread ? "text-red-600 font-semibold" : ""}>{it.label}</span>
+                        <span>{it.label}</span>
+                        {unreadCount > 0 && (
+                          <Badge className="ml-auto bg-slate-500 text-white hover:bg-slate-600 text-xs h-5 min-w-[20px] flex items-center justify-center px-1.5">
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                          </Badge>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

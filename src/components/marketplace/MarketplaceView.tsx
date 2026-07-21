@@ -1228,19 +1228,19 @@ export function MarketplaceView() {
         sub="Find fresh produce, food waste, and compost from verified sellers across Siargao."
         action={
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-primary/60" />
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
               <Input 
                 value={q} 
                 onChange={(e) => setQ(e.target.value)} 
                 placeholder="Search products, sellers, or municipalities..." 
-                className="h-14 pl-12 rounded-full border-primary/30 focus:border-primary focus:ring-primary/50 bg-white/90 backdrop-blur-sm shadow-lg"
+                className="h-14 pl-12 pr-4 rounded-2xl border-2 border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 bg-white shadow-md hover:shadow-lg transition-all duration-200"
               />
             </div>
             {user && profile?.primary_role !== "resident" && profile?.lgu_approved && (
               <Button 
                 size="lg" 
-                className="h-14 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white hover:from-primary/90 hover:to-emerald-600/90 px-8 shadow-lg"
+                className="h-14 rounded-2xl bg-gradient-to-r from-primary to-emerald-600 text-white hover:from-primary/90 hover:to-emerald-600/90 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
                 onClick={() => {
                   setShowForm((value) => !value);
                   if (profile?.primary_role === "lgu_admin") {
