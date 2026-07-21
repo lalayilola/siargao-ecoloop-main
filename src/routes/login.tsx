@@ -125,7 +125,12 @@ function LoginPage() {
       }
 
       if (data.user) {
-        if (!data.user.email_confirmed_at) {
+        // Existing users (created before July 21, 2026) can bypass email verification
+        const userCreatedAt = data.user.created_at;
+        const legacyCutoffDate = new Date('2026-07-21T00:00:00Z');
+        const isExistingUser = userCreatedAt && new Date(userCreatedAt) < legacyCutoffDate;
+        
+        if (!data.user.email_confirmed_at && !isExistingUser) {
           toast.error("Please verify your email before signing in");
           navigate({ to: "/verify-email", search: { email: normalizedEmail } });
         } else {

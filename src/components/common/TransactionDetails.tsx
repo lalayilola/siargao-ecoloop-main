@@ -175,7 +175,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
         // Get current listing data
         const { data: listingData, error: listingFetchError } = await supabase
           .from('marketplace_listings')
-          .select('kg')
+          .select('kg, kind')
           .eq('id', listingId)
           .single();
 
@@ -187,8 +187,9 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
         const currentKg = listingData?.kg || 0;
         const newKg = Math.max(0, currentKg - quantityKg);
         const listingStatus = newKg <= 0 ? 'sold_out' : 'available';
+        const listingKind = listingData?.kind;
 
-        console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}`);
+        console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}, Kind: ${listingKind}`);
 
         // Update listing
         const { error: listingUpdateError } = await supabase
@@ -206,6 +207,41 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
           console.warn("Transaction completed but inventory update failed");
         } else {
           console.log("Listing inventory updated successfully");
+        }
+
+        // If this is a food waste collection, update the food_waste_reports status
+        if (listingKind === 'waste') {
+          console.log("This is a food waste collection, updating food_waste_reports");
+          
+          // Find the corresponding food_waste_reports record
+          const { data: wasteReport, error: wasteReportError } = await supabase
+            .from('food_waste_reports')
+            .select('*')
+            .eq('listing_id', listingId)
+            .single();
+
+          if (wasteReportError) {
+            console.error("Error finding food waste report:", wasteReportError);
+            console.warn("Transaction completed but food waste report update failed");
+          } else if (wasteReport) {
+            // Update the food_waste_reports status to 'collected'
+            const { error: wasteUpdateError } = await supabase
+              .from('food_waste_reports')
+              .update({ 
+                status: 'collected',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', wasteReport.id);
+
+            if (wasteUpdateError) {
+              console.error("Error updating food waste report status:", wasteUpdateError);
+              console.warn("Transaction completed but food waste report status update failed");
+            } else {
+              console.log("Food waste report status updated to 'collected'");
+            }
+          } else {
+            console.log("No food waste report found for this listing");
+          }
         }
       } else {
         console.log("No listing_id or quantity_kg found, skipping inventory update");

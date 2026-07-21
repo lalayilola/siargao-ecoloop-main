@@ -356,6 +356,9 @@ function DashboardPage() {
       // Process food waste data by restaurant
       const restaurantWasteMap = new Map<string, number>();
       municipalityWasteReports.forEach((report) => {
+        // Only include collected or processed waste reports
+        if (!["collected", "processed"].includes(report.status)) return;
+        
         const restaurant = profiles.find((member) => member.id === report.restaurant_id);
         if (restaurant && restaurant.primary_role === "restaurant") {
           const restaurantName = restaurant.full_name;

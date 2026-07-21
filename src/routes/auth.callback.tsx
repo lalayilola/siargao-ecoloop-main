@@ -27,9 +27,38 @@ function AuthCallback() {
           // Refresh auth context to get user data
           await refresh();
           
+          // Check if this is a new user by checking if they have a profile
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', data.session.user.id)
+            .single();
+          
+          const isNewUser = !profileData;
+          
           // Check if email is verified
-          if (!data.session.user.email_confirmed_at) {
-            toast.success("Please verify your email to continue");
+          // Existing users (created before July 21, 2026) can bypass email verification
+          const userCreatedAt = data.session.user.created_at;
+          const legacyCutoffDate = new Date('2026-07-21T00:00:00Z');
+          const isExistingUser = userCreatedAt && new Date(userCreatedAt) < legacyCutoffDate;
+          
+          // New users must verify email before accessing dashboard
+          if (isNewUser || (!data.session.user.email_confirmed_at && !isExistingUser)) {
+            // Sign out the user
+            await supabase.auth.signOut();
+            
+            // Send verification email
+            const userEmail = data.session.user.email;
+            if (userEmail) {
+              await supabase.auth.resend({
+                type: 'signup',
+                email: userEmail,
+                options: {
+                  emailRedirectTo: `${window.location.origin}/verify-email`,
+                },
+              });
+              toast.success("Please verify your email to continue. A verification email has been sent to your Google account.");
+            }
             navigate({ to: "/verify-email" as any });
             return;
           }

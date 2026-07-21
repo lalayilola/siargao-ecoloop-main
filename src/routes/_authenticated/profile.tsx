@@ -319,10 +319,17 @@ function ProfilePage() {
 
   return (
     <>
-      <PremiumHero
-        title={isOwnProfile ? t("profile.yourProfile") : `${displayProfile?.full_name}'s profile`}
-      />
-      <Container className="py-8">
+      <div className="bg-gradient-to-r from-emerald-600 to-green-600 py-12 px-4 rounded-b-3xl relative z-20">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            {isOwnProfile ? t("profile.yourProfile") : `${displayProfile?.full_name}'s profile`}
+          </h1>
+          <p className="text-white/80 text-lg">
+            {isOwnProfile ? "Manage your profile and account settings" : "View user profile and listings"}
+          </p>
+        </div>
+      </div>
+      <Container className="py-8 bg-[#F7FBF8] -mt-8 relative z-10">
         {!isOwnProfile && (
           <div className="mb-4">
             <Button variant="ghost" size="sm" onClick={() => router.navigate({ to: "/profile", search: { userId: undefined } })}>
@@ -333,36 +340,14 @@ function ProfilePage() {
         )}
 
         {/* Profile Header Card */}
-        <Card className="mx-auto max-w-4xl border-2 border-primary/25 bg-gradient-to-br from-white to-secondary/10 overflow-hidden">
-          {/* Cover Image Banner - 3/4 height */}
-          <div className="h-48 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 relative">
-            {coverPreviewUrl ? (
-              <img src={coverPreviewUrl} alt="Cover" className="h-full w-full object-cover" />
-            ) : (
-              <>
-                <div className="absolute inset-0 bg-black/10"></div>
-              </>
-            )}
-            {isOwnProfile && (
-              <label className="absolute top-4 right-4 bg-white/90 text-primary rounded-xl p-2.5 cursor-pointer hover:bg-white transition-colors shadow-lg hover:scale-110 duration-200">
-                <Upload className="h-4 w-4" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setCoverPhoto(e.target.files?.[0] ?? null)}
-                  className="hidden"
-                />
-              </label>
-            )}
-          </div>
-
+        <Card className="mx-auto max-w-4xl border-2 border-[#D8F3DC] bg-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 relative z-10">
           {/* Profile Content */}
-          <div className="px-6 pb-6">
-            <div className="flex flex-col md:flex-row gap-6 -mt-16">
+          <div className="px-8 pb-8 pt-8">
+            <div className="flex flex-col md:flex-row gap-8">
               {/* Profile Picture */}
               <div className="flex-shrink-0">
                 <div className="relative group">
-                  <div className="h-32 w-32 rounded-2xl overflow-hidden border-4 border-white bg-primary/10 flex items-center justify-center shadow-xl">
+                  <div className="h-32 w-32 rounded-2xl overflow-hidden border-4 border-white bg-primary/10 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-300">
                     {previewUrl ? (
                       <img src={previewUrl} alt="Profile" className="h-full w-full object-cover" />
                     ) : (
@@ -389,19 +374,19 @@ function ProfilePage() {
               <div className="flex-1 pt-4">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{displayProfile?.full_name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-3">{displayProfile?.full_name}</h1>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {displayProfile?.primary_role === "lgu_admin" ? (
-                        <Badge variant="secondary" className="bg-secondary/20 text-primary border-primary/30 px-3 py-1 text-sm font-medium">
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-300 px-3 py-1 text-sm font-medium">
                           LGU Admin
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-primary/15 text-primary border-primary/30 px-3 py-1 text-sm font-medium">
+                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 text-sm font-medium">
                           {displayProfile?.primary_role}
                         </Badge>
                       )}
                       {displayProfile?.primary_role !== "lgu_admin" && displayProfile?.lgu_approved ? (
-                        <Badge className="bg-green-500 text-white border-green-600 px-3 py-1 text-sm font-medium">
+                        <Badge className="bg-emerald-500 text-white border-emerald-600 px-3 py-1 text-sm font-medium">
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Verified
                         </Badge>
@@ -412,71 +397,76 @@ function ProfilePage() {
                         </Badge>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500 mb-4">
+                    <div className="text-sm text-gray-600 mb-4">
                       {isOwnProfile ? user?.email : displayProfile?.id}
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {!isOwnProfile && user && otherUserProfile && (
                       <Button
                         size="lg"
-                        className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30"
+                        className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                         onClick={() => setShowChat(true)}
                       >
-                        <MessageCircle className="h-4 w-4 mr-2" />
+                        <MessageCircle className="h-5 w-5 mr-2" />
                         {t("profile.message")}
                       </Button>
                     )}
                     {isOwnProfile && profilePicture && (
                       <Button
                         size="lg"
-                        className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30"
+                        className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                         onClick={handleProfilePictureUpload}
                         disabled={uploading}
                       >
                         {uploading ? t("profile.uploading") : t("profile.savePhoto")}
                       </Button>
                     )}
-                    {isOwnProfile && coverPhoto && (
-                      <Button
-                        size="lg"
-                        className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30"
-                        onClick={handleCoverPhotoUpload}
-                        disabled={uploadingCover}
-                      >
-                        {uploadingCover ? "Uploading..." : "Save Cover Photo"}
-                      </Button>
-                    )}
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">{userListings.length}</div>
-                    <div className="text-sm text-gray-500">Listings</div>
-                  </div>
-                  {displayProfile?.primary_role !== "lgu_admin" && (
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        {displayProfile?.lgu_approved ? "✓" : "—"}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+                  <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <span className="text-xl">📦</span>
                       </div>
-                      <div className="text-sm text-gray-500">Verified</div>
+                      <div>
+                        <div className="text-2xl font-bold text-emerald-700">{userListings.length}</div>
+                        <div className="text-sm text-gray-600">Listings</div>
+                      </div>
                     </div>
+                  </Card>
+                  {displayProfile?.primary_role !== "lgu_admin" && (
+                    <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                          <span className="text-xl">{displayProfile?.lgu_approved ? "✓" : "—"}</span>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-emerald-700">
+                            {displayProfile?.lgu_approved ? "Yes" : "No"}
+                          </div>
+                          <div className="text-sm text-gray-600">Verified</div>
+                        </div>
+                      </div>
+                    </Card>
                   )}
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {displayProfile?.municipality?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()) || "—"}
+                  <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <span className="text-xl">📍</span>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-emerald-700">
+                          {displayProfile?.municipality?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()) || "—"}
+                        </div>
+                        <div className="text-sm text-gray-600">Municipality</div>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-500">Municipality</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {displayProfile?.barangay || "—"}
-                    </div>
-                    <div className="text-sm text-gray-500">Location</div>
-                  </div>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -484,10 +474,10 @@ function ProfilePage() {
         </Card>
 
         {/* Contact Information Card */}
-        <Card className="mx-auto max-w-4xl mt-6 border-2 border-primary/25 bg-gradient-to-br from-white to-secondary/10">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="text-2xl">📋</span>
+        <Card className="mx-auto max-w-4xl mt-8 border-2 border-[#D8F3DC] bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <span className="text-3xl">📋</span>
               Contact Information
             </h2>
             {isOwnProfile ? (
@@ -511,42 +501,42 @@ function ProfilePage() {
                   }
                 }}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
                     <Label htmlFor="fn" className="text-sm font-medium text-gray-700">{t("profile.fullName")}</Label>
-                    <Input id="fn" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-11" />
+                    <Input id="fn" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label htmlFor="ph" className="text-sm font-medium text-gray-700">{t("profile.phone")}</Label>
-                    <Input id="ph" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-11" />
+                    <Input id="ph" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="brgy" className="text-sm font-medium text-gray-700">{t("profile.barangay")}</Label>
-                  <Input id="brgy" value={form.barangay} onChange={(e) => setForm({ ...form, barangay: e.target.value })} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-11" />
+                  <Input id="brgy" value={form.barangay} onChange={(e) => setForm({ ...form, barangay: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="ad" className="text-sm font-medium text-gray-700">{t("profile.address")}</Label>
-                  <Input id="ad" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="border-primary/30 focus:border-primary focus:ring-primary/50 h-11" />
+                  <Input id="ad" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
                 </div>
-                <Button type="submit" disabled={busy} className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 h-11 px-8 shadow-lg shadow-primary/30">{busy ? t("profile.saving") : t("profile.saveChanges")}</Button>
+                <Button type="submit" disabled={busy} className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">{busy ? t("profile.saving") : t("profile.saveChanges")}</Button>
               </form>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">{t("profile.fullName")}</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.fullName")}</Label>
                   <div className="text-base font-semibold text-gray-900">{displayProfile?.full_name}</div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">{t("profile.phone")}</Label>
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.phone")}</Label>
                   <div className="text-base font-semibold text-gray-900">{displayProfile?.phone}</div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">{t("profile.barangay")}</Label>
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.barangay")}</Label>
                   <div className="text-base font-semibold text-gray-900">{displayProfile?.barangay}</div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1 block">{t("profile.address")}</Label>
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.address")}</Label>
                   <div className="text-base font-semibold text-gray-900">{displayProfile?.address}</div>
                 </div>
               </div>
@@ -557,10 +547,10 @@ function ProfilePage() {
         {/* Account Settings Card (only for own profile) */}
         {isOwnProfile && (
           <>
-            <Card className="mx-auto max-w-4xl mt-6 border-2 border-primary/25 bg-gradient-to-br from-white to-secondary/10">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🪪</span>
+            <Card className="mx-auto max-w-4xl mt-8 border-2 border-[#D8F3DC] bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <span className="text-3xl">🪪</span>
                   Valid ID
                 </h2>
                 <div className="space-y-4">
@@ -569,14 +559,14 @@ function ProfilePage() {
                       <img
                         src={validIdPreview}
                         alt="Valid ID"
-                        className="w-full max-w-md rounded-lg border-2 border-primary/30"
+                        className="w-full max-w-md rounded-xl border-2 border-[#D8F3DC] shadow-md"
                       />
                       {validIdSaved && (
-                        <div className="mt-2 text-sm text-green-600 font-medium">Saved</div>
+                        <div className="mt-2 text-sm text-emerald-600 font-medium">Saved</div>
                       )}
-                      <div className="mt-3 flex gap-2">
+                      <div className="mt-4 flex gap-3">
                         <label className="cursor-pointer">
-                          <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10" asChild>
+                          <Button size="sm" variant="outline" className="border-2 border-[#D8F3DC] text-emerald-700 hover:bg-emerald-50 rounded-xl" asChild>
                             <span>
                               <Upload className="h-4 w-4 mr-2" />
                               Replace ID
@@ -592,7 +582,7 @@ function ProfilePage() {
                         {validId && (
                           <Button
                             size="sm"
-                            className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
+                            className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 rounded-xl shadow-md hover:shadow-lg transition-all"
                             onClick={handleValidIdUpload}
                             disabled={uploadingValidId}
                           >
@@ -602,13 +592,14 @@ function ProfilePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center">
-                      <Upload className="h-12 w-12 mx-auto mb-3 text-primary/50" />
-                      <p className="text-sm text-muted-foreground mb-3">No valid ID uploaded yet</p>
+                    <div className="border-2 border-dashed border-[#D8F3DC] rounded-2xl p-8 text-center bg-emerald-50/50 hover:bg-emerald-50 transition-colors">
+                      <Upload className="h-16 w-16 mx-auto mb-4 text-emerald-400" />
+                      <p className="text-base font-medium text-gray-700 mb-2">Drag & Drop your Valid ID or Click to Upload</p>
+                      <p className="text-sm text-gray-500 mb-4">Supported formats: PNG, JPG, PDF • Max size: 5MB</p>
                       <label className="cursor-pointer">
-                        <Button size="sm" className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90" asChild>
+                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 rounded-xl shadow-md hover:shadow-lg transition-all" asChild>
                           <span>
-                            <Upload className="h-4 w-4 mr-2" />
+                            <Upload className="h-5 w-5 mr-2" />
                             Upload Valid ID
                           </span>
                         </Button>
@@ -620,9 +611,9 @@ function ProfilePage() {
                         />
                       </label>
                       {validId && (
-                        <div className="mt-4">
+                        <div className="mt-6">
                           <Button
-                            className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90"
+                            className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 rounded-xl shadow-md hover:shadow-lg transition-all"
                             onClick={handleValidIdUpload}
                             disabled={uploadingValidId}
                           >
@@ -636,17 +627,17 @@ function ProfilePage() {
               </div>
             </Card>
 
-            <Card className="mx-auto max-w-4xl mt-6 border-2 border-primary/25 bg-gradient-to-br from-white to-secondary/10">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🔒</span>
+            <Card className="mx-auto max-w-4xl mt-8 border-2 border-[#D8F3DC] bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <span className="text-3xl">🔒</span>
                   {t("profile.changePassword")}
                 </h2>
                 <form
-                  className="space-y-4"
+                  className="space-y-6"
                   onSubmit={handlePasswordChange}
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label htmlFor="current-password">{t("profile.currentPassword")}</Label>
                     <div className="relative">
                       <Input
@@ -654,20 +645,20 @@ function ProfilePage() {
                         type={showCurrentPassword ? "text" : "password"}
                         value={passwordForm.currentPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                        className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10 h-11"
+                        className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                         placeholder={t("profile.enterCurrentPassword")}
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
                       <Label htmlFor="new-password">{t("profile.newPassword")}</Label>
                       <div className="relative">
                         <Input
@@ -675,19 +666,27 @@ function ProfilePage() {
                           type={showNewPassword ? "text" : "password"}
                           value={passwordForm.newPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                          className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10 h-11"
+                          className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                           placeholder={t("profile.enterNewPassword")}
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                       </div>
+                      {passwordForm.newPassword && (
+                        <div className="text-xs text-gray-500 mt-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={passwordForm.newPassword.length >= 6 ? "text-emerald-600" : "text-gray-400"}>✓</span>
+                            <span>At least 6 characters</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Label htmlFor="confirm-password">{t("profile.confirmPassword")}</Label>
                       <div className="relative">
                         <Input
@@ -695,24 +694,32 @@ function ProfilePage() {
                           type={showConfirmPassword ? "text" : "password"}
                           value={passwordForm.confirmPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                          className="border-primary/30 focus:border-primary focus:ring-primary/50 pr-10 h-11"
+                          className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                           placeholder={t("profile.confirmNewPassword")}
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                       </div>
+                      {passwordForm.confirmPassword && (
+                        <div className="text-xs text-gray-500 mt-2">
+                          <div className="flex items-center gap-2">
+                            <span className={passwordForm.newPassword === passwordForm.confirmPassword ? "text-emerald-600" : "text-gray-400"}>✓</span>
+                            <span>Passwords match</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <Button
                     type="submit"
                     disabled={updatingPassword}
                     variant="outline"
-                    className="border-primary/30 text-primary hover:bg-primary/10 h-11 px-8"
+                    className="border-2 border-[#D8F3DC] text-emerald-700 hover:bg-emerald-50 h-12 px-8 rounded-xl transition-all"
                   >
                     {updatingPassword ? t("profile.updating") : t("profile.updatePassword")}
                   </Button>
@@ -724,14 +731,14 @@ function ProfilePage() {
 
         {/* Listings Section */}
         <Container className="py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <span className="text-3xl">🛍️</span>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <span className="text-4xl">🛍️</span>
               {isOwnProfile ? "My Listings" : `${displayProfile?.full_name}'s Listings`}
             </h2>
             {isOwnProfile && (
               <Link to="/marketplace">
-                <Button className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30">
+                <Button className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                   <span className="text-xl mr-2">+</span>
                   Create New Listing
                 </Button>
@@ -766,20 +773,20 @@ function ProfilePage() {
               ))}
             </div>
           ) : (
-            <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-              <div className="p-12 text-center">
-                <div className="text-6xl mb-4">📦</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <Card className="border-2 border-dashed border-[#D8F3DC] bg-white rounded-2xl">
+              <div className="p-16 text-center">
+                <div className="text-7xl mb-6">📦</div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-3">
                   {isOwnProfile ? "No Listings Yet" : "No Listings Available"}
                 </h3>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-gray-600 mb-8 text-lg">
                   {isOwnProfile 
                     ? "Start by creating your first listing to showcase your products." 
                     : `${displayProfile?.full_name} hasn't posted any listings yet.`}
                 </p>
                 {isOwnProfile && (
                   <Link to="/marketplace">
-                    <Button className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30">
+                    <Button className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                       <span className="text-xl mr-2">+</span>
                       Create Your First Listing
                     </Button>
