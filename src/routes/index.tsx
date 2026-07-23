@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Recycle, Sprout, Store, Home, Building2, Users, MapPin, BarChart3, Handshake, Search, Calendar } from "lucide-react";
+import { ArrowRight, Recycle, Sprout, Store, Home, Building2, Users, MapPin, BarChart3, Handshake, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/layout/Section";
@@ -7,10 +7,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import hero from "@/assets/homepage.jpg";
-import hero2 from "@/assets/hero2.jpg";
-import compost from "@/assets/compost.jpg";
-import produce from "@/assets/produce.jpg";
-import heroAnimation from "@/assets/hero-animation.mp4";
+import heroAnimation from "@/assets/homepagevid.mp4";
 import { getListings } from "@/lib/api/marketplace.functions";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 
@@ -212,12 +209,6 @@ function Index() {
     { icon: Users, titleKey: "home.features.verified", bodyKey: "home.features.verifiedDesc" },
   ];
 
-  const problemPoints = [
-    "home.problem.point1",
-    "home.problem.point2",
-    "home.problem.point3",
-    "home.problem.point4",
-  ];
 
   return (
     <>

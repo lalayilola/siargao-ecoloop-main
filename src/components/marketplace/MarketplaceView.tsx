@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
+import { Container, PremiumHero } from "@/components/layout/Section";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -56,7 +56,6 @@ import { useAuth, type AppRole } from "@/hooks/use-auth";
 
 import { supabase } from "@/integrations/supabase/client";
 
-import marketBg from "@/assets/siargao-spot.jpg";
 
 import type { Database } from "@/integrations/supabase/types";
 

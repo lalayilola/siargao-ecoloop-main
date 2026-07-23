@@ -10,9 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Megaphone, ThumbsUp, Heart, MessageCircle, Filter, Search, Calendar, Tag, AlertCircle, Plus, Edit, Trash2, X, Image as ImageIcon, MoreVertical, MapPin, Eye, Clock, Pin } from "lucide-react";
+import { Megaphone, ThumbsUp, Heart, MessageCircle, Search, Calendar, Tag, AlertCircle, Plus, Edit, Trash2, X, Image as ImageIcon, Eye, Clock, Pin } from "lucide-react";
 import { toast } from "sonner";
-import { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/announcements")({
   head: () => ({ meta: [{ title: "Announcements — EcoLoop Siargao" }] }),
@@ -61,7 +60,6 @@ function UserAnnouncements() {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterImportance, setFilterImportance] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -396,24 +394,6 @@ function UserAnnouncements() {
     return comments.filter(c => c.announcement_id === announcementId);
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      general: "bg-blue-100 text-blue-700 border-blue-200",
-      emergency: "bg-red-100 text-red-700 border-red-200",
-      event: "bg-purple-100 text-purple-700 border-purple-200",
-      policy: "bg-orange-100 text-orange-700 border-orange-200",
-    };
-    return colors[category] || colors.general;
-  };
-
-  const getImportanceColor = (importance: string) => {
-    const colors: Record<string, string> = {
-      normal: "bg-gray-100 text-gray-700 border-gray-200",
-      important: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      urgent: "bg-red-100 text-red-700 border-red-200",
-    };
-    return colors[importance] || colors.normal;
-  };
 
   const filteredAnnouncements = announcements.filter(announcement => {
     const matchesCategory = filterCategory === "all" || announcement.category === filterCategory;
@@ -694,46 +674,30 @@ function UserAnnouncements() {
                 />
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: 'all', label: 'All' },
-                { value: 'general', label: 'General' },
-                { value: 'emergency', label: 'Emergency' },
-                { value: 'event', label: 'Event' },
-                { value: 'policy', label: 'Policy' }
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setFilterCategory(option.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    filterCategory === option.value
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: 'all', label: 'All' },
-                { value: 'normal', label: 'Normal' },
-                { value: 'important', label: 'Important' },
-                { value: 'urgent', label: 'Urgent' }
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setFilterImportance(option.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    filterImportance === option.value
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/30'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="flex gap-3">
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="emergency">Emergency</SelectItem>
+                  <SelectItem value="event">Event</SelectItem>
+                  <SelectItem value="policy">Policy</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterImportance} onValueChange={setFilterImportance}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Importance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Importance</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="important">Important</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </Card>
@@ -832,11 +796,34 @@ function UserAnnouncements() {
                           </Badge>
                         </div>
 
-                        {/* Actions - Reveal on Hover */}
+                        {/* Actions - Edit/Delete for LGU Admin */}
                         {isLguAdmin && (
-                          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100">
-                              <MoreVertical className="h-4 w-4 text-slate-600" />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditDialog(announcement);
+                              }}
+                              className="gap-1"
+                            >
+                              <Edit className="h-3 w-3" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm("Are you sure you want to delete this announcement?")) {
+                                  handleDeleteAnnouncement(announcement.id);
+                                }
+                              }}
+                              className="gap-1"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Delete
                             </Button>
                           </div>
                         )}

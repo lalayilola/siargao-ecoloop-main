@@ -169,6 +169,7 @@ export function PlanningForecastDashboard() {
 
     try {
       // Load harvest forecasts (visible to farmers, restaurants, residents, and LGU)
+      // Residents can view harvest forecasts from all municipalities to enable cross-municipality buying
       if (profile.primary_role === "farmer" || profile.primary_role === "restaurant" || profile.primary_role === "resident" || profile.primary_role === "lgu_admin") {
         const { data: harvestData } = await supabase
           .from("harvest_forecasts")
@@ -190,6 +191,8 @@ export function PlanningForecastDashboard() {
       }
 
       // Load projected waste (visible to LGU admins and restaurant owners)
+      // Waste collection is municipality-specific: restaurant owners only see their own reports,
+      // LGU admins can see all but focus on their municipality
       if (profile.primary_role === "lgu_admin" || profile.primary_role === "restaurant") {
         let query = supabase
           .from("projected_waste_reports")
@@ -214,6 +217,24 @@ export function PlanningForecastDashboard() {
 
   const handleCreateHarvestForecast = async () => {
     if (!user || !profile) return;
+
+    // Validate required fields
+    if (!harvestForm.crop_type.trim()) {
+      toast.error("Please enter a crop type.");
+      return;
+    }
+    if (!harvestForm.estimated_quantity_kg || parseFloat(harvestForm.estimated_quantity_kg) <= 0) {
+      toast.error("Please enter a valid estimated quantity.");
+      return;
+    }
+    if (!harvestForm.projected_harvest_date) {
+      toast.error("Please select a projected harvest date.");
+      return;
+    }
+    if (!harvestForm.barangay.trim()) {
+      toast.error("Please enter your barangay.");
+      return;
+    }
 
     try {
       const imageUrls = await uploadImages(harvestImages);
@@ -246,7 +267,8 @@ export function PlanningForecastDashboard() {
       loadData();
     } catch (error) {
       console.error("Error creating harvest forecast:", error);
-      toast.error("Failed to create harvest forecast");
+      const errorMessage = getSupabaseErrorMessage(error, "Failed to create harvest forecast");
+      toast.error(errorMessage);
     }
   };
 
@@ -1448,15 +1470,15 @@ export function PlanningForecastDashboard() {
           setHarvestImages([]);
         }
       }}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingHarvest ? "Edit Harvest Forecast" : "Add Harvest Forecast"}</DialogTitle>
             <DialogDescription>
               {editingHarvest ? "Update your harvest forecast details" : "Post your expected harvest to help buyers plan ahead"}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
               <Label htmlFor="crop_type">Crop Type</Label>
               <Input
                 id="crop_type"
@@ -1504,36 +1526,19 @@ export function PlanningForecastDashboard() {
                 placeholder="e.g., Barangay 1"
               />
             </div>
-            <div>
+            <div className="col-span-2">
               <Label htmlFor="images">Images (optional)</Label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const newFiles = Array.from(e.target.files || []);
-                    setHarvestImages([...harvestImages, ...newFiles]);
-                  }}
-                  className="text-sm border-2 border-dashed border-primary/40 rounded-lg p-4 w-full cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-colors"
-                />
-                {harvestImages.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center text-primary/60">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-sm">Click to upload images</p>
-                      <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {harvestImages.length > 0 && (
-                <div className="mt-2 text-sm text-primary/70 font-medium">
-                  {harvestImages.length} image{harvestImages.length !== 1 ? 's' : ''} selected
-                </div>
-              )}
+              <input
+                type="file"
+                id="images"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const newFiles = Array.from(e.target.files || []);
+                  setHarvestImages([...harvestImages, ...newFiles]);
+                }}
+                className="mt-2"
+              />
             </div>
             <div>
               <Label htmlFor="notes">Notes (optional)</Label>
@@ -1707,14 +1712,14 @@ export function PlanningForecastDashboard() {
           setWasteImages([]);
         }
       }}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingWaste ? "Edit Projected Waste Report" : "Add Projected Waste Report"}</DialogTitle>
             <DialogDescription>
               {editingWaste ? "Update your waste projection details" : "Report expected food waste to help LGU plan for recovery and management"}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="waste_quantity">Estimated Quantity (kg)</Label>
               <Input
@@ -1756,7 +1761,7 @@ export function PlanningForecastDashboard() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="col-span-2">
               <Label htmlFor="waste_barangay">Barangay</Label>
               <Input
                 id="waste_barangay"
@@ -1765,36 +1770,19 @@ export function PlanningForecastDashboard() {
                 placeholder="e.g., Barangay 1"
               />
             </div>
-            <div>
+            <div className="col-span-2">
               <Label htmlFor="waste_images">Images (optional)</Label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const newFiles = Array.from(e.target.files || []);
-                    setWasteImages([...wasteImages, ...newFiles]);
-                  }}
-                  className="text-sm border-2 border-dashed border-primary/40 rounded-lg p-4 w-full cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-colors"
-                />
-                {wasteImages.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center text-primary/60">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-sm">Click to upload images</p>
-                      <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {wasteImages.length > 0 && (
-                <div className="mt-2 text-sm text-primary/70 font-medium">
-                  {wasteImages.length} image{wasteImages.length !== 1 ? 's' : ''} selected
-                </div>
-              )}
+              <input
+                type="file"
+                id="waste_images"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const newFiles = Array.from(e.target.files || []);
+                  setWasteImages([...wasteImages, ...newFiles]);
+                }}
+                className="mt-2"
+              />
             </div>
             <div>
               <Label htmlFor="waste_notes">Notes (optional)</Label>

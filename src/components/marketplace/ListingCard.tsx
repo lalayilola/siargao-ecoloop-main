@@ -196,9 +196,19 @@ export function ListingCard({
         <Link
           to="/profile"
           search={{ userId: item.user_id }}
-          className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+          className="flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
           onClick={(event) => event.stopPropagation()}
         >
+          {/* Profile picture */}
+          <div className="h-6 w-6 rounded-full overflow-hidden bg-gradient-to-br from-emerald-500 to-green-600 flex-shrink-0">
+            {item.profiles?.profile_picture_url ? (
+              <img src={item.profiles.profile_picture_url} alt={item.seller} className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center font-semibold text-white text-xs">
+                {sellerInitials}
+              </div>
+            )}
+          </div>
           <CheckCircle className="h-3 w-3" />
           <span>{item.seller}</span>
         </Link>
