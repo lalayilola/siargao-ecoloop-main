@@ -66,12 +66,13 @@ interface ProjectedWaste {
 }
 
 export function PlanningForecastDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [harvestForecasts, setHarvestForecasts] = useState<HarvestForecast[]>([]);
   const [lguDistributions, setLguDistributions] = useState<LGUDistribution[]>([]);
   const [projectedWaste, setProjectedWaste] = useState<ProjectedWaste[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filterMunicipality, setFilterMunicipality] = useState<string>("all");
   const [filterCropType, setFilterCropType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -149,7 +150,13 @@ export function PlanningForecastDashboard() {
   ];
 
   useEffect(() => {
-    if (!profile) return;
+    if (authLoading) return;
+
+    if (!profile) {
+      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
+      setLoading(false);
+      return;
+    }
 
     if (profile.primary_role === "restaurant") {
       setActiveTab("waste");
@@ -158,34 +165,49 @@ export function PlanningForecastDashboard() {
     }
 
     loadData();
-  }, [profile]);
+  }, [authLoading, profile]);
 
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [selectedHarvest, selectedDistribution, selectedWaste]);
 
   const loadData = async () => {
-    if (!profile) return;
+    if (!profile) {
+      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setLoadError(null);
+    const abortController = new AbortController();
+    const timeoutId = window.setTimeout(() => abortController.abort(), 15_000);
 
     try {
       // Load harvest forecasts (visible to farmers, restaurants, residents, and LGU)
       // Residents can view harvest forecasts from all municipalities to enable cross-municipality buying
       if (profile.primary_role === "farmer" || profile.primary_role === "restaurant" || profile.primary_role === "resident" || profile.primary_role === "lgu_admin") {
-        const { data: harvestData } = await supabase
+        const { data: harvestData, error: harvestError } = await supabase
           .from("harvest_forecasts")
           .select("*")
           .eq("status", "active")
-          .order("projected_harvest_date", { ascending: true });
+          .order("projected_harvest_date", { ascending: true })
+          .abortSignal(abortController.signal);
+
+        if (harvestError) throw harvestError;
 
         if (harvestData) setHarvestForecasts(harvestData);
       }
 
       // Load LGU distributions (visible to farmers and LGU admins)
       if (profile.primary_role === "farmer" || profile.primary_role === "lgu_admin") {
-        const { data: distributionData } = await supabase
+        const { data: distributionData, error: distributionError } = await supabase
           .from("lgu_distributions")
           .select("*")
-          .order("distribution_date", { ascending: true });
+          .order("distribution_date", { ascending: true })
+          .abortSignal(abortController.signal);
+
+        if (distributionError) throw distributionError;
 
         if (distributionData) setLguDistributions(distributionData);
       }
@@ -203,14 +225,22 @@ export function PlanningForecastDashboard() {
           query = query.eq("user_id", user.id);
         }
 
-        const { data: wasteData } = await query;
+        const { data: wasteData, error: wasteError } = await query.abortSignal(abortController.signal);
+
+        if (wasteError) throw wasteError;
 
         if (wasteData) setProjectedWaste(wasteData);
       }
     } catch (error) {
       console.error("Error loading forecasts:", error);
-      toast.error("Failed to load forecasts");
+      const message =
+        error instanceof DOMException && error.name === "AbortError"
+          ? "Planning data took too long to load. Check your connection and try again."
+          : getSupabaseErrorMessage(error, "Failed to load planning data.");
+      setLoadError(message);
+      toast.error(message);
     } finally {
+      window.clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -749,8 +779,26 @@ export function PlanningForecastDashboard() {
         sub="Coordinate future harvests, distributions, and waste management with role-based forecasting tools."
       />
       <Container className="py-12">
-        {loading ? (
+        {authLoading || loading ? (
           <div className="text-center py-12">Loading...</div>
+        ) : loadError ? (
+          <Card className="mx-auto max-w-xl p-8 text-center">
+            <AlertCircle className="mx-auto h-10 w-10 text-amber-500" />
+            <h2 className="mt-4 text-xl font-semibold">Unable to load planning data</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{loadError}</p>
+            <Button
+              className="mt-6"
+              onClick={() => {
+                if (profile) {
+                  void loadData();
+                } else {
+                  window.location.reload();
+                }
+              }}
+            >
+              Try Again
+            </Button>
+          </Card>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className={`grid w-full max-w-3xl mx-auto ${
