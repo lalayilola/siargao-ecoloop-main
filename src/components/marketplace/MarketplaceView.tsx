@@ -316,6 +316,9 @@ export function MarketplaceView() {
   const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let cancelled = false;
+
     const loadStatistics = async () => {
       try {
         const municipality = profile?.municipality;
@@ -325,39 +328,61 @@ export function MarketplaceView() {
         if (municipality) {
           listingsQuery = listingsQuery.eq("municipality", municipality);
         }
+        listingsQuery = listingsQuery.abortSignal(abortController.signal);
         
-        const { data: listings } = await listingsQuery;
+        const { data: listingsData, error: listingsError } = await listingsQuery;
+        if (cancelled) return;
+        if (listingsError) throw listingsError;
+        const listings = (listingsData || []) as Listing[];
         
         // Calculate statistics
-        const totalListings = listings?.length || 0;
-        const freshProduceListings = listings?.filter(l => l.kind === "produce").length || 0;
-        const foodWasteListings = listings?.filter(l => l.kind === "waste").length || 0;
-        const compostListings = listings?.filter(l => l.kind === "compost").length || 0;
+        const totalListings = listings.length;
+        const freshProduceListings = listings.filter(l => l.kind === "produce").length;
+        const foodWasteListings = listings.filter(l => l.kind === "waste").length;
+        const compostListings = listings.filter(l => l.kind === "compost").length;
         
         // Get verified sellers
         let profilesQuery = supabase.from("profiles").select("*");
         if (municipality) {
           profilesQuery = profilesQuery.eq("municipality", municipality);
         }
-        const { data: profiles } = await profilesQuery;
-        const verifiedSellers = profiles?.filter(p => p.lgu_approved).length || 0;
+        profilesQuery = profilesQuery.abortSignal(abortController.signal);
+        const { data: profilesData, error: profilesError } = await profilesQuery;
+        if (cancelled) return;
+        if (profilesError) throw profilesError;
+        const profiles = (profilesData || []) as Database["public"]["Tables"]["profiles"]["Row"][];
+        const verifiedSellers = profiles.filter(p => p.lgu_approved).length;
         
-        // Get active buyers (users who have made purchase requests)
-        let purchaseRequestsQuery = supabase.from("purchase_requests").select("*");
-        if (municipality) {
-          purchaseRequestsQuery = purchaseRequestsQuery.eq("municipality", municipality);
+        // Purchase requests inherit their municipality and kind from their listing.
+        // Scope them using the municipality-filtered listing IDs because those
+        // columns do not exist directly on purchase_requests.
+        const listingIds = listings.map((listing) => listing.id);
+        let purchaseRequests: PurchaseRequest[] = [];
+
+        if (listingIds.length > 0) {
+          const { data, error } = await supabase
+            .from("purchase_requests")
+            .select("*")
+            .in("listing_id", listingIds)
+            .abortSignal(abortController.signal);
+
+          if (cancelled) return;
+          if (error) throw error;
+          purchaseRequests = data || [];
         }
-        const { data: purchaseRequests } = await purchaseRequestsQuery;
-        const activeBuyers = new Set(purchaseRequests?.map(pr => pr.buyer_id)).size;
+
+        const activeBuyers = new Set(purchaseRequests.map((request) => request.buyer_user_id)).size;
         
         // Get completed transactions
-        const completedTransactions = purchaseRequests?.filter(pr => pr.status === "completed").length || 0;
+        const completedTransactions = purchaseRequests.filter((request) => request.status === "completed").length;
         
         // Calculate waste diverted (sum of kg from completed waste transactions)
+        const listingKindById = new Map(listings.map((listing) => [listing.id, listing.kind]));
         const wasteDiverted = purchaseRequests
-          ?.filter(pr => pr.status === "completed" && pr.kind === "waste")
-          .reduce((sum, pr) => sum + (pr.quantity_kg || 0), 0) || 0;
+          .filter((request) => request.status === "completed" && listingKindById.get(request.listing_id) === "waste")
+          .reduce((sum, request) => sum + (request.quantity_kg || 0), 0);
         
+        if (cancelled) return;
         setStats({
           totalListings,
           freshProduceListings,
@@ -370,16 +395,24 @@ export function MarketplaceView() {
         });
         setLastRefresh(new Date());
       } catch (error) {
+        if (cancelled) return;
         console.error("Error loading statistics:", error);
       }
     };
 
-    loadStatistics();
+    void loadStatistics();
+
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
   }, [profile?.municipality]);
 
 
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let cancelled = false;
 
     const loadListings = async () => {
 
@@ -407,8 +440,11 @@ export function MarketplaceView() {
 
 
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query
+        .order("created_at", { ascending: false })
+        .abortSignal(abortController.signal);
 
+      if (cancelled) return;
       if (error) {
 
         toast.error(`Unable to load marketplace listings: ${error.message}`);
@@ -425,8 +461,11 @@ export function MarketplaceView() {
 
           .select("id, profile_picture_url, full_name")
 
-          .in("id", userIds);
+          .in("id", userIds)
 
+          .abortSignal(abortController.signal);
+
+        if (cancelled) return;
 
 
         const profileMap = new Map(profilesData?.map((p: any) => [p.id, p]) || []);
@@ -453,6 +492,10 @@ export function MarketplaceView() {
 
     void loadListings();
 
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
   }, [profile, user]);
 
 
@@ -460,6 +503,8 @@ export function MarketplaceView() {
   useEffect(() => {
 
     if (!user) return;
+    const abortController = new AbortController();
+    let cancelled = false;
 
     const loadUserListings = async () => {
 
@@ -471,8 +516,11 @@ export function MarketplaceView() {
 
         .eq("user_id", user.id)
 
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
 
+        .abortSignal(abortController.signal);
+
+      if (cancelled) return;
       if (error) {
 
         console.error("Error loading user listings:", error);
@@ -487,6 +535,10 @@ export function MarketplaceView() {
 
     void loadUserListings();
 
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
   }, [user]);
 
 
@@ -500,6 +552,9 @@ export function MarketplaceView() {
       return;
 
     }
+
+    const abortController = new AbortController();
+    let cancelled = false;
 
 
 
@@ -525,7 +580,13 @@ export function MarketplaceView() {
 
         .in("listing_id", listingIds)
 
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+
+        .abortSignal(abortController.signal);
+
+
+
+      if (cancelled) return;
 
 
 
@@ -544,6 +605,11 @@ export function MarketplaceView() {
 
 
     void loadIncomingRequests();
+
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
 
   }, [user, userListings]);
 
