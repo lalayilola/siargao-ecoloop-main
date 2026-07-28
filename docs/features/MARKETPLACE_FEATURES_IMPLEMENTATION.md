@@ -1,7 +1,7 @@
 # Circular Economy Marketplace - Implementation Summary
 
 ## Overview
-This document summarizes the implementation of the circular economy marketplace features for EcoLoop Siargao.
+This document summarizes the implementation of the circular economy marketplace features for Siargao Loops.
 
 ## Completed Features
 

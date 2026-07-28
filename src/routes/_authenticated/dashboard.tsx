@@ -35,7 +35,7 @@ type ProduceRow = {
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 
-  head: () => ({ meta: [{ title: "LGU Monitoring Dashboard — EcoLoop Siargao" }] }),
+  head: () => ({ meta: [{ title: "LGU Monitoring Dashboard — Siargao Loops" }] }),
 
   component: DashboardPage,
 

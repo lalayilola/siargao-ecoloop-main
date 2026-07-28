@@ -1,8 +1,8 @@
-# 📑 EcoLoop Siargao - Complete Documentation Index
+# 📑 Siargao Loops - Complete Documentation Index
 
 ## 🎉 Welcome!
 
-You now have a **complete, production-ready EcoLoop Siargao application** with **10 comprehensive documentation files** (2,500+ lines total).
+You now have a **complete, production-ready Siargao Loops application** with **10 comprehensive documentation files** (2,500+ lines total).
 
 This index helps you find exactly what you need.
 
@@ -447,7 +447,7 @@ You have:
 - ✅ Quick reference guides
 - ✅ Role-specific recommendations
 
-**Everything you need to understand and deploy EcoLoop Siargao.**
+**Everything you need to understand and deploy Siargao Loops.**
 
 ---
 

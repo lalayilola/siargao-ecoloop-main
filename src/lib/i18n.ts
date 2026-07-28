@@ -62,7 +62,7 @@ const resources = {
         hero: {
           badge: "A circular food system in Siargao",
           title: "Turn food waste into island harvest.",
-          subtitle: "Siargao Loops Siargao connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the island green and the loop closed.",
+          subtitle: "Siargao Loops connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the island green and the loop closed.",
           joinLoop: "Join the loop",
           seeHowItWorks: "See how it works",
           wasteCollected: "Waste collected",
@@ -121,7 +121,7 @@ const resources = {
         hero: {
           eyebrow: "About",
           title: "A circular economy, designed for Siargao.",
-          subtitle: "Siargao Loops Siargao is a community platform that links the people who produce food waste with the people who can turn it into something useful — closing the loop on island sustainability."
+          subtitle: "Siargao Loops is a community platform that links the people who produce food waste with the people who can turn it into something useful — closing the loop on island sustainability."
         },
         mission: {
           title: "Our mission",
@@ -204,7 +204,7 @@ const resources = {
         creatingAccount: "Creating account…",
         welcomeBack: "Welcome back!",
         accountCreated: "Account created! You're signed in.",
-        lguAccountCreated: "LGU account created. An Siargao Loops admin will review and approve access.",
+        lguAccountCreated: "LGU account created. A Siargao Loops admin will review and approve access.",
         googleSignInFailed: "Google sign-in failed",
         invalidInput: "Invalid input",
         unableToConfirmEmail: "Unable to auto-confirm email"
@@ -364,7 +364,7 @@ const resources = {
         hero: {
           badge: "Isang circular food system para sa Siargao",
           title: "Ibalik ang pagkain sa ani ng isla.",
-          subtitle: "Ang Siargao Loops Siargao ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang isla na berde at ang loop na sarado.",
+          subtitle: "Ang Siargao Loops ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang isla na berde at ang loop na sarado.",
           joinLoop: "Sumali sa loop",
           seeHowItWorks: "Tingnan kung paano ito gumagana",
           wasteCollected: "Nakolektang basura",
@@ -423,7 +423,7 @@ const resources = {
         hero: {
           eyebrow: "Tungkol sa",
           title: "Isang circular economy, dinisenyo para sa Siargao.",
-          subtitle: "Ang Siargao Loops Siargao ay isang platform ng komunidad na nagkokonekta sa mga taong gumagawa ng pagkain sa mga taong maaaring gawin itong kapaki-pakinabang — pagsasara ng loop sa sustainability ng isla."
+          subtitle: "Ang Siargao Loops ay isang platform ng komunidad na nagkokonekta sa mga taong gumagawa ng pagkain sa mga taong maaaring gawin itong kapaki-pakinabang — pagsasara ng loop sa sustainability ng isla."
         },
         mission: {
           title: "Ang aming misyon",
@@ -666,7 +666,7 @@ const resources = {
         hero: {
           badge: "Usa ka circular food system alang sa Siargao",
           title: "Ibalik ang pagkaon sa ani sa isla.",
-          subtitle: "Ang Siargao Loops Siargao nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa isla nga berde ug ang loop nga sarado.",
+          subtitle: "Ang Siargao Loops nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa isla nga berde ug ang loop nga sarado.",
           joinLoop: "Sali sa loop",
           seeHowItWorks: "Tan-awa kung unsa managsa kini",
           wasteCollected: "Nakolekta nga basura",
@@ -725,7 +725,7 @@ const resources = {
         hero: {
           eyebrow: "Mahitungod sa",
           title: "Usa ka circular economy, gidesinyo alang sa Siargao.",
-          subtitle: "Ang Siargao Loops Siargao usa ka platform sa komunidad nga nagkonekta sa mga tawo nga nagbuhat sa pagkaon sa mga tawo nga mahimo kini nga kapinabahan — pagsarado sa loop sa sustainability sa isla."
+          subtitle: "Ang Siargao Loops usa ka platform sa komunidad nga nagkonekta sa mga tawo nga nagbuhat sa pagkaon sa mga tawo nga mahimo kini nga kapinabahan — pagsarado sa loop sa sustainability sa isla."
         },
         mission: {
           title: "Ang among misyon",

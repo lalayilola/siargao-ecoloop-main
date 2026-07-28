@@ -1,4 +1,4 @@
-# 🌱 EcoLoop Siargao
+# 🌱 Siargao Loops
 
 ## A Complete Circular Food Waste Management Ecosystem
 
@@ -8,7 +8,7 @@
 
 ## 🎯 What This Is
 
-EcoLoop Siargao is a **fully-built, production-ready full-stack web application** that connects farmers, hotels/restaurants, and local government units in a circular food waste management system.
+Siargao Loops is a **fully-built, production-ready full-stack web application** that connects farmers, hotels/restaurants, and local government units in a circular food waste management system.
 
 **Everything is complete. Deploy it today.**
 
@@ -235,7 +235,7 @@ npm run dev
 
 ---
 
-## 💡 Why Choose EcoLoop Siargao
+## 💡 Why Choose Siargao Loops
 
 ✅ **Complete** - Not a template, fully built
 ✅ **Production Ready** - Deploy immediately
@@ -415,7 +415,7 @@ siargao-ecoloop-main/
 │   ✅ Deploy today                      │
 │                                         │
 │   🌱 Ready to make environmental       │
-│      impact with EcoLoop Siargao       │
+│      impact with Siargao Loops       │
 │                                         │
 └─────────────────────────────────────────┘
 ```

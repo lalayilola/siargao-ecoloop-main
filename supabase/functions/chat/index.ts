@@ -10,7 +10,7 @@ if (!geminiKey) {
   throw new Error("GEMINI_API_KEY environment variable is not set");
 }
 
-const systemPrompt = `You are an AI assistant for EcoLoop, a circular economy marketplace in Siargao, Philippines.
+const systemPrompt = `You are an AI assistant for Siargao Loops, a circular economy marketplace in Siargao, Philippines.
 
 Your role is to help users with:
 - Product search and recommendations from the marketplace (produce, waste materials, compost)
@@ -33,21 +33,21 @@ Guidelines:
 - Use simple language that's easy to understand
 - If you don't know something specific, direct them to browse the marketplace
 - For product questions, mention specific categories (produce, waste, fertilizer)
-- Be supportive of the EcoLoop mission and circular economy principles
+- Be supportive of the Siargao Loops mission and circular economy principles
 
-Context: EcoLoop connects farmers, restaurants, hotels, residents, and LGU (Local Government Units) in Siargao to buy, sell, and barter sustainable products and waste materials.`;
+Context: Siargao Loops connects farmers, restaurants, hotels, residents, and LGU (Local Government Units) in Siargao to buy, sell, and barter sustainable products and waste materials.`;
 
 function getFallbackResponse(message: string) {
   const lowerMessage = message.toLowerCase();
 
   // Greetings
   if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey")) {
-    return "Hello! I’m EcoLoop Assistant. I can help you find fresh produce, compost, waste materials, and other sustainable items in the marketplace. What are you looking for?";
+    return "Hello! I’m Siargao Loops Assistant. I can help you find fresh produce, compost, waste materials, and other sustainable items in the marketplace. What are you looking for?";
   }
 
   // Products available
   if (lowerMessage.includes("what") && (lowerMessage.includes("product") || lowerMessage.includes("available") || lowerMessage.includes("marketplace"))) {
-    return "The EcoLoop marketplace offers fresh produce (vegetables, fruits), food waste for composting, organic fertilizer, and other sustainable materials. Farmers, restaurants, and residents list items here. Browse the marketplace to see current listings!";
+    return "The Siargao Loops marketplace offers fresh produce (vegetables, fruits), food waste for composting, organic fertilizer, and other sustainable materials. Farmers, restaurants, and residents list items here. Browse the marketplace to see current listings!";
   }
 
   // Who buys produce
@@ -72,21 +72,21 @@ function getFallbackResponse(message: string) {
 
   // Waste management
   if (lowerMessage.includes("waste") || lowerMessage.includes("recycle") || lowerMessage.includes("compost")) {
-    return "EcoLoop helps with waste management by connecting restaurants with farmers who can use food waste for composting. You can also find organic fertilizer listings from LGU. Use the marketplace to find waste materials or compost opportunities.";
+    return "Siargao Loops helps with waste management by connecting restaurants with farmers who can use food waste for composting. You can also find organic fertilizer listings from LGU. Use the marketplace to find waste materials or compost opportunities.";
   }
 
   // Location assistance
   if (lowerMessage.includes("location") || lowerMessage.includes("siargao") || lowerMessage.includes("where")) {
-    return "EcoLoop operates across Siargao with listings from different barangays. You can filter marketplace items by location to find sellers near you. Each listing shows the seller's barangay for easy coordination.";
+    return "Siargao Loops operates across Siargao with listings from different barangays. You can filter marketplace items by location to find sellers near you. Each listing shows the seller's barangay for easy coordination.";
   }
 
   // Thanks
   if (lowerMessage.includes("thank") || lowerMessage.includes("thanks")) {
-    return "You're welcome! Feel free to ask more questions about the marketplace, waste management, or any EcoLoop features. I'm here to help!";
+    return "You're welcome! Feel free to ask more questions about the marketplace, waste management, or any Siargao Loops features. I'm here to help!";
   }
 
   // Default
-  return "I can help you with the EcoLoop marketplace - finding fresh produce, compost materials, waste management, and local Siargao services. Try asking about available products, how to buy/sell, or waste recycling options.";
+  return "I can help you with the Siargao Loops marketplace - finding fresh produce, compost materials, waste management, and local Siargao services. Try asking about available products, how to buy/sell, or waste recycling options.";
 }
 
 async function getGeminiResponse(message: string) {

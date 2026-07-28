@@ -4,7 +4,7 @@ import { EcoPointsView } from "@/components/common/EcoPointsView";
 export const Route = createFileRoute("/_authenticated/eco-points")({
   head: () => ({
     meta: [
-      { title: "Eco Points — EcoLoop Siargao" },
+      { title: "Eco Points — Siargao Loops" },
       { name: "description", content: "View your eco points and sustainability achievements." },
       { property: "og:title", content: "Eco Points" },
       { property: "og:description", content: "Track your sustainability journey." },

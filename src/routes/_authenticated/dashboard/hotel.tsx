@@ -4,10 +4,10 @@ import { HotelDashboard } from "@/components/dashboard/HotelDashboard";
 export const Route = createFileRoute("/_authenticated/dashboard/hotel")({
   head: () => ({
     meta: [
-      { title: "Hotel Dashboard — EcoLoop Siargao" },
+      { title: "Hotel Dashboard — Siargao Loops" },
       { name: "description", content: "Manage your produce orders and waste collection." },
       { property: "og:title", content: "Hotel Dashboard" },
-      { property: "og:description", content: "Hotel/Restaurant dashboard for EcoLoop Siargao." },
+      { property: "og:description", content: "Hotel/Restaurant dashboard for Siargao Loops." },
     ],
   }),
   component: () => <HotelDashboard />,

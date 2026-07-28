@@ -13,8 +13,8 @@ import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Forgot Password — EcoLoop Siargao" },
-      { name: "description", content: "Reset your EcoLoop password via email." },
+      { title: "Forgot Password — Siargao Loops" },
+      { name: "description", content: "Reset your Siargao Loops password via email." },
     ],
   }),
   component: ForgotPasswordPage,

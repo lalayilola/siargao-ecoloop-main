@@ -1,4 +1,4 @@
-# Getting Started with EcoLoop Siargao
+# Getting Started with Siargao Loops
 
 ## Prerequisites
 
@@ -257,8 +257,8 @@ netlify deploy
 
 #### Docker
 ```bash
-docker build -t ecoloop-siargao .
-docker run -p 80:5173 ecoloop-siargao
+docker build -t siargao-loops .
+docker run -p 80:5173 siargao-loops
 ```
 
 #### Traditional Hosting

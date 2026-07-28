@@ -4,7 +4,7 @@ import { NotificationsView } from "@/components/notifications/NotificationsView"
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — EcoLoop Siargao" },
+      { title: "Notifications — Siargao Loops" },
       { name: "description", content: "View your notifications." },
       { property: "og:title", content: "Notifications" },
       { property: "og:description", content: "Stay updated on your activities." },

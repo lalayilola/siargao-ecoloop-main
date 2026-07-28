@@ -12,10 +12,10 @@ import { useLanguage } from "@/hooks/use-language";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — EcoLoop Siargao" },
-      { name: "description", content: "Get in touch with the EcoLoop Siargao team — LGU partnerships, community rollouts, media and general questions." },
-      { property: "og:title", content: "Contact EcoLoop Siargao" },
-      { property: "og:description", content: "We'd love to hear from you. Reach the EcoLoop team here." },
+      { title: "Contact — Siargao Loops" },
+      { name: "description", content: "Get in touch with the Siargao Loops team — LGU partnerships, community rollouts, media and general questions." },
+      { property: "og:title", content: "Contact Siargao Loops" },
+      { property: "og:description", content: "We'd love to hear from you. Reach the Siargao Loops team here." },
     ],
   }),
   component: ContactPage,

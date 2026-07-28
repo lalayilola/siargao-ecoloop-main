@@ -1,11 +1,11 @@
-# 🌟 EcoLoop Siargao - Quick Visual Summary
+# 🌟 Siargao Loops - Quick Visual Summary
 
 ## ✅ PROJECT COMPLETE & PRODUCTION READY
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                               │
-│   🌱 EcoLoop Siargao - Circular Food Waste Management       │
+│   🌱 Siargao Loops - Circular Food Waste Management       │
 │                                                               │
 │   Status: ✅ 100% COMPLETE & READY TO DEPLOY               │
 │                                                               │
@@ -403,7 +403,7 @@ Everything you need is included.
 No additional development required.
 Deploy with confidence.
 
-**Welcome to EcoLoop Siargao!** 🌱🚀
+**Welcome to Siargao Loops!** 🌱🚀
 
 ---
 

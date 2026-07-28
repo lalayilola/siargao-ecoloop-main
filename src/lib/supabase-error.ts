@@ -1,4 +1,4 @@
-export function getSupabaseErrorMessage(error: unknown, fallback = "EcoLoop is temporarily unavailable. Please try again in a moment.") {
+export function getSupabaseErrorMessage(error: unknown, fallback = "Siargao Loops is temporarily unavailable. Please try again in a moment.") {
   if (!error) return fallback;
 
   let message = "";
@@ -39,7 +39,7 @@ export function getSupabaseErrorMessage(error: unknown, fallback = "EcoLoop is t
     normalized.includes("socket hang up") ||
     normalized.includes("econnrefused")
   ) {
-    return "EcoLoop is currently unavailable. Please check your connection and try again shortly.";
+    return "Siargao Loops is currently unavailable. Please check your connection and try again shortly.";
   }
 
   if (

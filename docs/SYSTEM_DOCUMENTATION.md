@@ -1,4 +1,4 @@
-# Siargao EcoLoop - Complete System Documentation
+# Siargao Loops - Complete System Documentation
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -18,7 +18,7 @@
 
 ## Overview
 
-Siargao EcoLoop is a circular food economy platform designed for the Siargao community. It connects farmers, restaurants, hotels, residents, and local government units (LGUs) to reduce food waste, promote sustainable practices, and create a local circular economy.
+Siargao Loops is a circular food economy platform designed for the Siargao community. It connects farmers, restaurants, hotels, residents, and local government units (LGUs) to reduce food waste, promote sustainable practices, and create a local circular economy.
 
 ### Key Objectives
 - Reduce food waste through redistribution and composting

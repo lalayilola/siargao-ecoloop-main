@@ -1,8 +1,8 @@
-# 🌱 EcoLoop Siargao - Complete Application Overview
+# 🌱 Siargao Loops - Complete Application Overview
 
 ## Executive Summary
 
-**EcoLoop Siargao** is a fully-implemented, production-ready full-stack web application connecting farmers, hotels/restaurants, and local government units in a circular food waste management ecosystem.
+**Siargao Loops** is a fully-implemented, production-ready full-stack web application connecting farmers, hotels/restaurants, and local government units in a circular food waste management ecosystem.
 
 **Status**: ✅ **100% COMPLETE AND FUNCTIONAL**
 
@@ -567,7 +567,7 @@ vercel  # or netlify deploy or your host
 
 ## 🎉 Summary
 
-**EcoLoop Siargao is a complete, production-ready application that:**
+**Siargao Loops is a complete, production-ready application that:**
 
 ✅ Implements a full circular economy ecosystem
 ✅ Connects 3 different user types
@@ -585,7 +585,7 @@ vercel  # or netlify deploy or your host
 
 ## 🌍 Making an Impact
 
-By deploying EcoLoop Siargao, you are:
+By deploying Siargao Loops, you are:
 - 🌱 Promoting circular economy principles
 - ♻️ Reducing food waste
 - 🌿 Enabling compost production

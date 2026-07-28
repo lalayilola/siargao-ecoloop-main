@@ -8,9 +8,9 @@ import restaurantBg from "@/assets/restaurant.jpg";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — EcoLoop Siargao" },
+      { title: "About — Siargao Loops" },
       { name: "description", content: "Our mission to build a circular food economy in Siargao through community partnership and sustainable farming." },
-      { property: "og:title", content: "About EcoLoop Siargao" },
+      { property: "og:title", content: "About Siargao Loops" },
       { property: "og:description", content: "How we turn island food waste into local harvest." },
     ],
   }),

@@ -17,22 +17,22 @@ function getFallbackResponse(message: string) {
   const lowerMessage = message.toLowerCase();
 
   if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
-    return "Hello! I’m EcoLoop Assistant. I can help with marketplace questions, waste management, and local tips for Siargao.";
+    return "Hello! I’m Siargao Loops Assistant. I can help with marketplace questions, waste management, and local tips for Siargao.";
   }
 
   if (lowerMessage.includes("marketplace") || lowerMessage.includes("buy") || lowerMessage.includes("sell") || lowerMessage.includes("trade")) {
-    return "You can browse the EcoLoop marketplace to buy, sell, barter, or trade produce, compost, waste materials, and other sustainable items.";
+    return "You can browse the Siargao Loops marketplace to buy, sell, barter, or trade produce, compost, waste materials, and other sustainable items.";
   }
 
   if (lowerMessage.includes("waste") || lowerMessage.includes("recycle") || lowerMessage.includes("compost")) {
-    return "EcoLoop supports better waste sorting and circular economy practices. You can also use the local waste and collection features for guidance.";
+    return "Siargao Loops supports better waste sorting and circular economy practices. You can also use the local waste and collection features for guidance.";
   }
 
   if (lowerMessage.includes("location") || lowerMessage.includes("siargao") || lowerMessage.includes("where")) {
-    return "Siargao has many eco-friendly local services and community listings. You can use EcoLoop to find nearby opportunities and useful local information.";
+    return "Siargao has many eco-friendly local services and community listings. You can use Siargao Loops to find nearby opportunities and useful local information.";
   }
 
-  return "I’m here to help with EcoLoop marketplace questions, waste management, and local Siargao information. Try asking about buying, selling, recycling, or nearby services.";
+  return "I’m here to help with Siargao Loops marketplace questions, waste management, and local Siargao information. Try asking about buying, selling, recycling, or nearby services.";
 }
 
 export function AIChatbot() {
@@ -41,7 +41,7 @@ export function AIChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "bot",
-      text: "Hi! I'm the EcoLoop assistant. I can help you with product recommendations, marketplace questions, waste management info, and location assistance in Siargao. What would you like to know?",
+      text: "Hi! I'm the Siargao Loops assistant. I can help you with product recommendations, marketplace questions, waste management info, and location assistance in Siargao. What would you like to know?",
       timestamp: new Date(),
     },
   ]);
@@ -139,7 +139,7 @@ export function AIChatbot() {
       <Button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 bg-transparent text-white shadow-none hover:shadow-none transition-all hover:scale-110 z-40 p-0"
-        title="Chat with Siargao EcoLoop Assistant"
+        title="Chat with Siargao Loops Assistant"
         size="icon"
       >
         <img src={aiIcon} alt="AI" className="h-16 w-16" />
@@ -150,7 +150,7 @@ export function AIChatbot() {
           <DialogHeader className="p-4 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600">
             <DialogTitle className="flex items-center gap-2 text-white">
               <img src={aiIcon} alt="AI" className="h-8 w-8" />
-              Siargao EcoLoop Assistant
+              Siargao Loops Assistant
             </DialogTitle>
           </DialogHeader>
 

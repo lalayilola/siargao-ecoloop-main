@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ecoloop-siargao-v1';
+const CACHE_NAME = 'siargao-loops-v1';
 const urlsToCache = [
   '/',
   '/feed',

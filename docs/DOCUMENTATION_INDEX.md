@@ -1,8 +1,8 @@
-# 📚 EcoLoop Siargao - Documentation Index
+# 📚 Siargao Loops - Documentation Index
 
 ## Welcome! 👋
 
-You now have a **complete, production-ready full-stack circular economy application** called EcoLoop Siargao.
+You now have a **complete, production-ready full-stack circular economy application** called Siargao Loops.
 
 This document will guide you through all the documentation to get started quickly.
 
@@ -473,7 +473,7 @@ siargao-ecoloop-main/
 
 ## 🎉 You're All Set!
 
-Everything you need to understand, develop, test, and deploy EcoLoop Siargao is in these documents.
+Everything you need to understand, develop, test, and deploy Siargao Loops is in these documents.
 
 **Start with: [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)**
 
@@ -495,6 +495,6 @@ Everything you need to understand, develop, test, and deploy EcoLoop Siargao is 
 
 ---
 
-**Welcome to EcoLoop Siargao! 🌱🚀**
+**Welcome to Siargao Loops! 🌱🚀**
 
 *Next: Read COMPLETION_SUMMARY.md*

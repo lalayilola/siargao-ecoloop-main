@@ -1,4 +1,4 @@
-# ✅ EcoLoop Siargao - Final Completion Checklist
+# ✅ Siargao Loops - Final Completion Checklist
 
 ## 🎉 PROJECT COMPLETE - ALL ITEMS DELIVERED
 

@@ -14,8 +14,8 @@ import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign In — EcoLoop Siargao" },
-      { name: "description", content: "Sign in to your EcoLoop account to access your dashboard." },
+      { title: "Sign In — Siargao Loops" },
+      { name: "description", content: "Sign in to your Siargao Loops account to access your dashboard." },
     ],
   }),
   component: LoginPage,
@@ -169,7 +169,7 @@ function LoginPage() {
       <div className="min-h-screen animate-gradient">
         <Container className="py-12">
           <div className="mx-auto max-w-md text-center mb-8">
-            <h1 className="font-display text-4xl font-bold text-white">Sign In to EcoLoop</h1>
+            <h1 className="font-display text-4xl font-bold text-white">Sign in to Siargao Loops</h1>
             <p className="text-white/80 mt-2">Access your dashboard to manage your circular food economy activities.</p>
           </div>
         <div className="mx-auto max-w-md">

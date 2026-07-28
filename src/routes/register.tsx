@@ -28,8 +28,8 @@ const bounceAnimation = `
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Create Account — EcoLoop Siargao" },
-      { name: "description", content: "Register for EcoLoop Siargao to join the circular food economy." },
+      { title: "Create Account — Siargao Loops" },
+      { name: "description", content: "Register for Siargao Loops to join the circular food economy." },
     ],
   }),
   component: RegisterPage,
@@ -375,7 +375,7 @@ function RegisterPage() {
                 disabled={googleBusy}
                 onClick={handleGoogleSignUp}
               >
-                <img src={logo} alt="EcoLoop Siargao" className="mr-2 h-4 w-4 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
+                <img src={logo} alt="Siargao Loops" className="mr-2 h-4 w-4 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
                 {googleBusy ? "Connecting..." : "Continue with Google"}
               </Button>
 

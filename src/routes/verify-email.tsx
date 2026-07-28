@@ -30,9 +30,9 @@ export const Route = createFileRoute("/verify-email")({
 
     meta: [
 
-      { title: "Verify Email — EcoLoop Siargao" },
+      { title: "Verify Email — Siargao Loops" },
 
-      { name: "description", content: "Verify your email address to activate your EcoLoop account." },
+      { name: "description", content: "Verify your email address to activate your Siargao Loops account." },
 
     ],
 

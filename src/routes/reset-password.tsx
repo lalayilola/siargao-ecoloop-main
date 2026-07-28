@@ -11,7 +11,7 @@ import { Eye, EyeOff, CheckCircle2, ArrowLeft, Lock } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Reset Password — EcoLoop Siargao" }] }),
+  head: () => ({ meta: [{ title: "Reset Password — Siargao Loops" }] }),
   component: ResetPage,
 });
 

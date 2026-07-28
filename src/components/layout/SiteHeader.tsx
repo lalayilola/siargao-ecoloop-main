@@ -33,7 +33,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-primary/20 bg-gradient-to-r from-secondary/20 via-white/80 to-sand/20 shadow-sm backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3 rounded-full border border-primary/10 bg-white/80 px-3 py-2 shadow-sm shadow-primary/5 transition hover:bg-white">
-          <img src={logo} alt="EcoLoop Siargao" className="h-10 w-10 object-contain" />
+          <img src={logo} alt="Siargao Loops" className="h-10 w-10 object-contain" />
           <span className="font-display text-base font-semibold tracking-tight text-slate-900">
             Siargao <span className="text-primary">Loops</span>
           </span>

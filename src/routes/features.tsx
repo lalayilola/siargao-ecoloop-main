@@ -8,9 +8,9 @@ import featuresBg from "@/assets/features.jpeg";
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — EcoLoop Siargao" },
+      { title: "Features — Siargao Loops" },
       { name: "description", content: "Marketplaces, barter trades, planning & forecast, smart search, maps, and the LGU dashboard — every feature explained." },
-      { property: "og:title", content: "EcoLoop Siargao features" },
+      { property: "og:title", content: "Siargao Loops features" },
       { property: "og:description", content: "Features that power Siargao's circular food economy." },
     ],
   }),

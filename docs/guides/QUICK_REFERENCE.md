@@ -1,4 +1,4 @@
-# EcoLoop Siargao - Quick Reference Guide
+# Siargao Loops - Quick Reference Guide
 
 ## 🚀 Quick Start
 

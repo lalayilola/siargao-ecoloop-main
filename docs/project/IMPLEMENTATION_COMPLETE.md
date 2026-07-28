@@ -1,8 +1,8 @@
-# EcoLoop Siargao - Full-Stack Implementation Complete
+# Siargao Loops - Full-Stack Implementation Complete
 
 ## Project Overview
 
-EcoLoop Siargao is a full-stack circular food waste management ecosystem connecting Farmers, Hotels/Restaurants, and the Local Government Unit (LGU). The system tracks the complete cycle from produce to waste to compost.
+Siargao Loops is a full-stack circular food waste management ecosystem connecting Farmers, Hotels/Restaurants, and the Local Government Unit (LGU). The system tracks the complete cycle from produce to waste to compost.
 
 **Status**: Fully functional core features implemented with modern tech stack.
 
@@ -202,7 +202,7 @@ EcoLoop Siargao is a full-stack circular food waste management ecosystem connect
 
 ### 6. Community & Social Features
 
-#### EcoLoop Hub (Feed)
+#### Siargao Loops Hub (Feed)
 - ✅ Facebook-style community feed (`/feed`)
 - ✅ Post creation with:
   - Text content
@@ -483,7 +483,7 @@ bun build
 
 ## ✨ Summary
 
-EcoLoop Siargao is a **fully functional circular economy ecosystem** that:
+Siargao Loops is a **fully functional circular economy ecosystem** that:
 
 ✅ Connects all stakeholders (Farmers, Restaurants, LGU)
 ✅ Manages complete waste-to-compost cycle

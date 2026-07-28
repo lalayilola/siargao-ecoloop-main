@@ -113,7 +113,7 @@ export function PostCard({ post, onDelete }: { post: FeedPost; onDelete?: (id: s
     const shareUrl = `${window.location.origin}/feed?post=${post.id}`;
     const shareData = {
       title: `Post by ${post.author}`,
-      text: post.body?.substring(0, 100) || "Check out this post on EcoLoop Siargao",
+      text: post.body?.substring(0, 100) || "Check out this post on Siargao Loops",
       url: shareUrl,
     };
 

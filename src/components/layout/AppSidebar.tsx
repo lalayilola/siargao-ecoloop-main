@@ -180,9 +180,9 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center justify-between px-4 py-4">
           <Link to="/" onClick={handleLinkClick} className="flex items-center gap-3 rounded-b-3xl relative z-10">
-            <img src={logo} alt="Siargao EcoLoop" className="h-16 w-16 object-contain" />
+            <img src={logo} alt="Siargao Loops" className="h-16 w-16 object-contain" />
             <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
-              Siargao <span className="text-primary">EcoLoop</span>
+              Siargao <span className="text-primary">Loops</span>
             </span>
           </Link>
           <NotificationBell />
@@ -291,7 +291,7 @@ export function AppSidebar() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-medium truncate text-slate-900">{profile.full_name || "EcoLoop member"}</div>
+                <div className="font-medium truncate text-slate-900">{profile.full_name || "Siargao Loops member"}</div>
                 <div className="text-slate-500 truncate text-xs">
                   {profile.primary_role === "lgu_admin"
                     ? profile.lgu_approved ? "LGU Admin" : "LGU Admin (pending)"

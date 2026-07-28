@@ -90,11 +90,11 @@ export const Route = createFileRoute("/auth")({
 
 
 
-      { title: "Sign in or join — EcoLoop Siargao" },
+      { title: "Sign in or join — Siargao Loops" },
 
 
 
-      { name: "description", content: "Create your EcoLoop account or sign in to post, trade and track your barangay's circular food economy." },
+      { name: "description", content: "Create your Siargao Loops account or sign in to post, trade and track your barangay's circular food economy." },
 
 
 
@@ -1654,7 +1654,7 @@ function LoginForm() {
 
 
 
-                By accessing and using EcoLoop Siargao, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
+                By accessing and using Siargao Loops, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
 
 
 
@@ -1750,7 +1750,7 @@ function LoginForm() {
 
 
 
-                Your personal information will be processed in accordance with our Privacy Policy. By using EcoLoop, you consent to the collection and use of your data as described.
+                Your personal information will be processed in accordance with our Privacy Policy. By using Siargao Loops, you consent to the collection and use of your data as described.
 
 
 
@@ -1798,7 +1798,7 @@ function LoginForm() {
 
 
 
-                EcoLoop reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
+                Siargao Loops reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
 
 
 
@@ -2738,7 +2738,7 @@ function SignupForm() {
 
 
 
-              By accessing and using EcoLoop Siargao, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
+              By accessing and using Siargao Loops, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our platform.
 
 
 
@@ -2834,7 +2834,7 @@ function SignupForm() {
 
 
 
-              Your personal information will be processed in accordance with our Privacy Policy. By using EcoLoop, you consent to the collection and use of your data as described.
+              Your personal information will be processed in accordance with our Privacy Policy. By using Siargao Loops, you consent to the collection and use of your data as described.
 
 
 
@@ -2882,7 +2882,7 @@ function SignupForm() {
 
 
 
-              EcoLoop reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
+              Siargao Loops reserves the right to modify these terms at any time. Continued use of the platform after changes constitutes acceptance of the modified terms.
 
 
 

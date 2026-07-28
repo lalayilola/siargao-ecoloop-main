@@ -892,7 +892,7 @@ export function MessagesView() {
 
         title="Messages"
 
-        sub="Chat with other EcoLoop members about trades, purchases, and more."
+        sub="Chat with other Siargao Loops members about trades, purchases, and more."
 
       />
 
@@ -1419,7 +1419,7 @@ export function MessagesView() {
                     <MessageCircle className="h-16 w-16 text-emerald-600" />
                   </div>
                   <h3 className="text-2xl font-semibold text-slate-900 mb-3">Select a conversation</h3>
-                  <p className="text-slate-500 max-w-sm mx-auto">Choose a conversation from the list to start chatting about trades, purchases, and more with EcoLoop members.</p>
+                  <p className="text-slate-500 max-w-sm mx-auto">Choose a conversation from the list to start chatting about trades, purchases, and more with Siargao Loops members.</p>
                 </div>
 
               </div>

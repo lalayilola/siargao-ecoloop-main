@@ -1,6 +1,6 @@
 # Supabase Authentication Setup Guide
 
-This guide explains how to configure Supabase for the EcoLoop Siargao authentication system with real email verification.
+This guide explains how to configure Supabase for the Siargao Loops authentication system with real email verification.
 
 ## Prerequisites
 
@@ -54,12 +54,12 @@ This guide explains how to configure Supabase for the EcoLoop Siargao authentica
 
 **Subject:**
 ```
-Verify your EcoLoop Siargao account
+Verify your Siargao Loops account
 ```
 
 **Body (HTML):**
 ```html
-<h2>Welcome to EcoLoop Siargao!</h2>
+<h2>Welcome to Siargao Loops!</h2>
 <p>Thank you for registering. Please verify your email address to activate your account.</p>
 <p><a href="{{ .ConfirmationURL }}">Verify Email Address</a></p>
 <p>This link will expire in 24 hours.</p>
@@ -73,7 +73,7 @@ Verify your EcoLoop Siargao account
 
 **Subject:**
 ```
-Reset your EcoLoop Siargao password
+Reset your Siargao Loops password
 ```
 
 **Body (HTML):**
@@ -133,7 +133,7 @@ For production, configure custom SMTP settings:
    - **SMTP User**: your SMTP username
    - **SMTP Password**: your SMTP password
    - **Sender Email**: noreply@your-domain.com
-   - **Sender Name**: EcoLoop Siargao
+   - **Sender Name**: Siargao Loops
 
 ## Step 5: Test Email Verification
 

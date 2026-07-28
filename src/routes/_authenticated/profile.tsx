@@ -20,7 +20,7 @@ import { Link } from "@tanstack/react-router";
 const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "My profile — EcoLoop Siargao" }] }),
+  head: () => ({ meta: [{ title: "My profile — Siargao Loops" }] }),
   component: ProfilePage,
   validateSearch: (search: Record<string, unknown>) => ({
     userId: typeof search.userId === "string" ? search.userId : undefined,
