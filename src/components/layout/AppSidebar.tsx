@@ -171,21 +171,32 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
-      <SidebarHeader className="border-b-2 border-primary/20 bg-white/95 relative overflow-hidden">
-        <div className="absolute top-2 right-2 opacity-20 animate-float">
+      <SidebarHeader className="relative overflow-hidden border-b-2 border-primary/20 bg-white/95 transition-[padding] group-data-[collapsible=icon]:p-2">
+        <div className="absolute right-2 top-2 animate-float opacity-20 group-data-[collapsible=icon]:hidden">
           <TreePine className="h-8 w-8 text-primary" />
         </div>
-        <div className="absolute bottom-2 right-8 opacity-15 animate-float-delayed">
+        <div className="absolute bottom-2 right-8 animate-float-delayed opacity-15 group-data-[collapsible=icon]:hidden">
           <Sprout className="h-6 w-6 text-primary" />
         </div>
-        <div className="flex items-center justify-between px-4 py-4">
-          <Link to="/" onClick={handleLinkClick} className="flex items-center gap-3 rounded-b-3xl relative z-10">
-            <img src={logo} alt="Siargao Loops" className="h-16 w-16 object-contain" />
+        <div className="flex items-center justify-between px-4 py-4 transition-all group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-1">
+          <Link
+            to="/"
+            onClick={handleLinkClick}
+            title="Siargao Loops"
+            className="relative z-10 flex min-w-0 items-center gap-3 rounded-b-3xl group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-lg"
+          >
+            <img
+              src={logo}
+              alt="Siargao Loops"
+              className="h-16 w-16 shrink-0 object-contain transition-[width,height] duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
+            />
             <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
               Siargao <span className="text-primary">Loops</span>
             </span>
           </Link>
-          <NotificationBell />
+          <div className="relative z-10 shrink-0 group-data-[collapsible=icon]:[&_button]:h-8 group-data-[collapsible=icon]:[&_button]:w-8 group-data-[collapsible=icon]:[&_button]:p-0">
+            <NotificationBell />
+          </div>
         </div>
       </SidebarHeader>
 
@@ -235,7 +246,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-users")}>
                     <Link to="/dashboard-users" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
                       <UserIcon />
-                      <span>Members Dashboard</span>
+                      <span>Member's Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
