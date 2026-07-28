@@ -1,79 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotificationSound } from "@/hooks/use-notification-sound";
 import { toast } from "sonner";
 import { MessageCircle } from "lucide-react";
 
 export function MessageNotification() {
   const { user } = useAuth();
-  const lastMessageId = useRef<string | null>(null);
-  const audioInitialized = useRef(false);
-
-  const playNotificationSound = () => {
-    try {
-      // Create audio context
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-      
-      const audioContext = new AudioContext();
-      
-      // Create oscillator for beep sound
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 880; // A5 note
-      oscillator.type = 'sine';
-      gainNode.gain.value = 0.5; // Increase volume
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2);
-      
-      // Second beep
-      setTimeout(() => {
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode2 = audioContext.createGain();
-        oscillator2.connect(gainNode2);
-        gainNode2.connect(audioContext.destination);
-        oscillator2.frequency.value = 1046; // C6 note
-        oscillator2.type = 'sine';
-        gainNode2.gain.value = 0.5;
-        oscillator2.start();
-        oscillator2.stop(audioContext.currentTime + 0.2);
-      }, 250);
-      
-    } catch (error) {
-      console.log("Audio play failed:", error);
-    }
-  };
-
-  // Initialize audio on first user interaction
-  useEffect(() => {
-    const initAudio = () => {
-      if (!audioInitialized.current) {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioContext) {
-          const audioContext = new AudioContext();
-          if (audioContext.state === 'suspended') {
-            audioContext.resume();
-          }
-          audioInitialized.current = true;
-        }
-      }
-    };
-
-    document.addEventListener('click', initAudio);
-    document.addEventListener('keydown', initAudio);
-    document.addEventListener('touchstart', initAudio);
-
-    return () => {
-      document.removeEventListener('click', initAudio);
-      document.removeEventListener('keydown', initAudio);
-      document.removeEventListener('touchstart', initAudio);
-    };
-  }, []);
+  const playNotificationSound = useNotificationSound();
 
   useEffect(() => {
     if (!user) return;
@@ -151,7 +85,7 @@ export function MessageNotification() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, playNotificationSound]);
 
   return null;
 }

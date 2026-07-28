@@ -1,53 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotificationSound } from "@/hooks/use-notification-sound";
 import { toast } from "sonner";
 import { Megaphone } from "lucide-react";
 
 export function AnnouncementNotification() {
   const { user } = useAuth();
-  const lastAnnouncementId = useRef<string | null>(null);
-
-  const playNotificationSound = () => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-      
-      const audioContext = new AudioContext();
-      
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 880;
-      oscillator.type = 'sine';
-      gainNode.gain.value = 0.5;
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2);
-      
-      setTimeout(() => {
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode2 = audioContext.createGain();
-        oscillator2.connect(gainNode2);
-        gainNode2.connect(audioContext.destination);
-        oscillator2.frequency.value = 1046;
-        oscillator2.type = 'sine';
-        gainNode2.gain.value = 0.5;
-        oscillator2.start();
-        oscillator2.stop(audioContext.currentTime + 0.2);
-      }, 250);
-      
-    } catch (error) {
-      console.log("Audio play failed:", error);
-    }
-  };
+  const playNotificationSound = useNotificationSound();
 
   useEffect(() => {
     if (!user) return;
@@ -114,7 +74,7 @@ export function AnnouncementNotification() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, playNotificationSound]);
 
   return null;
 }
