@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "A circular economy platform connecting Siargao farmers, restaurants, residents, and LGUs to turn food waste into local harvest." },
       { name: "author", content: "EcoLoop Siargao" },
       { name: "theme-color", content: "#2E7D32" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "EcoLoop" },
       { property: "og:title", content: "EcoLoop Siargao" },
