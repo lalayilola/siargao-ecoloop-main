@@ -77,7 +77,7 @@ export function RestaurantDashboard() {
       icon: Package,
       color: "text-blue-600",
       bgColor: "bg-blue-500/10",
-      link: "/waste-collections",
+      link: "/waste-collection",
     },
   ];
 

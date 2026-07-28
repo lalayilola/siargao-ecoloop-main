@@ -22,6 +22,9 @@ export interface Database {
           is_super_admin: boolean
           profile_picture_url: string | null
           cover_photo_url: string | null
+          government_id_url: string | null
+          average_rating: number | null
+          total_ratings: number
           created_at: string
           updated_at: string
         }
@@ -37,6 +40,9 @@ export interface Database {
           is_super_admin?: boolean
           profile_picture_url?: string | null
           cover_photo_url?: string | null
+          government_id_url?: string | null
+          average_rating?: number | null
+          total_ratings?: number
           created_at?: string
           updated_at?: string
         }
@@ -52,9 +58,13 @@ export interface Database {
           is_super_admin?: boolean
           profile_picture_url?: string | null
           cover_photo_url?: string | null
+          government_id_url?: string | null
+          average_rating?: number | null
+          total_ratings?: number
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -72,6 +82,7 @@ export interface Database {
           user_id?: string
           role?: Database['public']['Enums']['app_role']
         }
+        Relationships: []
       }
       feed_posts: {
         Row: {
@@ -131,6 +142,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       marketplace_listings: {
         Row: {
@@ -150,6 +162,7 @@ export interface Database {
           transaction_type: Database['public']['Enums']['transaction_type']
           acceptable_exchanges: string[]
           category: string
+          listing_status: string
           latitude: number | null
           longitude: number | null
           location_name: string | null
@@ -174,6 +187,7 @@ export interface Database {
           transaction_type?: Database['public']['Enums']['transaction_type']
           acceptable_exchanges?: string[]
           category?: string
+          listing_status?: string
           latitude?: number | null
           longitude?: number | null
           location_name?: string | null
@@ -198,6 +212,7 @@ export interface Database {
           transaction_type?: Database['public']['Enums']['transaction_type']
           acceptable_exchanges?: string[]
           category?: string
+          listing_status?: string
           latitude?: number | null
           longitude?: number | null
           location_name?: string | null
@@ -205,6 +220,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       planning_entries: {
         Row: {
@@ -240,6 +256,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       trades: {
         Row: {
@@ -287,6 +304,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       trade_requests: {
         Row: {
@@ -298,6 +316,7 @@ export interface Database {
           offered_item_id: string | null
           offered_item_title: string | null
           message: string
+          quantity_kg: number
           status: Database['public']['Enums']['trade_status']
           created_at: string
           updated_at: string
@@ -311,6 +330,7 @@ export interface Database {
           offered_item_id?: string | null
           offered_item_title?: string | null
           message: string
+          quantity_kg?: number
           status?: Database['public']['Enums']['trade_status']
           created_at?: string
           updated_at?: string
@@ -324,10 +344,12 @@ export interface Database {
           offered_item_id?: string | null
           offered_item_title?: string | null
           message?: string
+          quantity_kg?: number
           status?: Database['public']['Enums']['trade_status']
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       purchase_requests: {
         Row: {
@@ -366,6 +388,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       conversations: {
         Row: {
@@ -398,6 +421,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -406,6 +430,7 @@ export interface Database {
           sender_id: string
           content: string
           image_url: string | null
+          image_urls: string[] | null
           read_at: string | null
           created_at: string
         }
@@ -415,6 +440,7 @@ export interface Database {
           sender_id: string
           content: string
           image_url?: string | null
+          image_urls?: string[] | null
           read_at?: string | null
           created_at?: string
         }
@@ -424,9 +450,19 @@ export interface Database {
           sender_id?: string
           content?: string
           image_url?: string | null
+          image_urls?: string[] | null
           read_at?: string | null
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -459,6 +495,7 @@ export interface Database {
           read_at?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       announcements: {
         Row: {
@@ -503,29 +540,31 @@ export interface Database {
           image_url?: string | null
           images?: string | null
         }
+        Relationships: []
       }
       announcement_reactions: {
         Row: {
           id: string
           announcement_id: string
           user_id: string
-          reaction_type: string
+          reaction_type: 'like' | 'love' | 'helpful' | 'support'
           created_at: string
         }
         Insert: {
           id?: string
           announcement_id: string
           user_id: string
-          reaction_type: string
+          reaction_type: 'like' | 'love' | 'helpful' | 'support'
           created_at?: string
         }
         Update: {
           id?: string
           announcement_id?: string
           user_id?: string
-          reaction_type?: string
+          reaction_type?: 'like' | 'love' | 'helpful' | 'support'
           created_at?: string
         }
+        Relationships: []
       }
       announcement_comments: {
         Row: {
@@ -552,6 +591,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       feed_comments: {
         Row: {
@@ -578,29 +618,31 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       feed_reactions: {
         Row: {
           id: string
           post_id: string
           user_id: string
-          reaction_type: string
+          reaction_type: 'like' | 'love' | 'helpful' | 'support'
           created_at: string
         }
         Insert: {
           id?: string
           post_id: string
           user_id: string
-          reaction_type: string
+          reaction_type: 'like' | 'love' | 'helpful' | 'support'
           created_at?: string
         }
         Update: {
           id?: string
           post_id?: string
           user_id?: string
-          reaction_type?: string
+          reaction_type?: 'like' | 'love' | 'helpful' | 'support'
           created_at?: string
         }
+        Relationships: []
       }
       compost_inventory: {
         Row: {
@@ -636,6 +678,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       compost_requests: {
         Row: {
@@ -677,6 +720,274 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
+      }
+      food_waste_reports: {
+        Row: {
+          id: string
+          restaurant_id: string
+          restaurant_name: string
+          waste_type: string
+          quantity_kg: number
+          collection_date: string
+          collection_address: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          restaurant_name: string
+          waste_type: string
+          quantity_kg: number
+          collection_date: string
+          collection_address: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          restaurant_name?: string
+          waste_type?: string
+          quantity_kg?: number
+          collection_date?: string
+          collection_address?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      waste_collections: {
+        Row: {
+          id: string
+          waste_report_id: string
+          collector_id: string
+          collector_name: string
+          scheduled_date: string
+          completed_date: string | null
+          status: string
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          waste_report_id: string
+          collector_id: string
+          collector_name: string
+          scheduled_date: string
+          completed_date?: string | null
+          status?: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          waste_report_id?: string
+          collector_id?: string
+          collector_name?: string
+          scheduled_date?: string
+          completed_date?: string | null
+          status?: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transaction_ratings: {
+        Row: {
+          id: string
+          transaction_id: string
+          transaction_type: string
+          rater_id: string
+          rated_user_id: string
+          rating: number
+          review: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          transaction_id: string
+          transaction_type: string
+          rater_id: string
+          rated_user_id: string
+          rating: number
+          review?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          transaction_id?: string
+          transaction_type?: string
+          rater_id?: string
+          rated_user_id?: string
+          rating?: number
+          review?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      harvest_forecasts: {
+        Row: {
+          id: string
+          user_id: string
+          farmer_name: string
+          crop_type: string
+          estimated_quantity_kg: number
+          projected_harvest_date: string
+          municipality: string
+          barangay: string
+          notes: string | null
+          images: string[] | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          farmer_name: string
+          crop_type: string
+          estimated_quantity_kg: number
+          projected_harvest_date: string
+          municipality: string
+          barangay: string
+          notes?: string | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          farmer_name?: string
+          crop_type?: string
+          estimated_quantity_kg?: number
+          projected_harvest_date?: string
+          municipality?: string
+          barangay?: string
+          notes?: string | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lgu_distributions: {
+        Row: {
+          id: string
+          user_id: string
+          lgu_name: string
+          distribution_type: string
+          title: string
+          description: string
+          distribution_date: string
+          location: string
+          target_beneficiaries: string[]
+          municipality: string
+          barangay: string[]
+          quantity_available: number | null
+          images: string[] | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lgu_name: string
+          distribution_type: string
+          title: string
+          description: string
+          distribution_date: string
+          location: string
+          target_beneficiaries?: string[]
+          municipality: string
+          barangay?: string[]
+          quantity_available?: number | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lgu_name?: string
+          distribution_type?: string
+          title?: string
+          description?: string
+          distribution_date?: string
+          location?: string
+          target_beneficiaries?: string[]
+          municipality?: string
+          barangay?: string[]
+          quantity_available?: number | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projected_waste_reports: {
+        Row: {
+          id: string
+          user_id: string
+          business_name: string
+          business_type: string
+          estimated_quantity_kg: number
+          projected_date: string
+          waste_type: string
+          municipality: string
+          barangay: string
+          notes: string | null
+          images: string[] | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          business_name: string
+          business_type: string
+          estimated_quantity_kg: number
+          projected_date: string
+          waste_type: string
+          municipality: string
+          barangay: string
+          notes?: string | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          business_name?: string
+          business_type?: string
+          estimated_quantity_kg?: number
+          projected_date?: string
+          waste_type?: string
+          municipality?: string
+          barangay?: string
+          notes?: string | null
+          images?: string[] | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       chat_messages: {
         Row: {
@@ -703,7 +1014,14 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
     }
     Enums: {
       app_role: 'farmer' | 'restaurant' | 'resident' | 'lgu_admin' | 'super_admin'
@@ -711,6 +1029,9 @@ export interface Database {
       trade_status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled'
       transaction_type: 'sell_only' | 'barter_only' | 'sell_and_barter'
       municipality: 'burgos' | 'dapa' | 'general_luna' | 'pilar' | 'san_benito' | 'san_isidro' | 'santa_monica' | 'socorro' | 'del_carmen'
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

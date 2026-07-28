@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -32,11 +32,7 @@ export function FeedComments({ postId }: FeedCommentsProps) {
   const [editContent, setEditContent] = useState("");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadComments();
-  }, [postId]);
-
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       const { data: commentsData, error: commentsError } = await supabase
         .from("feed_comments" as any)
@@ -71,7 +67,11 @@ export function FeedComments({ postId }: FeedCommentsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
+
+  useEffect(() => {
+    void loadComments();
+  }, [loadComments]);
 
   const addComment = async () => {
     if (!user || !newComment.trim()) return;

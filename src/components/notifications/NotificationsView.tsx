@@ -56,11 +56,13 @@ export function NotificationsView() {
   };
 
   const markAllAsRead = async () => {
+    if (!user) return;
+
     const now = new Date().toISOString();
     const { error } = await supabase
       .from("notifications")
       .update({ read_at: now })
-      .eq("user_id", user?.id)
+      .eq("user_id", user.id)
       .is("read_at", null);
 
     if (error) {

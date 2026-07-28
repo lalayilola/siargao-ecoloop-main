@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -77,14 +77,10 @@ export function TransactionHistoryPage() {
   });
 
   useEffect(() => {
-    loadTransactions();
-  }, [user]);
-
-  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, filterType, filterStatus, sortBy]);
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -246,7 +242,11 @@ export function TransactionHistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    void loadTransactions();
+  }, [loadTransactions]);
 
   const filteredTransactions = transactions.filter(t => {
     const matchesSearch = searchQuery === "" || 

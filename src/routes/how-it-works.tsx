@@ -9,9 +9,9 @@ import hero from "@/assets/homepage1.jpg";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — EcoLoop Siargao" },
-      { name: "description", content: "Four simple steps: post, match, exchange, and track. See how EcoLoop connects farmers, restaurants, and LGUs in a circular economy." },
-      { property: "og:title", content: "How EcoLoop Siargao works" },
+      { title: "How it works — Siargao Loops" },
+      { name: "description", content: "Four simple steps: post, match, exchange, and track. See how Siargao Loops connects farmers, restaurants, and LGUs in a circular economy." },
+      { property: "og:title", content: "How Siargao Loops works" },
       { property: "og:description", content: "Post, match, exchange, track — the circular loop in four steps." },
     ],
   }),
@@ -106,7 +106,6 @@ function HowItWorks() {
         {/* CTA Section */}
         <div className="mt-16 text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-6 py-3 text-sm font-medium text-primary mb-6">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Ready to start?
           </div>
           <h3 className="font-display text-2xl font-semibold mb-4">Join the loop today</h3>
@@ -114,7 +113,7 @@ function HowItWorks() {
             Connect with farmers, restaurants, and your community to turn waste into harvest.
           </p>
           <Button asChild size="lg" className="rounded-full px-8">
-            <Link to="/auth">{t("howItWorks.example.startPost")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/auth">{t("howItWorks.startPost")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </Container>

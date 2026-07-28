@@ -23,17 +23,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.setItem("selectedLanguage", lang);
     }
-    i18n.changeLanguage(lang);
   };
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const savedLang = localStorage.getItem("selectedLanguage") as Language;
-    if (savedLang && savedLang !== language) {
-      setLanguageState(savedLang);
-      i18n.changeLanguage(savedLang);
+    void i18n.changeLanguage(language);
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language === "tl" ? "fil" : language;
     }
-  }, [i18n]);
+  }, [i18n, language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

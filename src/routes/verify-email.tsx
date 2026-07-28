@@ -144,6 +144,16 @@ function VerifyEmailPage() {
 
   }, [user, loading, navigate, verifying]);
 
+  useEffect(() => {
+
+    if (user && !user.email_confirmed_at) {
+
+      setEmail(user.email || "");
+
+    }
+
+  }, [user]);
+
 
 
   const handleResendVerification = async (e: React.FormEvent) => {
@@ -275,14 +285,6 @@ function VerifyEmailPage() {
       </div>
 
     );
-
-  }
-
-
-
-  if (user && !user.email_confirmed_at) {
-
-    setEmail(user.email || "");
 
   }
 

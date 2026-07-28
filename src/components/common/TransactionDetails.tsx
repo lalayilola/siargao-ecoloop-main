@@ -49,12 +49,6 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
   const [loading, setLoading] = useState(false);
   const [markingComplete, setMarkingComplete] = useState(false);
 
-  // Validate transaction data
-  if (!transaction || !transaction.id) {
-    console.error("Invalid transaction data:", transaction);
-    return null;
-  }
-
   // Ensure required fields have safe defaults
   const safeTransaction = {
     ...transaction,
@@ -93,6 +87,12 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
     }
   }, [open, safeTransaction.id, user]);
 
+  // Keep all hooks unconditional. Invalid data is handled only after hooks run.
+  if (!transaction || !transaction.id) {
+    console.error("Invalid transaction data:", transaction);
+    return null;
+  }
+
   const handleRatingSubmit = async () => {
     if (!user) {
       toast.error("You must be logged in to rate transactions");
@@ -104,18 +104,24 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
       return;
     }
 
+    const ratedUserId = safeTransaction.to_user_id || safeTransaction.from_user_id;
+    if (!ratedUserId) {
+      toast.error("The other participant could not be identified.");
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
-        .from("transaction_ratings" as any)
+        .from("transaction_ratings")
         .insert({
           transaction_id: safeTransaction.id,
           transaction_type: safeTransaction.type,
           rater_id: user.id,
-          rated_user_id: safeTransaction.to_user_id || safeTransaction.from_user_id,
+          rated_user_id: ratedUserId,
           rating: rating,
           review: review || null,
-        } as any);
+        });
 
       if (error) throw error;
 
@@ -139,13 +145,21 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
     try {
       const tableName = safeTransaction.type === 'trade' ? 'trade_requests' : 'purchase_requests';
       console.log(`Updating ${tableName} with id ${safeTransaction.id} to status 'completed'`);
-      
+
       // First, fetch the transaction data to get listing_id and quantity
-      const { data: transactionData, error: fetchError } = await supabase
-        .from(tableName as any)
-        .select('*')
-        .eq('id', safeTransaction.id)
-        .single();
+      const transactionResult = safeTransaction.type === "trade"
+        ? await supabase
+            .from("trade_requests")
+            .select("listing_id, quantity_kg")
+            .eq("id", safeTransaction.id)
+            .single()
+        : await supabase
+            .from("purchase_requests")
+            .select("listing_id, quantity_kg")
+            .eq("id", safeTransaction.id)
+            .single();
+
+      const { data: transactionData, error: fetchError } = transactionResult;
 
       if (fetchError) {
         console.error("Error fetching transaction data:", fetchError);
@@ -155,10 +169,17 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
       console.log("Transaction data:", transactionData);
 
       // Update transaction status to completed
-      const { error: updateError } = await supabase
-        .from(tableName as any)
-        .update({ status: 'completed' })
-        .eq('id', safeTransaction.id);
+      const updateResult = safeTransaction.type === "trade"
+        ? await supabase
+            .from("trade_requests")
+            .update({ status: "completed" })
+            .eq("id", safeTransaction.id)
+        : await supabase
+            .from("purchase_requests")
+            .update({ status: "completed" })
+            .eq("id", safeTransaction.id);
+
+      const { error: updateError } = updateResult;
 
       if (updateError) {
         console.error("Error updating transaction status:", updateError);
@@ -166,8 +187,8 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
       }
 
       // Update marketplace listing inventory
-      const listingId = (transactionData as any).listing_id;
-      const quantityKg = (transactionData as any).quantity_kg || 0;
+      const listingId = transactionData.listing_id;
+      const quantityKg = transactionData.quantity_kg || 0;
 
       if (listingId && quantityKg > 0) {
         console.log(`Updating listing ${listingId} by reducing ${quantityKg} kg`);
@@ -187,9 +208,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
         const currentKg = listingData?.kg || 0;
         const newKg = Math.max(0, currentKg - quantityKg);
         const listingStatus = newKg <= 0 ? 'sold_out' : 'available';
-        const listingKind = listingData?.kind;
-
-        console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}, Kind: ${listingKind}`);
+        console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}`);
 
         // Update listing
         const { error: listingUpdateError } = await supabase
@@ -209,40 +228,6 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
           console.log("Listing inventory updated successfully");
         }
 
-        // If this is a food waste collection, update the food_waste_reports status
-        if (listingKind === 'waste') {
-          console.log("This is a food waste collection, updating food_waste_reports");
-          
-          // Find the corresponding food_waste_reports record
-          const { data: wasteReport, error: wasteReportError } = await supabase
-            .from('food_waste_reports')
-            .select('*')
-            .eq('listing_id', listingId)
-            .single();
-
-          if (wasteReportError) {
-            console.error("Error finding food waste report:", wasteReportError);
-            console.warn("Transaction completed but food waste report update failed");
-          } else if (wasteReport) {
-            // Update the food_waste_reports status to 'collected'
-            const { error: wasteUpdateError } = await supabase
-              .from('food_waste_reports')
-              .update({ 
-                status: 'collected',
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', wasteReport.id);
-
-            if (wasteUpdateError) {
-              console.error("Error updating food waste report status:", wasteUpdateError);
-              console.warn("Transaction completed but food waste report status update failed");
-            } else {
-              console.log("Food waste report status updated to 'collected'");
-            }
-          } else {
-            console.log("No food waste report found for this listing");
-          }
-        }
       } else {
         console.log("No listing_id or quantity_kg found, skipping inventory update");
       }

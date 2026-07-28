@@ -1,10 +1,11 @@
-export type Role = "farmer" | "restaurant" | "resident" | "lgu_admin";
+export type Role = "farmer" | "restaurant" | "resident" | "lgu_admin" | "super_admin";
 
 export const roleMeta: Record<Role, { label: string; color: string }> = {
   farmer: { label: "Farmer", color: "bg-primary/10 text-primary border-primary/20" },
   restaurant: { label: "Restaurant", color: "bg-accent/15 text-accent-foreground border-accent/30" },
   resident: { label: "Resident", color: "bg-ocean/15 text-ocean border-ocean/30" },
   lgu_admin: { label: "LGU", color: "bg-foreground/10 text-foreground border-foreground/20" },
+  super_admin: { label: "Super Admin", color: "bg-secondary/15 text-secondary border-secondary/30" },
 };
 
 export type FeedPost = {

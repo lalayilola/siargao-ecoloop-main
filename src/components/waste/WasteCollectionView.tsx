@@ -20,7 +20,7 @@ export function WasteCollectionView() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || profile?.primary_role !== "hotel_restaurant") {
+    if (!user || profile?.primary_role !== "restaurant") {
       setIsLoading(false);
       return;
     }
@@ -89,13 +89,13 @@ export function WasteCollectionView() {
     }
   };
 
-  if (!profile || profile.primary_role !== "hotel_restaurant") {
+  if (!profile || profile.primary_role !== "restaurant") {
     return (
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <FolderOpen className="mx-auto h-12 w-12 text-accent mb-4" />
           <h2 className="text-2xl font-semibold text-accent">Collection Requests</h2>
-          <p className="text-slate-600 mt-2">This page is for hotels and restaurants to track waste pickup requests.</p>
+          <p className="text-slate-600 mt-2">This page is for restaurants to track waste pickup requests.</p>
         </Card>
       </Container>
     );

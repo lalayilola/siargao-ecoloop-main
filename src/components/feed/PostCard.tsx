@@ -19,12 +19,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { mediaSrc, type MediaKey } from "./Media";
+import { mediaSrc, type MediaKey } from "@/components/common/Media";
 import { roleMeta } from "@/data/mock";
 import type { Database } from "@/integrations/supabase/types";
 import { FeedComments } from "./FeedComments";
 import { FeedReactions } from "./FeedReactions";
-import { LocationView } from "./LocationView";
+import { LocationView } from "@/components/common/LocationView";
 
 type FeedPost = Database["public"]["Tables"]["feed_posts"]["Row"] & {
   profiles?: {

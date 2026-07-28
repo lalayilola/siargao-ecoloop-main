@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
 import { Container, PageHero, PremiumHero } from "@/components/layout/Section";
 
@@ -49,7 +49,7 @@ const roleColors = ["#10b981", "#f59e0b", "#3b82f6"];
 function useCounter(value: number, duration = 1000) {
   const [count, setCount] = useState(0);
   const countRef = useRef(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     countRef.current = 0;
@@ -257,7 +257,9 @@ function DashboardPage() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadMonitoringData = async () => {
+  const loadMonitoringData = useCallback(async () => {
+    if (!profile) return;
+
     try {
       const municipality = profile.municipality;
       const [profilesResult, listingsResult, purchaseResult, tradeResult, wasteReportResult] = await Promise.all([
@@ -450,7 +452,7 @@ function DashboardPage() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, [profile, timePeriod]);
 
   const refreshData = async () => {
     if (!user || !profile?.municipality) return;
@@ -487,7 +489,7 @@ function DashboardPage() {
 
     void loadMessageNotifications();
     void loadMonitoringData();
-  }, [profile?.municipality, user, timePeriod]);
+  }, [loadMonitoringData, profile?.municipality, user, timePeriod]);
 
 
 

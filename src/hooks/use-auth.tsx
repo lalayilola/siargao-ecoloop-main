@@ -2,21 +2,16 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
+import {
+  isAdministrativeRole,
+  isSuperAdminRole,
+  normalizeAppRole,
+  type AppRole,
+} from "@/lib/roles";
 
-export type AppRole = "farmer" | "restaurant" | "hotel_restaurant" | "resident" | "lgu_admin" | "super_admin";
+export type { AppRole } from "@/lib/roles";
 
 export type Municipality = "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen";
-
-const normalizeRole = (role?: string | null): AppRole | null => {
-  if (!role) return null;
-  if (role === "hotel_restaurant") return "restaurant";
-  if (role === "super_admin") return "super_admin";
-  if (role === "lgu_admin") return "lgu_admin";
-  if (role === "farmer") return "farmer";
-  if (role === "restaurant") return "restaurant";
-  if (role === "resident") return "resident";
-  return null;
-};
 
 export type Profile = {
   id: string;
@@ -39,6 +34,8 @@ type AuthCtx = {
   roles: AppRole[];
   loading: boolean;
   isLguAdmin: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
   isEmailVerified: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -65,18 +62,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", u.id),
       ]);
 
-      const metadataRole = normalizeRole((u.user_metadata?.role ?? u.app_metadata?.role) as string | undefined);
+      const metadataRole = normalizeAppRole(u.user_metadata?.role ?? u.app_metadata?.role);
       const dbRoles = ((rs as { role: string }[]) ?? [])
-        .map((r) => normalizeRole(r.role))
+        .map((r) => normalizeAppRole(r.role))
         .filter((r): r is AppRole => r !== null);
-      const derivedRoles = Array.from(new Set([...(metadataRole ? [metadataRole] : []), ...dbRoles]));
 
       const normalizedProfile = prof
         ? {
             ...(prof as Profile),
-            primary_role: normalizeRole((prof as any).primary_role) ?? (prof as Profile).primary_role,
+            primary_role: normalizeAppRole((prof as { primary_role?: unknown }).primary_role) ?? "resident",
           }
         : null;
+      const profileRole = normalizedProfile?.primary_role;
+      const derivedRoles = Array.from(
+        new Set([...(metadataRole ? [metadataRole] : []), ...dbRoles, ...(profileRole ? [profileRole] : [])]),
+      );
 
       setProfile(normalizedProfile);
       setRoles(derivedRoles);
@@ -135,6 +135,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const isSuperAdmin =
+    profile?.is_super_admin === true ||
+    isSuperAdminRole(profile?.primary_role) ||
+    roles.some(isSuperAdminRole);
+  const isAdmin =
+    isSuperAdmin ||
+    isAdministrativeRole(profile?.primary_role) ||
+    roles.some(isAdministrativeRole);
+
   return (
     <Ctx.Provider
       value={{
@@ -142,7 +151,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         roles,
         loading,
-        isLguAdmin: profile?.primary_role === "lgu_admin" || roles.includes("lgu_admin") || (profile?.primary_role as string | undefined) === "lgu_admin",
+        // Kept for existing consumers; super administrators must not be locked out
+        // of administrative UI while the capability model is adopted incrementally.
+        isLguAdmin: isAdmin,
+        isAdmin,
+        isSuperAdmin,
         isEmailVerified: !!user?.email_confirmed_at,
         refresh,
         signOut,

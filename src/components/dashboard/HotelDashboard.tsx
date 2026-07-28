@@ -74,7 +74,7 @@ export function HotelDashboard() {
       icon: Calendar,
       color: "text-blue-600",
       bgColor: "bg-blue-500/10",
-      link: "/waste-collections",
+      link: "/waste-collection",
     },
     {
       title: "Sustainability Score",

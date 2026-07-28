@@ -15,7 +15,7 @@ interface BuyRequestModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listing: Listing | null;
-  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["role"] } | null;
+  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["app_role"] } | null;
   onSuccess?: () => void;
 }
 

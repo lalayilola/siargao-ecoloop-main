@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,7 +78,27 @@ export function ChatMessenger({
     loadOtherUserProfile();
   }, [otherUserId]);
 
-  const loadMessages = async (convId: string) => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const markMessageAsRead = useCallback(async (messageId: string) => {
+    const { error } = await supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", messageId);
+
+    if (error) {
+      console.error("Error marking message as read:", error);
+    }
+  }, []);
+
+  const markMessagesAsRead = useCallback(async (items: Message[]) => {
+    const unreadMessages = items.filter((message) => message.sender_id !== user?.id && !message.read_at);
+    await Promise.all(unreadMessages.map((message) => markMessageAsRead(message.id)));
+  }, [markMessageAsRead, user?.id]);
+
+  const loadMessages = useCallback(async (convId: string) => {
     const { data, error } = await supabase
       .from("messages")
       .select("*")
@@ -92,8 +112,8 @@ export function ChatMessenger({
 
     setMessages(data ?? []);
     scrollToBottom();
-    markMessagesAsRead(data ?? []);
-  };
+    void markMessagesAsRead(data ?? []);
+  }, [markMessagesAsRead, scrollToBottom]);
 
   useEffect(() => {
     if (!open || !user) return;
@@ -142,7 +162,7 @@ export function ChatMessenger({
     };
 
     loadOrCreateConversation();
-  }, [open, conversationId, user, otherUserId, tradeRequestId, purchaseRequestId, listingId]);
+  }, [open, conversationId, user, otherUserId, tradeRequestId, purchaseRequestId, listingId, loadMessages]);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -186,28 +206,7 @@ export function ChatMessenger({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, user]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const markMessagesAsRead = async (msgs: Message[]) => {
-    const unreadMessages = msgs.filter(m => m.sender_id !== user?.id && !m.read_at);
-    for (const msg of unreadMessages) {
-      await markMessageAsRead(msg.id);
-    }
-  };
-
-  const markMessageAsRead = async (messageId: string) => {
-    const { error } = await (supabase.from("messages") as any)
-      .update({ read_at: new Date().toISOString() })
-      .eq("id", messageId);
-
-    if (error) {
-      console.error("Error marking message as read:", error);
-    }
-  };
+  }, [conversationId, loadMessages, markMessageAsRead, scrollToBottom, user]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

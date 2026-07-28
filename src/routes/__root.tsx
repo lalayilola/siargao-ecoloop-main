@@ -25,7 +25,6 @@ import { MessageNotification } from "@/components/messaging/MessageNotification"
 import { AnnouncementNotification } from "@/components/notifications/AnnouncementNotification";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "@/hooks/use-language";
-import { LoadingScreen } from "@/components/common/LoadingScreen";
 import "@/lib/i18n";
 import { registerServiceWorker } from "@/lib/register-sw";
 
@@ -81,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "EcoLoop Siargao — Food Waste Exchange & Sustainable Farming" },
+      { title: "Siargao Loops — Food Waste Exchange & Sustainable Farming" },
       { name: "description", content: "A circular economy platform connecting Siargao farmers, restaurants, residents, and LGUs to turn food waste into local harvest." },
-      { name: "author", content: "EcoLoop Siargao" },
+      { name: "author", content: "Siargao Loops" },
       { name: "theme-color", content: "#2E7D32" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "EcoLoop" },
-      { property: "og:title", content: "EcoLoop Siargao" },
+      { property: "og:title", content: "Siargao Loops" },
       { property: "og:description", content: "Turn food waste into harvest. A community platform for sustainable farming in Siargao." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -113,7 +112,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <body>
+        <a className="skip-link" href="#main-content">Skip to main content</a>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }
@@ -122,7 +125,6 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const [supabaseUnavailable, setSupabaseUnavailable] = useState(false);
-  const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
     // Register service worker for PWA
@@ -155,14 +157,8 @@ function RootComponent() {
 
     detectAuthError();
 
-    // Mark loading as complete after 2.5 seconds
-    const loadingTimer = setTimeout(() => {
-      setLoadingComplete(true);
-    }, 2500);
-
     return () => {
       subscription.unsubscribe();
-      clearTimeout(loadingTimer);
     };
   }, [router, queryClient]);
 
@@ -170,22 +166,17 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
-          <LoadingScreen />
-          {loadingComplete && (
-            <>
-              {supabaseUnavailable && (
-                <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-800">
-                  EcoLoop is temporarily unavailable. Please try again in a few moments.
-                </div>
-              )}
-              <Shell />
-              <NotificationListener />
-              <MessageNotification />
-              <AnnouncementNotification />
-              <AIChatbot />
-              <Toaster />
-            </>
+          {supabaseUnavailable && (
+            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-900" role="status">
+              Siargao Loops is temporarily unavailable. Please try again in a few moments.
+            </div>
           )}
+          <Shell />
+          <NotificationListener />
+          <MessageNotification />
+          <AnnouncementNotification />
+          <AIChatbot />
+          <Toaster />
         </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
@@ -211,7 +202,7 @@ function Shell() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1"><Outlet /></main>
+      <main id="main-content" className="flex-1"><Outlet /></main>
       <SiteFooter />
     </div>
   );
@@ -227,7 +218,7 @@ function PublicInsideAppShell() {
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
           </header>
-          <main className="flex-1 overflow-hidden"><Outlet /></main>
+          <main id="main-content" className="flex-1 overflow-hidden"><Outlet /></main>
         </SidebarInset>
       </div>
     </SidebarProvider>

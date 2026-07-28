@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Container } from "@/components/layout/Section";
 import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import hero from "@/assets/homepage.jpg";
 import heroAnimation from "@/assets/homepagevid.mp4";
 import { getListings } from "@/lib/api/marketplace.functions";
@@ -14,9 +14,9 @@ import { ListingCard } from "@/components/marketplace/ListingCard";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EcoLoop Siargao — Turn food waste into harvest" },
+      { title: "Siargao Loops — Turn food waste into harvest" },
       { name: "description", content: "Connect Siargao's farmers, restaurants, residents and LGUs in a circular economy that diverts food waste into compost, feed and fresh produce." },
-      { property: "og:title", content: "EcoLoop Siargao — Turn food waste into harvest" },
+      { property: "og:title", content: "Siargao Loops — Turn food waste into harvest" },
       { property: "og:description", content: "A community-powered food waste exchange and sustainable farming platform for Siargao Island." },
       { property: "og:image", content: hero },
       { name: "twitter:image", content: hero },
@@ -37,7 +37,7 @@ function Index() {
   const [listings, setListings] = useState<any[]>([]);
 
   // Mock marketplace listings for demo
-  const mockListings = [
+  const mockListings = useMemo(() => [
     {
       id: "mock-1",
       title: "Fresh Organic Vegetables",
@@ -142,7 +142,7 @@ function Index() {
       image: null,
       created_at: new Date().toISOString(),
     },
-  ];
+  ], []);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -191,7 +191,7 @@ function Index() {
     };
 
     void loadStats();
-  }, []);
+  }, [mockListings]);
 
   const roles = [
     { icon: Sprout, titleKey: "home.roles.farmer", bodyKey: "home.roles.farmerDesc" },

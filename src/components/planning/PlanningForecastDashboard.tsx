@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
@@ -150,28 +150,10 @@ export function PlanningForecastDashboard() {
   ];
 
   useEffect(() => {
-    if (authLoading) return;
-
-    if (!profile) {
-      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
-      setLoading(false);
-      return;
-    }
-
-    if (profile.primary_role === "restaurant") {
-      setActiveTab("waste");
-    } else {
-      setActiveTab("lgu-harvests");
-    }
-
-    loadData();
-  }, [authLoading, profile]);
-
-  useEffect(() => {
     setCurrentImageIndex(0);
   }, [selectedHarvest, selectedDistribution, selectedWaste]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!profile) {
       setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
       setLoading(false);
@@ -243,7 +225,20 @@ export function PlanningForecastDashboard() {
       window.clearTimeout(timeoutId);
       setLoading(false);
     }
-  };
+  }, [profile, user]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!profile) {
+      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
+      setLoading(false);
+      return;
+    }
+
+    setActiveTab(profile.primary_role === "restaurant" ? "waste" : "lgu-harvests");
+    void loadData();
+  }, [authLoading, loadData, profile]);
 
   const handleCreateHarvestForecast = async () => {
     if (!user || !profile) return;
@@ -743,6 +738,7 @@ export function PlanningForecastDashboard() {
 
   const uploadImages = async (files: File[]): Promise<string[]> => {
     if (files.length === 0) return [];
+    if (!user) throw new Error("You must be signed in to upload forecast images.");
 
     setUploading(true);
     try {

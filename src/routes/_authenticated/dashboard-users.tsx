@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { Container, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -100,12 +100,7 @@ function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
-  useEffect(() => {
-    if (!isLguAdmin || !profile?.municipality) return;
-    void loadUsers();
-  }, [isLguAdmin, profile?.municipality]);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     if (!profile?.municipality) return;
     setLoading(true);
     try {
@@ -122,7 +117,12 @@ function UserManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile?.municipality]);
+
+  useEffect(() => {
+    if (!isLguAdmin || !profile?.municipality) return;
+    void loadUsers();
+  }, [isLguAdmin, loadUsers, profile?.municipality]);
 
   const farmers = users.filter((user) => user.primary_role === "farmer").length;
   const restaurants = users.filter((user) => user.primary_role === "restaurant").length;
@@ -505,7 +505,7 @@ function UserManagement() {
                                 src={selectedUser.government_id_url} 
                                 alt="Government ID" 
                                 className="w-full h-auto max-h-64 object-contain cursor-pointer" 
-                                onClick={() => window.open(selectedUser.government_id_url, '_blank')}
+                                onClick={() => window.open(selectedUser.government_id_url ?? undefined, '_blank')}
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200" />
                             </div>
@@ -514,7 +514,7 @@ function UserManagement() {
                                 size="sm" 
                                 variant="outline" 
                                 className="flex-1 h-9 rounded-lg border-slate-200 hover:bg-slate-50"
-                                onClick={() => window.open(selectedUser.government_id_url, '_blank')}
+                                onClick={() => window.open(selectedUser.government_id_url ?? undefined, '_blank')}
                               >
                                 <ExternalLink className="h-4 w-4 mr-2" />
                                 Open in New Tab
@@ -525,7 +525,7 @@ function UserManagement() {
                                 className="h-9 rounded-lg border-slate-200 hover:bg-slate-50"
                                 onClick={() => {
                                   const link = document.createElement('a');
-                                  link.href = selectedUser.government_id_url;
+                                  link.href = selectedUser.government_id_url ?? "";
                                   link.download = `government-id-${selectedUser.full_name}.jpg`;
                                   link.click();
                                 }}

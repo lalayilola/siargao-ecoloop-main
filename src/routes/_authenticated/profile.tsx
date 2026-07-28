@@ -761,7 +761,7 @@ function ProfilePage() {
                   item={{
                     ...listing,
                     seller: displayProfile?.full_name || "Unknown",
-                    role: (displayProfile?.primary_role === "hotel_restaurant" ? "restaurant" : displayProfile?.primary_role) || "resident",
+                    role: displayProfile?.primary_role || "resident",
                   }}
                   onViewDetails={() => {}}
                   onMessage={() => {

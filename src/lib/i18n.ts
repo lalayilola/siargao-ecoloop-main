@@ -12,7 +12,7 @@ const resources = {
         features: "Features",
         about: "About",
         signIn: "Sign in",
-        joinEcoLoop: "Join EcoLoop",
+        joinEcoLoop: "Join Siargao Loops",
         myProfile: "My profile",
         openApp: "Open app",
         myRequests: "Transactions",
@@ -22,7 +22,7 @@ const resources = {
       // Profile
       profile: {
         myAccount: "My account",
-        yourProfile: "Your EcoLoop profile",
+        yourProfile: "Your Siargao Loops profile",
         userProfile: "User profile",
         backToMyProfile: "Back to my profile",
         fullName: "Full name",
@@ -62,7 +62,7 @@ const resources = {
         hero: {
           badge: "A circular food system in Siargao",
           title: "Turn food waste into island harvest.",
-          subtitle: "EcoLoop Siargao connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the island green and the loop closed.",
+          subtitle: "Siargao Loops Siargao connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the island green and the loop closed.",
           joinLoop: "Join the loop",
           seeHowItWorks: "See how it works",
           wasteCollected: "Waste collected",
@@ -72,7 +72,7 @@ const resources = {
         problem: {
           label: "The problem",
           title: "Siargao's food waste belongs in the soil — not the landfill.",
-          description: "Tons of edible scraps and organic matter leave restaurants, resorts and homes every week. Meanwhile, local farmers spend on inputs they could grow themselves through composting. EcoLoop bridges the two ends — and rewards everyone in between.",
+          description: "Tons of edible scraps and organic matter leave restaurants, resorts and homes every week. Meanwhile, local farmers spend on inputs they could grow themselves through composting. Siargao Loops bridges the two ends — and rewards everyone in between.",
           point1: "Reduce environmental pollution and methane from landfills",
           point2: "Support local food production with low-cost compost",
           point3: "Strengthen barangay-level cooperation and barter culture",
@@ -92,7 +92,7 @@ const resources = {
         },
         features: {
           title: "Everything the loop needs",
-          subtitle: "From posting scraps to tracking island-wide impact, EcoLoop bundles every tool the community needs in one place.",
+          subtitle: "From posting scraps to tracking island-wide impact, Siargao Loops bundles every tool the community needs in one place.",
           allFeatures: "All features",
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "A social feed of available crops, waste and trades from your barangay.",
@@ -121,11 +121,11 @@ const resources = {
         hero: {
           eyebrow: "About",
           title: "A circular economy, designed for Siargao.",
-          subtitle: "EcoLoop Siargao is a community platform that links the people who produce food waste with the people who can turn it into something useful — closing the loop on island sustainability."
+          subtitle: "Siargao Loops Siargao is a community platform that links the people who produce food waste with the people who can turn it into something useful — closing the loop on island sustainability."
         },
         mission: {
           title: "Our mission",
-          description: "Siargao's beauty depends on what happens behind the scenes — how households manage scraps, how restaurants handle trimmings, how farmers fertilize their fields, and how LGUs steward collective resources. EcoLoop makes each of those decisions easier and more rewarding by connecting them in a single circular system."
+          description: "Siargao's beauty depends on what happens behind the scenes — how households manage scraps, how restaurants handle trimmings, how farmers fertilize their fields, and how LGUs steward collective resources. Siargao Loops makes each of those decisions easier and more rewarding by connecting them in a single circular system."
         },
         whyItMatters: {
           title: "Why it matters",
@@ -154,7 +154,7 @@ const resources = {
         hero: {
           eyebrow: "Features",
           title: "Nine tools that close the loop.",
-          subtitle: "EcoLoop bundles a social feed, two marketplaces, a trade engine and an LGU monitoring layer — all designed for Siargao life."
+          subtitle: "Siargao Loops bundles a social feed, two marketplaces, a trade engine and an LGU monitoring layer — all designed for Siargao life."
         },
         ecoFeed: "EcoFeed",
         ecoFeedDesc: "A community dashboard of crops, scraps and promotions from farmers, residents and restaurants — with photos, weight, price, location and dates.",
@@ -180,7 +180,7 @@ const resources = {
       // Auth Page
       auth: {
         hero: {
-          eyebrow: "EcoLoop Account",
+          eyebrow: "Siargao Loops Account",
           title: "Sign in or join the loop.",
           subtitle: "A circular economy platform connecting Siargao's farmers, restaurants, residents, and LGUs to turn waste into harvest."
         },
@@ -204,7 +204,7 @@ const resources = {
         creatingAccount: "Creating account…",
         welcomeBack: "Welcome back!",
         accountCreated: "Account created! You're signed in.",
-        lguAccountCreated: "LGU account created. An EcoLoop admin will review and approve access.",
+        lguAccountCreated: "LGU account created. An Siargao Loops admin will review and approve access.",
         googleSignInFailed: "Google sign-in failed",
         invalidInput: "Invalid input",
         unableToConfirmEmail: "Unable to auto-confirm email"
@@ -280,7 +280,7 @@ const resources = {
         hero: {
           eyebrow: "How it works",
           title: "A four-step loop the whole island can use.",
-          subtitle: "EcoLoop is designed to feel as natural as a barangay tiangge — easy to join, quick to use, fair for everyone."
+          subtitle: "Siargao Loops is designed to feel as natural as a barangay tiangge — easy to join, quick to use, fair for everyone."
         },
         steps: {
           post: "01 · Post",
@@ -314,7 +314,7 @@ const resources = {
         features: "Mga Tampok",
         about: "Tungkol sa",
         signIn: "Mag-sign in",
-        joinEcoLoop: "Sumali sa EcoLoop",
+        joinEcoLoop: "Sumali sa Siargao Loops",
         myProfile: "Ang aking profile",
         openApp: "Buksan ang app",
         myRequests: "Mga Transaksyon",
@@ -324,7 +324,7 @@ const resources = {
       // Profile
       profile: {
         myAccount: "Ang aking account",
-        yourProfile: "Ang iyong EcoLoop profile",
+        yourProfile: "Ang iyong Siargao Loops profile",
         userProfile: "Profile ng user",
         backToMyProfile: "Bumalik sa aking profile",
         fullName: "Buong pangalan",
@@ -364,7 +364,7 @@ const resources = {
         hero: {
           badge: "Isang circular food system para sa Siargao",
           title: "Ibalik ang pagkain sa ani ng isla.",
-          subtitle: "Ang EcoLoop Siargao ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang isla na berde at ang loop na sarado.",
+          subtitle: "Ang Siargao Loops Siargao ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang isla na berde at ang loop na sarado.",
           joinLoop: "Sumali sa loop",
           seeHowItWorks: "Tingnan kung paano ito gumagana",
           wasteCollected: "Nakolektang basura",
@@ -374,7 +374,7 @@ const resources = {
         problem: {
           label: "Ang problema",
           title: "Ang pagkain sa Siargao ay dapat sa lupa — hindi sa landfill.",
-          description: "Tonelada ng nakakain na scraps at organic matter ang umaalis sa mga restawran, resort at bahay tuwing linggo. Samantala, ang mga lokal na magsasaka ay gumagastos sa mga input na maaari nilang magtalo mismo sa pamamagitan ng composting. Ang EcoLoop ay nagtulay sa dalawang dulo — at nagpapala sa lahat sa gitna.",
+          description: "Tonelada ng nakakain na scraps at organic matter ang umaalis sa mga restawran, resort at bahay tuwing linggo. Samantala, ang mga lokal na magsasaka ay gumagastos sa mga input na maaari nilang magtalo mismo sa pamamagitan ng composting. Ang Siargao Loops ay nagtulay sa dalawang dulo — at nagpapala sa lahat sa gitna.",
           point1: "Bawasan ang polusyon sa kapaligiran at methane mula sa mga landfill",
           point2: "Suportahan ang lokal na produksyon ng pagkain mula sa mababang compost",
           point3: "Palakasin ang kooperasyon sa barangay at kultura ng barter",
@@ -394,7 +394,7 @@ const resources = {
         },
         features: {
           title: "Ang lahat ng kailangan ng loop",
-          subtitle: "Mula sa pag-post ng scraps hanggang sa pag-track ng island-wide impact, ang EcoLoop ay nagbibigay ng bawat tool na kailangan ng komunidad sa isang lugar.",
+          subtitle: "Mula sa pag-post ng scraps hanggang sa pag-track ng island-wide impact, ang Siargao Loops ay nagbibigay ng bawat tool na kailangan ng komunidad sa isang lugar.",
           allFeatures: "Lahat ng tampok",
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "Isang social feed ng available na crops, waste at trades mula sa iyong barangay.",
@@ -423,11 +423,11 @@ const resources = {
         hero: {
           eyebrow: "Tungkol sa",
           title: "Isang circular economy, dinisenyo para sa Siargao.",
-          subtitle: "Ang EcoLoop Siargao ay isang platform ng komunidad na nagkokonekta sa mga taong gumagawa ng pagkain sa mga taong maaaring gawin itong kapaki-pakinabang — pagsasara ng loop sa sustainability ng isla."
+          subtitle: "Ang Siargao Loops Siargao ay isang platform ng komunidad na nagkokonekta sa mga taong gumagawa ng pagkain sa mga taong maaaring gawin itong kapaki-pakinabang — pagsasara ng loop sa sustainability ng isla."
         },
         mission: {
           title: "Ang aming misyon",
-          description: "Ang ganda ng Siargao ay nakadepende sa nangyayari sa likod ng eksena — kung paano namamahala ang mga household ng scraps, kung paano hinahandle ng mga restawran ang trimmings, kung paano binubuhay ng mga magsasaka ang kanilang mga field, at kung paano nagpapangalaga ang mga LGU ng kolektibong resources. Ang EcoLoop ay nagpapadali at nagpapaganda ng bawat desisyon sa pamamagitan ng pagkokonekta sa isang circular system."
+          description: "Ang ganda ng Siargao ay nakadepende sa nangyayari sa likod ng eksena — kung paano namamahala ang mga household ng scraps, kung paano hinahandle ng mga restawran ang trimmings, kung paano binubuhay ng mga magsasaka ang kanilang mga field, at kung paano nagpapangalaga ang mga LGU ng kolektibong resources. Ang Siargao Loops ay nagpapadali at nagpapaganda ng bawat desisyon sa pamamagitan ng pagkokonekta sa isang circular system."
         },
         whyItMatters: {
           title: "Bakit ito mahalaga",
@@ -456,7 +456,7 @@ const resources = {
         hero: {
           eyebrow: "Mga Tampok",
           title: "Siyam na tool na pagsasara ng loop.",
-          subtitle: "Ang EcoLoop ay nagbibigay ng social feed, dalawang marketplace, trade engine at LGU monitoring layer — lahat dinisenyo para sa buhay sa Siargao."
+          subtitle: "Ang Siargao Loops ay nagbibigay ng social feed, dalawang marketplace, trade engine at LGU monitoring layer — lahat dinisenyo para sa buhay sa Siargao."
         },
         ecoFeed: "EcoFeed",
         ecoFeedDesc: "Isang dashboard ng komunidad ng crops, scraps at promotions mula sa mga magsasaka, residente at restawran — na may mga litrato, timbang, presyo, lokasyon at mga petsa.",
@@ -484,7 +484,7 @@ const resources = {
         hero: {
           eyebrow: "Paano ito gumagana",
           title: "Isang apat na hakbang na loop na pwedeng gamitin ng buong isla.",
-          subtitle: "Ang EcoLoop ay dinisenyo para maging natural tulad ng barangay tiangge — madaling sumali, mabilis gamitin, pantay para sa lahat."
+          subtitle: "Ang Siargao Loops ay dinisenyo para maging natural tulad ng barangay tiangge — madaling sumali, mabilis gamitin, pantay para sa lahat."
         },
         steps: {
           post: "01 · I-post",
@@ -510,7 +510,7 @@ const resources = {
       // Auth Page
       auth: {
         hero: {
-          eyebrow: "EcoLoop Account",
+          eyebrow: "Siargao Loops Account",
           title: "Mag-sign in o sumali sa loop.",
           subtitle: "Ang mga miyembro ay makapag-post sa EcoFeed, ilista ang waste at produce, humiling ng trades, at i-track ang community impact."
         },
@@ -534,7 +534,7 @@ const resources = {
         creatingAccount: "Gumagawa ng account…",
         welcomeBack: "Welcome back!",
         accountCreated: "Nagawa ang account! Naka-sign in ka na.",
-        lguAccountCreated: "Nagawa ang LGU account. Ang isang EcoLoop admin ay magsusuri at aprubahan ang access.",
+        lguAccountCreated: "Nagawa ang LGU account. Ang isang Siargao Loops admin ay magsusuri at aprubahan ang access.",
         googleSignInFailed: "Nabigo ang Google sign-in",
         invalidInput: "Invalid input",
         unableToConfirmEmail: "Hindi ma-auto-confirm ang email"
@@ -616,7 +616,7 @@ const resources = {
         features: "Mga Feature",
         about: "Mahitungod sa",
         signIn: "Mag-sign in",
-        joinEcoLoop: "Sali sa EcoLoop",
+        joinEcoLoop: "Sali sa Siargao Loops",
         myProfile: "Akong profile",
         openApp: "Ablii ang app",
         myRequests: "Mga Transaksyon",
@@ -626,7 +626,7 @@ const resources = {
       // Profile
       profile: {
         myAccount: "Akong account",
-        yourProfile: "Imong EcoLoop profile",
+        yourProfile: "Imong Siargao Loops profile",
         userProfile: "Profile sa user",
         backToMyProfile: "Balik sa akong profile",
         fullName: "Bug-os nga ngalan",
@@ -666,7 +666,7 @@ const resources = {
         hero: {
           badge: "Usa ka circular food system alang sa Siargao",
           title: "Ibalik ang pagkaon sa ani sa isla.",
-          subtitle: "Ang EcoLoop Siargao nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa isla nga berde ug ang loop nga sarado.",
+          subtitle: "Ang Siargao Loops Siargao nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa isla nga berde ug ang loop nga sarado.",
           joinLoop: "Sali sa loop",
           seeHowItWorks: "Tan-awa kung unsa managsa kini",
           wasteCollected: "Nakolekta nga basura",
@@ -676,7 +676,7 @@ const resources = {
         problem: {
           label: "Ang problema",
           title: "Ang pagkaon sa Siargao kinahanglan sa yuta — dili sa landfill.",
-          description: "Tonelada sa makakaon nga scraps ug organic matter ang mobalik sa mga restawran, resort ug balay matag semana. Samtanan, ang mga lokal nga mag-uuma naggastos sa mga input nga mahimo nilang magtalo mismo pinaagi sa composting. Ang EcoLoop nagtulay sa duha nga tumoy — ug nagpahalag sa tanan sa tunga-tunga.",
+          description: "Tonelada sa makakaon nga scraps ug organic matter ang mobalik sa mga restawran, resort ug balay matag semana. Samtanan, ang mga lokal nga mag-uuma naggastos sa mga input nga mahimo nilang magtalo mismo pinaagi sa composting. Ang Siargao Loops nagtulay sa duha nga tumoy — ug nagpahalag sa tanan sa tunga-tunga.",
           point1: "Bawasan ang polusyon sa kapalibutan ug methane gikan sa mga landfill",
           point2: "Suportahan ang lokal nga produksyon sa pagkaon gikan sa mubong compost",
           point3: "Palig-on ang kooperasyon sa barangay ug kultura sa barter",
@@ -696,7 +696,7 @@ const resources = {
         },
         features: {
           title: "Ang tanan nga gikinahanglan sa loop",
-          subtitle: "Gikan sa pag-post sa scraps hangtod sa pag-track sa island-wide impact, ang EcoLoop naghatag sa matag tool nga gikinahanglan sa komunidad sa usa ka lugar.",
+          subtitle: "Gikan sa pag-post sa scraps hangtod sa pag-track sa island-wide impact, ang Siargao Loops naghatag sa matag tool nga gikinahanglan sa komunidad sa usa ka lugar.",
           allFeatures: "Tanang feature",
           ecoFeed: "EcoFeed",
           ecoFeedDesc: "Usa ka social feed sa available nga crops, waste ug trades gikan sa imong barangay.",
@@ -725,11 +725,11 @@ const resources = {
         hero: {
           eyebrow: "Mahitungod sa",
           title: "Usa ka circular economy, gidesinyo alang sa Siargao.",
-          subtitle: "Ang EcoLoop Siargao usa ka platform sa komunidad nga nagkonekta sa mga tawo nga nagbuhat sa pagkaon sa mga tawo nga mahimo kini nga kapinabahan — pagsarado sa loop sa sustainability sa isla."
+          subtitle: "Ang Siargao Loops Siargao usa ka platform sa komunidad nga nagkonekta sa mga tawo nga nagbuhat sa pagkaon sa mga tawo nga mahimo kini nga kapinabahan — pagsarado sa loop sa sustainability sa isla."
         },
         mission: {
           title: "Ang among misyon",
-          description: "Ang ganda sa Siargao nagdepende sa nangyari sa likod sa eksena — kung unsa managemaher ang mga household sa scraps, kung unsa manehandle ang mga restawran ang trimmings, kung unsa binuhay ang mga mag-uuma ang ilang mga field, ug kung unsa nagpangalaga ang mga LGU sa kolektibong resources. Ang EcoLoop nagpadali ug nagpahimutang sa matag desisyon pinaagi sa pagkonekta sa usa ka circular system."
+          description: "Ang ganda sa Siargao nagdepende sa nangyari sa likod sa eksena — kung unsa managemaher ang mga household sa scraps, kung unsa manehandle ang mga restawran ang trimmings, kung unsa binuhay ang mga mag-uuma ang ilang mga field, ug kung unsa nagpangalaga ang mga LGU sa kolektibong resources. Ang Siargao Loops nagpadali ug nagpahimutang sa matag desisyon pinaagi sa pagkonekta sa usa ka circular system."
         },
         whyItMatters: {
           title: "Ngano kini importante",
@@ -758,7 +758,7 @@ const resources = {
         hero: {
           eyebrow: "Mga Feature",
           title: "Siyam nga tool nga pagsarado sa loop.",
-          subtitle: "Ang EcoLoop naghatag og social feed, duha ka marketplace, trade engine ug LGU monitoring layer — tanang gidesinyo alang sa kinabuhi sa Siargao."
+          subtitle: "Ang Siargao Loops naghatag og social feed, duha ka marketplace, trade engine ug LGU monitoring layer — tanang gidesinyo alang sa kinabuhi sa Siargao."
         },
         ecoFeed: "EcoFeed",
         ecoFeedDesc: "Usa ka dashboard sa komunidad sa crops, scraps ug promotions gikan sa mga mag-uuma, residente ug restawran — nga may mga litrato, timbang, presyo, lokasyon ug mga petsa.",
@@ -786,7 +786,7 @@ const resources = {
         hero: {
           eyebrow: "Unsa managsa kini",
           title: "Upat nga lakang nga loop nga mahimong gamiton sa tibuok isla.",
-          subtitle: "Ang EcoLoop gidesinyo aron natural nga ingon sa barangay tiangge — sayon nga moapil, dali gamiton, patay sa tanan."
+          subtitle: "Ang Siargao Loops gidesinyo aron natural nga ingon sa barangay tiangge — sayon nga moapil, dali gamiton, patay sa tanan."
         },
         steps: {
           post: "01 · I-post",
@@ -812,7 +812,7 @@ const resources = {
       // Auth Page
       auth: {
         hero: {
-          eyebrow: "EcoLoop Account",
+          eyebrow: "Siargao Loops Account",
           title: "Mag-sign in o sali sa loop.",
           subtitle: "Ang mga miyembro makapag-post sa EcoFeed, ilista ang waste ug produce, mangayo og trades, ug i-track ang community impact."
         },
@@ -836,7 +836,7 @@ const resources = {
         creatingAccount: "Naghimo og account…",
         welcomeBack: "Welcome back!",
         accountCreated: "Nahimo ang account! Naka-sign in ka na.",
-        lguAccountCreated: "Nahimo ang LGU account. Ang usa ka EcoLoop admin mosuri ug aprubahan ang access.",
+        lguAccountCreated: "Nahimo ang LGU account. Ang usa ka Siargao Loops admin mosuri ug aprubahan ang access.",
         googleSignInFailed: "Nabigo ang Google sign-in",
         invalidInput: "Invalid input",
         unableToConfirmEmail: "Dili ma-auto-confirm ang email"

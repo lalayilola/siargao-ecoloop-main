@@ -254,7 +254,7 @@ export function MessagesView() {
 
     };
 
-  }, [user]);
+  }, [loadConversations, user]);
 
 
 
@@ -304,7 +304,6 @@ export function MessagesView() {
 
           unreadMessages.map(msg =>
 
-            // @ts-ignore - Supabase TypeScript strictness issue
 
             supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", msg.id)
 
@@ -426,7 +425,6 @@ export function MessagesView() {
 
           if (newMsg.sender_id !== user?.id) {
 
-            // @ts-ignore - Supabase TypeScript strictness issue
 
             supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", newMsg.id);
 

@@ -73,9 +73,9 @@ export function EcoPointsView() {
 
         // Get waste reports
         const { data: wasteReports } = await supabase
-          .from("waste_reports")
+          .from("food_waste_reports")
           .select("*")
-          .eq("user_id", user.id);
+          .eq("restaurant_id", user.id);
 
         points += (wasteReports?.length || 0) * POINT_SYSTEM.waste_report_submitted;
 
@@ -91,7 +91,7 @@ export function EcoPointsView() {
 
         // Get posts
         const { data: posts } = await supabase
-          .from("posts")
+          .from("feed_posts")
           .select("*")
           .eq("user_id", user.id);
 

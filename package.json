@@ -9,6 +9,8 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "lint:behavior": "eslint src --rule \"prettier/prettier: off\" --rule \"@typescript-eslint/no-explicit-any: off\" --rule \"react-refresh/only-export-components: off\" --max-warnings 0",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {

@@ -34,7 +34,7 @@ function AuthenticatedLayout() {
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
           </header>
-          <main className="flex-1 overflow-hidden">
+          <main id="main-content" className="flex-1 overflow-hidden">
             <Outlet />
           </main>
         </SidebarInset>

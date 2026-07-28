@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -30,31 +30,31 @@ export function FeedReactions({ postId }: FeedReactionsProps) {
   const [userReaction, setUserReaction] = useState<Reaction | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadReactions();
-  }, [postId]);
-
-  const loadReactions = async () => {
+  const loadReactions = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from("feed_reactions" as any)
+        .from("feed_reactions")
         .select("*")
         .eq("post_id", postId);
 
       if (error) throw error;
-      setReactions((data || []) as Reaction[]);
+      setReactions(data || []);
 
       // Find current user's reaction
       if (user) {
-        const myReaction = data?.find((r: any) => r.user_id === user.id);
-        setUserReaction((myReaction || null) as Reaction | null);
+        const myReaction = data?.find((reaction) => reaction.user_id === user.id);
+        setUserReaction(myReaction || null);
       }
     } catch (error: any) {
       console.error("Error loading reactions:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId, user]);
+
+  useEffect(() => {
+    void loadReactions();
+  }, [loadReactions]);
 
   const handleReaction = async (reactionType: "like" | "love" | "helpful" | "support") => {
     if (!user) {
