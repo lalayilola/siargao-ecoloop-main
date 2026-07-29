@@ -14,9 +14,9 @@ import { ListingCard } from "@/components/marketplace/ListingCard";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Siargao Loops — Turn food waste into harvest" },
+      { title: "Siargao LOOPS — Turn food waste into harvest" },
       { name: "description", content: "Connect Siargao's farmers, restaurants, residents and LGUs in a circular economy that diverts food waste into compost, feed and fresh produce." },
-      { property: "og:title", content: "Siargao Loops — Turn food waste into harvest" },
+      { property: "og:title", content: "Siargao LOOPS — Turn food waste into harvest" },
       { property: "og:description", content: "A community-powered food waste exchange and sustainable farming platform for Siargao Island." },
       { property: "og:image", content: hero },
       { name: "twitter:image", content: hero },
