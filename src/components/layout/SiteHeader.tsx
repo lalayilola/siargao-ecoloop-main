@@ -35,7 +35,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-3 rounded-full border border-primary/10 bg-white/80 px-3 py-2 shadow-sm shadow-primary/5 transition hover:bg-white">
           <img src={logo} alt="Siargao Loops" className="h-10 w-10 object-contain" />
           <span className="font-display text-base font-semibold tracking-tight text-slate-900">
-            Siargao <span className="text-primary">Loops</span>
+            Siargao <span className="text-primary">LOOPS</span>
           </span>
         </Link>
         {user && municipalityLabel && (

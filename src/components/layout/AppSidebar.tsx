@@ -191,7 +191,7 @@ export function AppSidebar() {
               className="h-16 w-16 shrink-0 object-contain transition-[width,height] duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
             />
             <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
-              Siargao <span className="text-primary">Loops</span>
+              Siargao <span className="text-primary">LOOPS</span>
             </span>
           </Link>
           <div className="relative z-10 shrink-0 group-data-[collapsible=icon]:[&_button]:h-8 group-data-[collapsible=icon]:[&_button]:w-8 group-data-[collapsible=icon]:[&_button]:p-0">
