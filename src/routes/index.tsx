@@ -234,10 +234,10 @@ function Index() {
             </span>
             <h1 className="mt-8 font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight uppercase text-white drop-shadow-2xl">
               <div className="bg-gradient-to-r from-emerald-600 via-white to-emerald-600 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]">
-                Turn food waste into,
+                Turn food waste into
               </div>
               <div className="bg-gradient-to-r from-emerald-700 via-white to-emerald-700 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]" style={{ animationDelay: '0.5s' }}>
-                Island harvest.
+                Island harvest
               </div>
             </h1>
             <p className="mt-6 max-w-2xl text-lg sm:text-xl text-white/90 font-light leading-relaxed mx-auto text-center">
