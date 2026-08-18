@@ -12,8 +12,10 @@
 
 ### Three Complete Portal Systems
 
-#### 1️⃣ **Farmer Portal** 
+#### 1️⃣ **Farmer Portal**
+
 Route: `/dashboard/farmer`
+
 - Dashboard with real-time statistics
 - Produce inventory management
 - Order fulfillment workflow
@@ -21,7 +23,9 @@ Route: `/dashboard/farmer`
 - Community engagement
 
 #### 2️⃣ **Restaurant Portal**
+
 Route: `/dashboard/restaurant`
+
 - Dashboard with key metrics
 - Browse and purchase produce
 - Order tracking
@@ -29,7 +33,9 @@ Route: `/dashboard/restaurant`
 - Waste collection scheduling
 
 #### 3️⃣ **LGU Admin Portal**
+
 Route: `/dashboard`
+
 - Comprehensive analytics dashboard
 - User management and approvals
 - Waste monitoring and tracking
@@ -40,12 +46,14 @@ Route: `/dashboard`
 ### Community Features (All Users)
 
 ✅ **EcoFeed** (`/feed`)
+
 - Facebook-style community posts
 - Image uploads
 - Comments and reactions
 - Real-time updates
 
 ✅ **Marketplace** (`/marketplace`)
+
 - Browse produce listings
 - Multiple transaction types
 - Search and filtering
@@ -53,17 +61,20 @@ Route: `/dashboard`
 - Messaging with sellers
 
 ✅ **Real-Time Messaging** (`/messages`)
+
 - In-app chat system
 - Image sharing
 - Read status tracking
 - Automatic conversation creation
 
 ✅ **Notifications** (`/notifications`)
+
 - Real-time notification bell
 - Unread count tracking
 - Auto-generated notifications for all actions
 
 ✅ **Eco Points & Badges** (`/eco-points`)
+
 - Automatic point tracking
 - 4 achievement badges
 - Point breakdown by category
@@ -74,6 +85,7 @@ Route: `/dashboard`
 ## 📦 Technical Implementation
 
 ### Frontend Stack
+
 ```
 ✅ React 18+ with TypeScript
 ✅ TanStack Router (routing)
@@ -85,6 +97,7 @@ Route: `/dashboard`
 ```
 
 ### Backend Stack
+
 ```
 ✅ Supabase PostgreSQL Database
 ✅ Supabase Authentication
@@ -94,6 +107,7 @@ Route: `/dashboard`
 ```
 
 ### Infrastructure
+
 ```
 ✅ Vite (build tool)
 ✅ TypeScript (type safety)
@@ -106,6 +120,7 @@ Route: `/dashboard`
 ## 🗺️ Complete Feature Map
 
 ### Database Layer
+
 ```
 ✅ 14+ Database Tables
 ✅ User Profiles & Roles
@@ -120,6 +135,7 @@ Route: `/dashboard`
 ```
 
 ### Authentication & Authorization
+
 ```
 ✅ Email/Password Authentication
 ✅ 4 User Roles (Farmer, Restaurant, Resident, LGU Admin)
@@ -130,6 +146,7 @@ Route: `/dashboard`
 ```
 
 ### Marketplace Features
+
 ```
 ✅ Create/Edit/Delete Listings
 ✅ Transaction Types (Sell, Barter, Sell&Barter)
@@ -142,6 +159,7 @@ Route: `/dashboard`
 ```
 
 ### Communication System
+
 ```
 ✅ Real-Time Messaging
 ✅ Conversation Management
@@ -153,6 +171,7 @@ Route: `/dashboard`
 ```
 
 ### Waste Management
+
 ```
 ✅ Waste Report Submission
 ✅ Collection Scheduling
@@ -163,6 +182,7 @@ Route: `/dashboard`
 ```
 
 ### Gamification
+
 ```
 ✅ Eco Points System
   - Waste reports: +25 pts
@@ -183,6 +203,7 @@ Route: `/dashboard`
 ```
 
 ### Analytics & Reporting
+
 ```
 ✅ LGU Dashboard Analytics
   - Total waste collected
@@ -201,18 +222,18 @@ Route: `/dashboard`
 
 ## 📊 By The Numbers
 
-| Metric | Count |
-|--------|-------|
-| User Roles | 4 |
-| Main Portals | 3 |
-| Authenticated Routes | 34 |
-| React Components | 38 |
-| Database Tables | 14+ |
-| Features Implemented | 50+ |
-| Real-Time Features | 3 |
-| Achievement Badges | 4 |
-| Point Categories | 9 |
-| Documentation Pages | 6 |
+| Metric               | Count |
+| -------------------- | ----- |
+| User Roles           | 4     |
+| Main Portals         | 3     |
+| Authenticated Routes | 34    |
+| React Components     | 38    |
+| Database Tables      | 14+   |
+| Features Implemented | 50+   |
+| Real-Time Features   | 3     |
+| Achievement Badges   | 4     |
+| Point Categories     | 9     |
+| Documentation Pages  | 6     |
 
 ---
 
@@ -275,6 +296,7 @@ Route: `/dashboard`
 ```
 
 ### No Additional Development Needed
+
 - ✅ All core features complete
 - ✅ All user portals functional
 - ✅ Real-time systems working
@@ -288,6 +310,7 @@ Route: `/dashboard`
 ## 💻 User Experience
 
 ### Farmer Journey
+
 1. Login → Farmer Portal Dashboard
 2. View produce inventory
 3. Create listings → Upload images
@@ -298,6 +321,7 @@ Route: `/dashboard`
 8. Earn eco points
 
 ### Restaurant Journey
+
 1. Login → Restaurant Portal Dashboard
 2. Browse produce marketplace
 3. Place purchase requests
@@ -308,6 +332,7 @@ Route: `/dashboard`
 8. Earn eco points
 
 ### LGU Admin Journey
+
 1. Login → LGU Dashboard
 2. View real-time analytics
 3. Monitor waste submissions
@@ -318,6 +343,7 @@ Route: `/dashboard`
 8. Generate reports
 
 ### Resident Journey
+
 1. Login → Community section
 2. Browse marketplace
 3. Engage in EcoFeed
@@ -377,6 +403,7 @@ Route: `/dashboard`
 ## 🔄 Complete Waste Cycle
 
 ### From Start to Finish
+
 ```
 Farmer Creates Listing
     ↓
@@ -425,6 +452,7 @@ Cycle Continues
 ## 📈 Impact Potential
 
 This application enables:
+
 - ✅ Food waste reduction
 - ✅ Compost production
 - ✅ Farmer empowerment
@@ -439,6 +467,7 @@ This application enables:
 ## 🎓 Learning Value
 
 The codebase demonstrates:
+
 - React best practices
 - TypeScript patterns
 - TanStack ecosystem
@@ -455,6 +484,7 @@ The codebase demonstrates:
 ## ✨ What's Next?
 
 ### Immediate (Ready Now)
+
 1. Deploy to production
 2. Create admin account
 3. Invite farmers to platform
@@ -462,6 +492,7 @@ The codebase demonstrates:
 5. Start promoting
 
 ### Short-term (Optional)
+
 1. GIS Map integration
 2. Mobile app
 3. Advanced analytics
@@ -469,6 +500,7 @@ The codebase demonstrates:
 5. API for third parties
 
 ### Long-term (Optional)
+
 1. Blockchain verification
 2. AI-powered matching
 3. International expansion
@@ -479,18 +511,18 @@ The codebase demonstrates:
 
 ## 🏆 Project Status
 
-| Category | Status | Details |
-|----------|--------|---------|
-| Code | ✅ Complete | All features implemented |
-| Database | ✅ Complete | Schema ready, migrations included |
-| Frontend | ✅ Complete | All pages and components built |
-| Backend | ✅ Complete | Supabase configured |
-| Real-Time | ✅ Complete | Subscriptions working |
-| Documentation | ✅ Complete | 6 comprehensive guides |
-| Testing | ✅ Ready | Verification checklist provided |
-| Deployment | ✅ Ready | Ready for production |
-| Security | ✅ Complete | Best practices implemented |
-| UI/UX | ✅ Complete | Responsive, modern design |
+| Category      | Status      | Details                           |
+| ------------- | ----------- | --------------------------------- |
+| Code          | ✅ Complete | All features implemented          |
+| Database      | ✅ Complete | Schema ready, migrations included |
+| Frontend      | ✅ Complete | All pages and components built    |
+| Backend       | ✅ Complete | Supabase configured               |
+| Real-Time     | ✅ Complete | Subscriptions working             |
+| Documentation | ✅ Complete | 6 comprehensive guides            |
+| Testing       | ✅ Ready    | Verification checklist provided   |
+| Deployment    | ✅ Ready    | Ready for production              |
+| Security      | ✅ Complete | Best practices implemented        |
+| UI/UX         | ✅ Complete | Responsive, modern design         |
 
 ---
 
@@ -534,6 +566,7 @@ The codebase demonstrates:
 ## 🚀 Get Started in 3 Steps
 
 ### Step 1: Setup
+
 ```bash
 bun install
 cp .env.example .env.local
@@ -542,12 +575,14 @@ supabase db push
 ```
 
 ### Step 2: Run
+
 ```bash
 bun dev
 # Visit http://localhost:5173
 ```
 
 ### Step 3: Deploy
+
 ```bash
 vercel  # or netlify deploy or your host
 ```
@@ -586,6 +621,7 @@ vercel  # or netlify deploy or your host
 ## 🌍 Making an Impact
 
 By deploying Siargao Loops, you are:
+
 - 🌱 Promoting circular economy principles
 - ♻️ Reducing food waste
 - 🌿 Enabling compost production
@@ -601,6 +637,6 @@ By deploying Siargao Loops, you are:
 
 ---
 
-*Last Updated: 2026-06-23*
-*Version: 1.0.0*
-*Status: Complete & Production Ready*
+_Last Updated: 2026-06-23_
+_Version: 1.0.0_
+_Status: Complete & Production Ready_

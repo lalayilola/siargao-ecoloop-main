@@ -78,7 +78,8 @@ serve(async (req) => {
 
     const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
     const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const fromNumber = Deno.env.get("TWILIO_FROM_NUMBER") || Deno.env.get("TWILIO_MESSAGING_SERVICE_SID");
+    const fromNumber =
+      Deno.env.get("TWILIO_FROM_NUMBER") || Deno.env.get("TWILIO_MESSAGING_SERVICE_SID");
 
     let response: Response;
     let responseText: string;
@@ -101,10 +102,13 @@ serve(async (req) => {
       responseText = await response.text();
 
       if (!response.ok) {
-        return new Response(JSON.stringify({ error: "Twilio request failed", details: responseText }), {
-          status: response.status,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Twilio request failed", details: responseText }),
+          {
+            status: response.status,
+            headers: { ...corsHeaders, "content-type": "application/json" },
+          },
+        );
       }
     } else {
       const textbeltUrl = "https://textbelt.com/text";
@@ -121,21 +125,35 @@ serve(async (req) => {
       response = textbeltResponse;
 
       if (!response.ok) {
-        return new Response(JSON.stringify({ error: "SMS provider request failed", details: responseText }), {
-          status: response.status,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "SMS provider request failed", details: responseText }),
+          {
+            status: response.status,
+            headers: { ...corsHeaders, "content-type": "application/json" },
+          },
+        );
       }
     }
 
-    return new Response(JSON.stringify({ success: true, phone: normalizedPhone, provider: accountSid && authToken && fromNumber ? "twilio" : "textbelt", details: responseText }), {
-      status: 200,
-      headers: { ...corsHeaders, "content-type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        phone: normalizedPhone,
+        provider: accountSid && authToken && fromNumber ? "twilio" : "textbelt",
+        details: responseText,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      },
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
-      status: 500,
-      headers: { ...corsHeaders, "content-type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      },
+    );
   }
 });

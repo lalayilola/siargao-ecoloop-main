@@ -1,4 +1,7 @@
-export function getSupabaseErrorMessage(error: unknown, fallback = "Siargao Loops is temporarily unavailable. Please try again in a moment.") {
+export function getSupabaseErrorMessage(
+  error: unknown,
+  fallback = "Farm2Food Cycle is temporarily unavailable. Please try again in a moment.",
+) {
   if (!error) return fallback;
 
   let message = "";
@@ -11,7 +14,10 @@ export function getSupabaseErrorMessage(error: unknown, fallback = "Siargao Loop
     const err = error as Record<string, unknown>;
     if (typeof err.message === "string" && err.message.trim().length > 0) {
       message = err.message;
-    } else if (typeof err.error_description === "string" && err.error_description.trim().length > 0) {
+    } else if (
+      typeof err.error_description === "string" &&
+      err.error_description.trim().length > 0
+    ) {
       message = err.error_description;
     } else if (typeof err.hint === "string" && err.hint.trim().length > 0) {
       message = err.hint;
@@ -39,7 +45,7 @@ export function getSupabaseErrorMessage(error: unknown, fallback = "Siargao Loop
     normalized.includes("socket hang up") ||
     normalized.includes("econnrefused")
   ) {
-    return "Siargao Loops is currently unavailable. Please check your connection and try again shortly.";
+    return "Farm2Food Cycle is currently unavailable. Please check your connection and try again shortly.";
   }
 
   if (

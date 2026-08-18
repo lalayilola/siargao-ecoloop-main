@@ -10,8 +10,7 @@ export function useNotificationSound() {
 
   useEffect(() => {
     const AudioContextClass =
-      window.AudioContext ||
-      (window as WebkitAudioWindow).webkitAudioContext;
+      window.AudioContext || (window as WebkitAudioWindow).webkitAudioContext;
 
     if (!AudioContextClass) return;
 

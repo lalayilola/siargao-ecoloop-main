@@ -1,11 +1,13 @@
 # Circular Economy Marketplace - Implementation Summary
 
 ## Overview
+
 This document summarizes the implementation of the circular economy marketplace features for Siargao Loops.
 
 ## Completed Features
 
 ### 1. Database Schema Enhancements
+
 - **Transaction Type Enum**: Added `sell_only`, `barter_only`, `sell_and_barter` options
 - **Enhanced Marketplace Listings**: Added transaction type, acceptable exchanges, and category fields
 - **Trade Status Update**: Expanded to include `accepted`, `rejected`, `completed`, `cancelled`
@@ -17,6 +19,7 @@ This document summarizes the implementation of the circular economy marketplace 
   - `notifications` - User notifications for marketplace events
 
 ### 2. Marketplace Listing Enhancements
+
 - **Transaction Type Selection**: Users can choose Sell Only, Barter Only, or Sell & Barter
 - **Role-Specific Barter Options**:
   - Farmers can accept: Food Waste, Restaurant Food Waste, Cooked Food, Other Fresh Produce
@@ -26,6 +29,7 @@ This document summarizes the implementation of the circular economy marketplace 
 - **Acceptable Exchanges**: Visual display of what listings accept in trade
 
 ### 3. Request System (Trade & Purchase)
+
 - **Trade Request Modal**: Form to send barter requests with offer selection
 - **Buy Request Modal**: Form to send purchase requests with price display
 - **Offer Selection**: Users can select from their own listings to offer in trade
@@ -33,6 +37,7 @@ This document summarizes the implementation of the circular economy marketplace 
 - **Status Tracking**: Pending, Accepted, Rejected, Completed, Cancelled for all requests
 
 ### 4. Real-Time Notification & Chat System
+
 - **Notification Bell**: Displayed in header for authenticated users
 - **Unread Count**: Badge showing number of unread notifications
 - **Notification Dropdown**: View and manage notifications
@@ -47,12 +52,14 @@ This document summarizes the implementation of the circular economy marketplace 
 - **Real-Time Updates**: Live message and notification updates via Supabase subscriptions
 
 ### 5. Marketplace Filters
+
 - **Transaction Type Filter**: Filter by Sell Only, Barter Only, or Sell & Barter
 - **User Type Filter**: Filter by Farmer, Restaurant, or Resident
 - **Category Filter**: Search by item category
 - **Search**: Full-text search across title, seller, and barangay
 
 ### 6. API Functions
+
 - **Trade Request Functions**: Create, update status, get for user/listings
 - **Purchase Request Functions**: Create, update status, get for user/listings
 - **Conversation Functions**: Get or create, get for user
@@ -69,12 +76,14 @@ This document summarizes the implementation of the circular economy marketplace 
 ## Testing Instructions
 
 ### 1. Run Database Migrations
+
 ```bash
 # Apply all migrations to your Supabase instance
 supabase db push
 ```
 
 ### 2. Test Marketplace Listing Creation
+
 1. Sign in as a Farmer
 2. Navigate to Marketplace
 3. Click "New listing"
@@ -90,7 +99,9 @@ supabase db push
 6. Click "Publish listing"
 
 ### 3. Test Trade & Purchase Requests
+
 #### Trade Request
+
 1. Sign in as a different user (Restaurant or Resident)
 2. Navigate to Marketplace
 3. Find a listing with Barter enabled
@@ -101,6 +112,7 @@ supabase db push
 8. Verify notification appears for listing owner
 
 #### Purchase Request
+
 1. Sign in as a different user
 2. Navigate to Marketplace
 3. Find a listing with Sell enabled
@@ -110,6 +122,7 @@ supabase db push
 7. Verify notification appears for listing owner
 
 ### 4. Test Notifications & Chat
+
 1. Sign in as the listing owner
 2. Check the notification bell in the header
 3. Verify unread count badge
@@ -121,6 +134,7 @@ supabase db push
 9. Verify read status updates in real-time
 
 ### 5. Test Marketplace Filters
+
 1. Navigate to Marketplace
 2. Click "Filters" button
 3. Filter by Transaction Type: "Barter Only"
@@ -131,20 +145,24 @@ supabase db push
 ## Component Files Created/Modified
 
 ### New Components
+
 - `src/components/TradeRequestModal.tsx` - Trade request form modal
 - `src/components/BuyRequestModal.tsx` - Buy request form modal
 - `src/components/NotificationBell.tsx` - Notification bell and dropdown
 - `src/components/ChatMessenger.tsx` - In-app chat/messenger
 
 ### Modified Components
+
 - `src/components/MarketplaceView.tsx` - Added filters, modals, transaction type
 - `src/components/ListingCard.tsx` - Added transaction type display, trade/buy buttons
 - `src/components/SiteHeader.tsx` - Added notification bell integration
 
 ### API Functions
+
 - `src/lib/api/marketplace.functions.ts` - Centralized API functions for all marketplace operations
 
 ### Type Definitions
+
 - `src/integrations/supabase/types.ts` - Updated with new tables and enums
 
 ## System Rules Implemented

@@ -11,7 +11,7 @@ import { Eye, EyeOff, CheckCircle2, ArrowLeft, Lock } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Reset Password — Siargao Loops" }] }),
+  head: () => ({ meta: [{ title: "Reset Password — Farm2Food Cycle" }] }),
   component: ResetPage,
 });
 
@@ -87,9 +87,13 @@ function ResetPage() {
 
   return (
     <>
-      <PageHero 
-        title={recoveryMode ? "Set New Password" : "Reset Your Password"} 
-        sub={recoveryMode ? "Enter your new password to secure your account." : "Enter your email to receive a password reset link."}
+      <PageHero
+        title={recoveryMode ? "Set New Password" : "Reset Your Password"}
+        sub={
+          recoveryMode
+            ? "Enter your new password to secure your account."
+            : "Enter your email to receive a password reset link."
+        }
       />
       <Container className="py-12">
         <div className="mx-auto max-w-md">
@@ -104,13 +108,12 @@ function ResetPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Password Updated</h3>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Your password has been successfully updated. You can now sign in with your new password.
+                    Your password has been successfully updated. You can now sign in with your new
+                    password.
                   </p>
                 </div>
                 <Link to="/login">
-                  <Button className="w-full">
-                    Go to Sign In
-                  </Button>
+                  <Button className="w-full">Go to Sign In</Button>
                 </Link>
               </div>
             ) : recoveryMode ? (
@@ -125,13 +128,13 @@ function ResetPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="new-password">New Password *</Label>
                   <div className="relative">
-                    <Input 
-                      id="new-password" 
-                      type={showPassword ? "text" : "password"} 
-                      minLength={8} 
-                      required 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
+                    <Input
+                      id="new-password"
+                      type={showPassword ? "text" : "password"}
+                      minLength={8}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="pr-10"
                       placeholder="Min 8 characters"
                     />
@@ -148,13 +151,13 @@ function ResetPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="confirm-password">Confirm Password *</Label>
                   <div className="relative">
-                    <Input 
-                      id="confirm-password" 
-                      type={showConfirmPassword ? "text" : "password"} 
-                      minLength={8} 
-                      required 
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                    <Input
+                      id="confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      minLength={8}
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       className="pr-10"
                       placeholder="Re-enter password"
                     />
@@ -163,7 +166,11 @@ function ResetPage() {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -173,7 +180,10 @@ function ResetPage() {
                 </Button>
 
                 <div className="flex items-center justify-center text-sm">
-                  <Link to="/login" className="flex items-center text-muted-foreground hover:underline">
+                  <Link
+                    to="/login"
+                    className="flex items-center text-muted-foreground hover:underline"
+                  >
                     <ArrowLeft className="mr-1 h-4 w-4" />
                     Back to Sign In
                   </Link>
@@ -183,12 +193,12 @@ function ResetPage() {
               <form className="space-y-4" onSubmit={handleSendResetLink}>
                 <div className="space-y-1.5">
                   <Label htmlFor="email">Email Address *</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    required 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="juan@example.com"
                   />
                 </div>
@@ -198,7 +208,10 @@ function ResetPage() {
                 </Button>
 
                 <div className="flex items-center justify-center text-sm">
-                  <Link to="/login" className="flex items-center text-muted-foreground hover:underline">
+                  <Link
+                    to="/login"
+                    className="flex items-center text-muted-foreground hover:underline"
+                  >
                     <ArrowLeft className="mr-1 h-4 w-4" />
                     Back to Sign In
                   </Link>

@@ -22,7 +22,9 @@ export function LanguageSelector() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2 border-primary/20">
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{languages.find(l => l.code === language)?.name}</span>
+          <span className="hidden sm:inline">
+            {languages.find((l) => l.code === language)?.name}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

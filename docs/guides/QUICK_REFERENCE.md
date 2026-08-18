@@ -3,6 +3,7 @@
 ## 🚀 Quick Start
 
 ### Start Development Server
+
 ```bash
 bun dev
 # or
@@ -10,6 +11,7 @@ npm run dev
 ```
 
 ### Build for Production
+
 ```bash
 bun build
 # or
@@ -17,6 +19,7 @@ npm run build
 ```
 
 ### Apply Database Migrations
+
 ```bash
 supabase db push
 ```
@@ -26,10 +29,12 @@ supabase db push
 ## 📍 Key URLs
 
 ### Public Pages
+
 - Home: `/`
 - Login: `/auth`
 
 ### Authenticated Routes
+
 - Farmer Dashboard: `/dashboard/farmer`
 - Restaurant Dashboard: `/dashboard/restaurant`
 - LGU Dashboard: `/dashboard`
@@ -41,17 +46,20 @@ supabase db push
 - Profile: `/profile`
 
 ### Farmer Routes
+
 - Produce Inventory: `/inventory`
 - Orders: `/orders`
 - Compost: `/compost-marketplace`
 - Compost History: `/compost-history`
 
 ### Restaurant Routes
+
 - Order History: `/order-history`
 - Waste Reports: `/waste-reports`
 - Waste Collection: `/waste-collection`
 
 ### LGU Admin Routes
+
 - Diversion Monitoring: `/dashboard-diversion`
 - User Management: `/dashboard-users`
 - Reports: `/dashboard-reports`
@@ -62,26 +70,26 @@ supabase db push
 
 ## 🔐 User Roles
 
-| Role | Primary Roles | Features |
-|------|-----------|----------|
-| Farmer | `farmer` | Produce listing, compost purchasing, order management |
-| Restaurant | `restaurant` | Produce browsing, waste reporting, collection scheduling |
-| Resident | `resident` | Community participation, marketplace access |
-| LGU Admin | `lgu_admin` | System administration, monitoring, reporting |
+| Role       | Primary Roles | Features                                                 |
+| ---------- | ------------- | -------------------------------------------------------- |
+| Farmer     | `farmer`      | Produce listing, compost purchasing, order management    |
+| Restaurant | `restaurant`  | Produce browsing, waste reporting, collection scheduling |
+| Resident   | `resident`    | Community participation, marketplace access              |
+| LGU Admin  | `lgu_admin`   | System administration, monitoring, reporting             |
 
 ---
 
 ## 📁 Important Files
 
-| File | Purpose |
-|------|---------|
-| `src/hooks/use-auth.tsx` | Authentication hook |
-| `src/lib/api/` | API/database functions |
+| File                         | Purpose                 |
+| ---------------------------- | ----------------------- |
+| `src/hooks/use-auth.tsx`     | Authentication hook     |
+| `src/lib/api/`               | API/database functions  |
 | `src/integrations/supabase/` | Supabase client & types |
-| `supabase/migrations/` | Database schema |
-| `src/routes/` | Application routes |
-| `src/components/` | React components |
-| `.env.local` | Environment variables |
+| `supabase/migrations/`       | Database schema         |
+| `src/routes/`                | Application routes      |
+| `src/components/`            | React components        |
+| `.env.local`                 | Environment variables   |
 
 ---
 
@@ -120,6 +128,7 @@ compost_requests (id, user_id, quantity, status)
 ## 🔄 Common Workflows
 
 ### Create Produce Listing (Farmer)
+
 1. Login as Farmer
 2. Navigate to Inventory
 3. Click "New Listing"
@@ -129,6 +138,7 @@ compost_requests (id, user_id, quantity, status)
 7. Publish
 
 ### Purchase Produce (Restaurant)
+
 1. Login as Restaurant
 2. Go to Marketplace
 3. Search/filter for produce
@@ -138,6 +148,7 @@ compost_requests (id, user_id, quantity, status)
 7. Receive in Orders
 
 ### Submit Waste (Restaurant)
+
 1. Login as Restaurant
 2. Go to Waste Reports
 3. Click "Submit Report"
@@ -146,6 +157,7 @@ compost_requests (id, user_id, quantity, status)
 6. Receive collection confirmation
 
 ### Process Waste (LGU Admin)
+
 1. Login as LGU Admin
 2. Go to Diversion Monitoring
 3. View waste submissions
@@ -160,35 +172,41 @@ compost_requests (id, user_id, quantity, status)
 ## 🛠️ Debugging Tips
 
 ### Check Database Connection
+
 ```typescript
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
 // Test connection
-const { data, error } = await supabase.from('profiles').select('*').limit(1);
+const { data, error } = await supabase.from("profiles").select("*").limit(1);
 console.log(data, error);
 ```
 
 ### Check Authentication
+
 ```typescript
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
 // Get current user
-const { data: { user } } = await supabase.auth.getUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 console.log(user);
 ```
 
 ### Check Real-Time Subscriptions
+
 ```typescript
 // Subscribe to changes
 supabase
-  .channel('profiles')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
-    console.log('Change received!', payload);
+  .channel("profiles")
+  .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, (payload) => {
+    console.log("Change received!", payload);
   })
   .subscribe();
 ```
 
 ### View Logs
+
 - Browser console: Open DevTools (F12)
 - Supabase: View logs in Supabase dashboard
 - Terminal: Check for errors in terminal
@@ -198,53 +216,52 @@ supabase
 ## 📊 Useful Queries
 
 ### Get User's Listings
+
 ```typescript
-const { data } = await supabase
-  .from('marketplace_listings')
-  .select('*')
-  .eq('user_id', userId);
+const { data } = await supabase.from("marketplace_listings").select("*").eq("user_id", userId);
 ```
 
 ### Get User's Orders
+
 ```typescript
-const { data } = await supabase
-  .from('purchase_requests')
-  .select('*')
-  .eq('user_id', userId);
+const { data } = await supabase.from("purchase_requests").select("*").eq("user_id", userId);
 ```
 
 ### Get Feed Posts
+
 ```typescript
 const { data } = await supabase
-  .from('feed_posts')
-  .select('*')
-  .order('created_at', { ascending: false });
+  .from("feed_posts")
+  .select("*")
+  .order("created_at", { ascending: false });
 ```
 
 ### Get Notifications
+
 ```typescript
 const { data } = await supabase
-  .from('notifications')
-  .select('*')
-  .eq('user_id', userId)
-  .eq('read_at', null);
+  .from("notifications")
+  .select("*")
+  .eq("user_id", userId)
+  .eq("read_at", null);
 ```
 
 ---
 
 ## 🎨 Color System
 
-| Color | Usage | Tailwind Class |
-|-------|-------|----------------|
-| Green/Primary | Main theme, buttons, links | `text-primary`, `bg-primary` |
-| Orange/Accent | Restaurant portal, highlights | `text-accent`, `bg-accent` |
-| Slate | Text, backgrounds | `text-slate-*`, `bg-slate-*` |
+| Color         | Usage                         | Tailwind Class               |
+| ------------- | ----------------------------- | ---------------------------- |
+| Green/Primary | Main theme, buttons, links    | `text-primary`, `bg-primary` |
+| Orange/Accent | Restaurant portal, highlights | `text-accent`, `bg-accent`   |
+| Slate         | Text, backgrounds             | `text-slate-*`, `bg-slate-*` |
 
 ---
 
 ## 📦 Dependencies
 
 ### Frontend
+
 - react: UI library
 - @tanstack/react-router: Routing
 - @tanstack/react-query: Data management
@@ -254,6 +271,7 @@ const { data } = await supabase
 - lucide-react: Icons
 
 ### Backend
+
 - Supabase (PostgreSQL)
 - PostgREST (API)
 - Realtime (Subscriptions)
@@ -275,27 +293,32 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ## 🚨 Common Errors & Solutions
 
 ### Error: "User is not authenticated"
+
 - User not logged in
 - Session expired
 - Authentication failed
 - **Fix**: Ensure user is logged in
 
 ### Error: "Table does not exist"
+
 - Database migrations not applied
 - Wrong table name
 - **Fix**: Run `supabase db push`
 
 ### Error: "No matching function"
+
 - RLS policy denies access
 - Function doesn't exist
 - **Fix**: Check RLS policies, verify function exists
 
 ### Error: "Bucket does not exist"
+
 - Storage bucket not created
 - Wrong bucket name
 - **Fix**: Create bucket or update `VITE_SUPABASE_STORAGE_BUCKET`
 
 ### Error: "CORS error"
+
 - Request from wrong origin
 - Supabase CORS not configured
 - **Fix**: Add origin to Supabase CORS settings
@@ -339,6 +362,7 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ## 🎯 Development Checklist
 
 Before pushing code:
+
 - [ ] Code works locally
 - [ ] No console errors
 - [ ] No TypeScript errors
@@ -355,17 +379,20 @@ Before pushing code:
 ## 📅 Maintenance Schedule
 
 ### Daily
+
 - Monitor error logs
 - Check Supabase status
 - Verify critical features working
 
 ### Weekly
+
 - Review user feedback
 - Check for updates
 - Test core workflows
 - Backup database
 
 ### Monthly
+
 - Security audit
 - Performance review
 - Update dependencies
@@ -373,6 +400,7 @@ Before pushing code:
 - Plan improvements
 
 ### Quarterly
+
 - Major feature releases
 - Infrastructure review
 - Capacity planning

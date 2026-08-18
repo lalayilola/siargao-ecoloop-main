@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import { Container } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
-import {
-  Utensils,
-  ShoppingCart,
-  Recycle,
-  Calendar,
-  Award,
-  TrendingUp,
-} from "lucide-react";
+import { Utensils, ShoppingCart, Recycle, Calendar, Award, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,17 +16,29 @@ export function HotelDashboard() {
     collectionRequests: 0,
     sustainabilityScore: 75,
   });
-  const [recentActivity, setRecentActivity] = useState<Database['public']['Tables']['waste_collections']['Row'][]>([]);
+  const [recentActivity, setRecentActivity] = useState<
+    Database["public"]["Tables"]["waste_collections"]["Row"][]
+  >([]);
 
   useEffect(() => {
     if (!user) return;
 
     const loadDashboardData = async () => {
       try {
-        const [{ data: wasteReports, error: wasteError }, { data: collections, error: collectionsError }] = await Promise.all([
+        const [
+          { data: wasteReports, error: wasteError },
+          { data: collections, error: collectionsError },
+        ] = (await Promise.all([
           supabase.from("food_waste_reports").select("*").eq("restaurant_id", user.id),
-          supabase.from("waste_collections").select("*").order("created_at", { ascending: false }).limit(5),
-        ]) as [{ data: any, error: any }, { data: Database['public']['Tables']['waste_collections']['Row'][] | null, error: any }];
+          supabase
+            .from("waste_collections")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(5),
+        ])) as [
+          { data: any; error: any },
+          { data: Database["public"]["Tables"]["waste_collections"]["Row"][] | null; error: any },
+        ];
 
         if (wasteError) {
           console.error("Error loading waste reports:", wasteError);
@@ -107,7 +112,9 @@ export function HotelDashboard() {
         <Card className="p-8 text-center border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10">
           <Utensils className="h-16 w-16 text-primary mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-primary mb-2">Hotel/Restaurant Dashboard</h2>
-          <p className="text-slate-600">This dashboard is only available for hotels and restaurants.</p>
+          <p className="text-slate-600">
+            This dashboard is only available for hotels and restaurants.
+          </p>
         </Card>
       </Container>
     );
@@ -179,16 +186,23 @@ export function HotelDashboard() {
                     <p className="font-medium text-slate-900">
                       Collection #{activity.id.slice(0, 8)}
                     </p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      activity.status === "scheduled" ? "bg-yellow-100 text-yellow-800" :
-                      activity.status === "in_progress" ? "bg-blue-100 text-blue-800" :
-                      activity.status === "completed" ? "bg-green-100 text-green-800" :
-                      "bg-slate-100 text-slate-800"
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        activity.status === "scheduled"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : activity.status === "in_progress"
+                            ? "bg-blue-100 text-blue-800"
+                            : activity.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-slate-100 text-slate-800"
+                      }`}
+                    >
                       {activity.status}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600">Scheduled: {new Date(activity.scheduled_date).toLocaleDateString()}</p>
+                  <p className="text-sm text-slate-600">
+                    Scheduled: {new Date(activity.scheduled_date).toLocaleDateString()}
+                  </p>
                   {activity.completed_date && (
                     <p className="text-xs text-slate-500 mt-1">
                       Completed: {new Date(activity.completed_date).toLocaleDateString()}

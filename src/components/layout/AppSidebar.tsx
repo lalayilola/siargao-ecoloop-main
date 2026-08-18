@@ -1,5 +1,6 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { type LucideIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +14,26 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Newspaper, Store, Calendar, ArrowLeftRight, User as UserIcon, LogOut, Home, MessageCircle, Sprout, TreePine, Recycle, Bell, Megaphone, FileText, Package, ShoppingCart, History } from "lucide-react";
+import {
+  LayoutDashboard,
+  Newspaper,
+  Store,
+  Calendar,
+  ArrowLeftRight,
+  User as UserIcon,
+  LogOut,
+  Home,
+  MessageCircle,
+  Sprout,
+  TreePine,
+  Recycle,
+  Bell,
+  Megaphone,
+  FileText,
+  Package,
+  ShoppingCart,
+  History,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +50,7 @@ const memberItems = [
   { to: "/announcements", label: "Announcements", icon: Megaphone },
 ];
 
-const farmerItems: Array<{ to: string; label: string; icon: any }> = [];
+const farmerItems: Array<{ to: string; label: string; icon: LucideIcon }> = [];
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -58,21 +78,23 @@ export function AppSidebar() {
     const loadUnreadMessages = async () => {
       const { data: convData } = await supabase
         .from("conversations")
-        .select(`
+        .select(
+          `
           messages (
             id,
             sender_id,
             read_at
           )
-        `)
+        `,
+        )
         .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`);
 
       let unreadCount = 0;
       if (convData) {
         for (const conv of convData) {
-          const unreadInConv = conv.messages?.filter((message) =>
-            message.sender_id !== user.id && !message.read_at
-          ).length || 0;
+          const unreadInConv =
+            conv.messages?.filter((message) => message.sender_id !== user.id && !message.read_at)
+              .length || 0;
           unreadCount += unreadInConv;
         }
       }
@@ -93,8 +115,12 @@ export function AppSidebar() {
       }
 
       // Get read announcement IDs from localStorage
-      const readAnnouncements = JSON.parse(localStorage.getItem(`read_announcements_${user.id}`) || '[]');
-      const unreadCount = announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
+      const readAnnouncements = JSON.parse(
+        localStorage.getItem(`read_announcements_${user.id}`) || "[]",
+      );
+      const unreadCount = announcements.filter(
+        (a: { id: string }) => !readAnnouncements.includes(a.id),
+      ).length;
       setUnreadAnnouncements(unreadCount);
     };
 
@@ -113,7 +139,7 @@ export function AppSidebar() {
         },
         () => {
           loadUnreadMessages();
-        }
+        },
       )
       .subscribe();
 
@@ -129,7 +155,7 @@ export function AppSidebar() {
         },
         () => {
           loadUnreadAnnouncements();
-        }
+        },
       )
       .subscribe();
 
@@ -158,10 +184,15 @@ export function AppSidebar() {
           .eq("status", "published");
 
         if (announcements) {
-          const announcementIds = announcements.map((a: any) => a.id);
-          const readAnnouncements = JSON.parse(localStorage.getItem(`read_announcements_${user.id}`) || '[]');
+          const announcementIds = announcements.map((a: { id: string }) => a.id);
+          const readAnnouncements = JSON.parse(
+            localStorage.getItem(`read_announcements_${user.id}`) || "[]",
+          );
           const updatedReadAnnouncements = [...new Set([...readAnnouncements, ...announcementIds])];
-          localStorage.setItem(`read_announcements_${user.id}`, JSON.stringify(updatedReadAnnouncements));
+          localStorage.setItem(
+            `read_announcements_${user.id}`,
+            JSON.stringify(updatedReadAnnouncements),
+          );
           setUnreadAnnouncements(0);
         }
       };
@@ -170,7 +201,10 @@ export function AppSidebar() {
   }, [path, unreadAnnouncements, user]);
 
   return (
-    <Sidebar collapsible="icon" className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner">
+    <Sidebar
+      collapsible="icon"
+      className="border-r-2 border-primary/20 bg-gradient-to-b from-primary/10 via-white/90 to-secondary/10 shadow-inner"
+    >
       <SidebarHeader className="relative overflow-hidden border-b-2 border-primary/20 bg-white/95 transition-[padding] group-data-[collapsible=icon]:p-2">
         <div className="absolute right-2 top-2 animate-float opacity-20 group-data-[collapsible=icon]:hidden">
           <TreePine className="h-8 w-8 text-primary" />
@@ -182,16 +216,16 @@ export function AppSidebar() {
           <Link
             to="/"
             onClick={handleLinkClick}
-            title="Siargao Loops"
+            title="Farm2Food Cycle"
             className="relative z-10 flex min-w-0 items-center gap-3 rounded-b-3xl group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-lg"
           >
             <img
               src={logo}
-              alt="Siargao Loops"
+              alt="Farm2Food Cycle"
               className="h-16 w-16 shrink-0 object-contain transition-[width,height] duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
             />
             <span className="font-display text-xl font-bold tracking-tight text-slate-800 group-data-[collapsible=icon]:hidden">
-              Siargao <span className="text-primary">LOOPS</span>
+              Farm2Food <span className="text-primary">Cycle</span>
             </span>
           </Link>
           <div className="relative z-10 shrink-0 group-data-[collapsible=icon]:[&_button]:h-8 group-data-[collapsible=icon]:[&_button]:w-8 group-data-[collapsible=icon]:[&_button]:p-0">
@@ -202,21 +236,31 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">Community</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
+            Community
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {memberItems.map((it) => {
-                const unreadCount = it.to === "/messages" ? unreadMessages : 
-                                   it.to === "/announcements" ? unreadAnnouncements : 0;
+                const unreadCount =
+                  it.to === "/messages"
+                    ? unreadMessages
+                    : it.to === "/announcements"
+                      ? unreadAnnouncements
+                      : 0;
                 return (
                   <SidebarMenuItem key={it.to}>
                     <SidebarMenuButton asChild isActive={isActive(it.to)}>
-                      <Link to={it.to} onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                      <Link
+                        to={it.to}
+                        onClick={handleLinkClick}
+                        className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                      >
                         <it.icon className="h-4 w-4" />
                         <span>{it.label}</span>
                         {unreadCount > 0 && (
                           <Badge className="ml-auto bg-slate-500 text-white hover:bg-slate-600 text-xs h-5 min-w-[20px] flex items-center justify-center px-1.5">
-                            {unreadCount > 99 ? '99+' : unreadCount}
+                            {unreadCount > 99 ? "99+" : unreadCount}
                           </Badge>
                         )}
                       </Link>
@@ -230,12 +274,18 @@ export function AppSidebar() {
 
         {isLguAdmin && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">LGU Admin</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
+              LGU Admin
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard")}>
-                    <Link to="/dashboard" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link
+                      to="/dashboard"
+                      onClick={handleLinkClick}
+                      className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                    >
                       <LayoutDashboard />
                       <span>Dashboard</span>
                     </Link>
@@ -244,7 +294,11 @@ export function AppSidebar() {
 
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-users")}>
-                    <Link to="/dashboard-users" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link
+                      to="/dashboard-users"
+                      onClick={handleLinkClick}
+                      className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                    >
                       <UserIcon />
                       <span>Member's Dashboard</span>
                     </Link>
@@ -252,7 +306,11 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={isActive("/dashboard-reports")}>
-                    <Link to="/dashboard-reports" onClick={handleLinkClick} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                    <Link
+                      to="/dashboard-reports"
+                      onClick={handleLinkClick}
+                      className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                    >
                       <FileText />
                       <span>Reports</span>
                     </Link>
@@ -264,12 +322,18 @@ export function AppSidebar() {
         )}
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">Account</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
+            Account
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/profile")}>
-                  <Link to="/profile" search={{ userId: undefined }} className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                  <Link
+                    to="/profile"
+                    search={{ userId: undefined }}
+                    className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                  >
                     <UserIcon />
                     <span>Profile</span>
                   </Link>
@@ -277,7 +341,10 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/" className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700">
+                  <Link
+                    to="/"
+                    className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
+                  >
                     <Home />
                     <span>Back to site</span>
                   </Link>
@@ -294,7 +361,11 @@ export function AppSidebar() {
             <div className="rounded-3xl bg-gradient-to-r from-primary/15 to-secondary/10 p-3 text-xs border border-primary/20 flex items-center gap-3 shadow-sm shadow-primary/10">
               <div className="h-10 w-10 rounded-full overflow-hidden bg-primary/10 flex-shrink-0 border-2 border-primary/40 shadow-md">
                 {profile.profile_picture_url ? (
-                  <img src={profile.profile_picture_url} alt={profile.full_name} className="h-full w-full object-cover" />
+                  <img
+                    src={profile.profile_picture_url}
+                    alt={profile.full_name}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center font-semibold text-primary">
                     {profile.full_name?.[0]?.toUpperCase() ?? "?"}
@@ -302,10 +373,14 @@ export function AppSidebar() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-medium truncate text-slate-900">{profile.full_name || "Siargao Loops member"}</div>
+                <div className="font-medium truncate text-slate-900">
+                  {profile.full_name || "Farm2Food Cycle member"}
+                </div>
                 <div className="text-slate-500 truncate text-xs">
                   {profile.primary_role === "lgu_admin"
-                    ? profile.lgu_approved ? "LGU Admin" : "LGU Admin (pending)"
+                    ? profile.lgu_approved
+                      ? "LGU Admin"
+                      : "LGU Admin (pending)"
                     : profile.primary_role.charAt(0).toUpperCase() + profile.primary_role.slice(1)}
                 </div>
               </div>

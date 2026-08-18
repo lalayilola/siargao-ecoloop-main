@@ -8,7 +8,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Eye, EyeOff, Upload, X, AlertCircle, CheckCircle2 } from "lucide-react";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
@@ -28,8 +34,11 @@ const bounceAnimation = `
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Create Account — Siargao Loops" },
-      { name: "description", content: "Register for Siargao Loops to join the circular food economy." },
+      { title: "Create Account — Farm2Food Cycle" },
+      {
+        name: "description",
+        content: "Register for Farm2Food Cycle to join the circular food economy.",
+      },
     ],
   }),
   component: RegisterPage,
@@ -44,7 +53,17 @@ const signupSchema = z.object({
   barangay: z.string().trim().min(2).max(80),
   address: z.string().trim().max(200).optional().default(""),
   role: z.enum(["farmer", "restaurant", "lgu_admin"]),
-  municipality: z.enum(["burgos", "dapa", "general_luna", "pilar", "san_benito", "san_isidro", "santa_monica", "socorro", "del_carmen"]),
+  municipality: z.enum([
+    "burgos",
+    "dapa",
+    "general_luna",
+    "pilar",
+    "san_benito",
+    "san_isidro",
+    "santa_monica",
+    "socorro",
+    "del_carmen",
+  ]),
 });
 
 const AUTH_RATE_LIMIT_COOLDOWN_MS = 3 * 60 * 1000;
@@ -93,7 +112,16 @@ function RegisterPage() {
     barangay: "",
     address: "",
     role: "farmer" as "farmer" | "restaurant" | "lgu_admin",
-    municipality: "general_luna" as "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen",
+    municipality: "general_luna" as
+      | "burgos"
+      | "dapa"
+      | "general_luna"
+      | "pilar"
+      | "san_benito"
+      | "san_isidro"
+      | "santa_monica"
+      | "socorro"
+      | "del_carmen",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -103,17 +131,20 @@ function RegisterPage() {
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(() => readStoredAuthCooldown());
   const isCooldownActive = Boolean(cooldownUntil && cooldownUntil > Date.now());
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
 
   useEffect(() => {
     if (!cooldownUntil) return;
     if (cooldownUntil <= Date.now()) {
-      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      if (typeof window !== "undefined")
+        window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
       setCooldownUntil(null);
       return;
     }
     const timeout = window.setTimeout(() => {
-      if (typeof window !== "undefined") window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
+      if (typeof window !== "undefined")
+        window.localStorage.removeItem(AUTH_RATE_LIMIT_STORAGE_KEY);
       setCooldownUntil(null);
     }, cooldownUntil - Date.now());
     return () => window.clearTimeout(timeout);
@@ -142,7 +173,7 @@ function RegisterPage() {
     setBusy(true);
     try {
       const normalizedEmail = parsed.data.email.toLowerCase();
-      
+
       const { data, error: signupError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: parsed.data.password,
@@ -178,18 +209,18 @@ function RegisterPage() {
         // User was auto-confirmed by Supabase, but we still require email verification for new users
         // Sign out the user and send verification email
         await supabase.auth.signOut();
-        
+
         // Send verification email
         if (data.user?.email) {
           await supabase.auth.resend({
-            type: 'signup',
+            type: "signup",
             email: data.user.email,
             options: {
               emailRedirectTo: `${window.location.origin}/verify-email`,
             },
           });
         }
-        
+
         toast.success("Registration successful! Please check your email to verify your account.");
         navigate({ to: "/verify-email" as any });
       }
@@ -205,7 +236,7 @@ function RegisterPage() {
     setGoogleBusy(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -229,161 +260,188 @@ function RegisterPage() {
           </div>
           <div className="mx-auto max-w-md">
             <Card className="p-6">
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-3">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="full_name">Full Name *</Label>
+                    <Input
+                      id="full_name"
+                      required
+                      value={form.full_name}
+                      onChange={(e) => set("full_name", e.target.value)}
+                      placeholder="Juan Dela Cruz"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone">Phone *</Label>
+                    <Input
+                      id="phone"
+                      required
+                      value={form.phone}
+                      onChange={(e) => set("phone", e.target.value)}
+                      placeholder="09123456789"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="full_name">Full Name *</Label>
-                  <Input 
-                    id="full_name" 
-                    required 
-                    value={form.full_name} 
-                    onChange={(e) => set("full_name", e.target.value)} 
-                    placeholder="Juan Dela Cruz"
+                  <Label htmlFor="email">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => set("email", e.target.value)}
+                    placeholder="juan@example.com"
                   />
                 </div>
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone">Phone *</Label>
-                  <Input 
-                    id="phone" 
-                    required 
-                    value={form.phone} 
-                    onChange={(e) => set("phone", e.target.value)} 
-                    placeholder="09123456789"
+                  <Label htmlFor="password">Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={form.password}
+                      onChange={(e) => set("password", e.target.value)}
+                      className="pr-10"
+                      placeholder="Min 8 characters"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={form.confirmPassword}
+                      onChange={(e) => set("confirmPassword", e.target.value)}
+                      className="pr-10"
+                      placeholder="Re-enter password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="barangay">Barangay *</Label>
+                  <Input
+                    id="barangay"
+                    required
+                    placeholder="e.g., Barangay 1"
+                    value={form.barangay}
+                    onChange={(e) => set("barangay", e.target.value)}
                   />
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  required 
-                  value={form.email} 
-                  onChange={(e) => set("email", e.target.value)} 
-                  placeholder="juan@example.com"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Password *</Label>
-                <div className="relative">
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    required 
-                    value={form.password} 
-                    onChange={(e) => set("password", e.target.value)} 
-                    className="pr-10"
-                    placeholder="Min 8 characters"
+                <div className="space-y-1.5">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={form.address}
+                    onChange={(e) => set("address", e.target.value)}
+                    placeholder="Street address (optional)"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="municipality">Municipality *</Label>
+                  <Select
+                    value={form.municipality}
+                    onValueChange={(v) => set("municipality", v as typeof form.municipality)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="burgos">Burgos</SelectItem>
+                      <SelectItem value="dapa">Dapa</SelectItem>
+                      <SelectItem value="general_luna">General Luna</SelectItem>
+                      <SelectItem value="pilar">Pilar</SelectItem>
+                      <SelectItem value="san_benito">San Benito</SelectItem>
+                      <SelectItem value="san_isidro">San Isidro</SelectItem>
+                      <SelectItem value="santa_monica">Santa Monica</SelectItem>
+                      <SelectItem value="socorro">Socorro</SelectItem>
+                      <SelectItem value="del_carmen">Del Carmen</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                <div className="relative">
-                  <Input 
-                    id="confirmPassword" 
-                    type={showConfirmPassword ? "text" : "password"} 
-                    required 
-                    value={form.confirmPassword} 
-                    onChange={(e) => set("confirmPassword", e.target.value)} 
-                    className="pr-10"
-                    placeholder="Re-enter password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                <div className="space-y-1.5">
+                  <Label htmlFor="role">I am a *</Label>
+                  <Select
+                    value={form.role}
+                    onValueChange={(v) => set("role", v as typeof form.role)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="farmer">Farmer</SelectItem>
+                      <SelectItem value="restaurant">Hotel/Restaurant</SelectItem>
+                      <SelectItem value="lgu_admin">LGU Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="barangay">Barangay *</Label>
-                <Input 
-                  id="barangay" 
-                  required 
-                  placeholder="e.g., Barangay 1" 
-                  value={form.barangay} 
-                  onChange={(e) => set("barangay", e.target.value)} 
-                />
-              </div>
+                <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
+                  {busy
+                    ? "Creating account..."
+                    : isCooldownActive
+                      ? "Please wait..."
+                      : "Create Account"}
+                </Button>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="address">Address</Label>
-                <Input 
-                  id="address" 
-                  value={form.address} 
-                  onChange={(e) => set("address", e.target.value)} 
-                  placeholder="Street address (optional)"
-                />
-              </div>
+                <div className="my-5 flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="h-px flex-1 bg-border" /> or{" "}
+                  <div className="h-px flex-1 bg-border" />
+                </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="municipality">Municipality *</Label>
-                <Select value={form.municipality} onValueChange={(v) => set("municipality", v as typeof form.municipality)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="burgos">Burgos</SelectItem>
-                    <SelectItem value="dapa">Dapa</SelectItem>
-                    <SelectItem value="general_luna">General Luna</SelectItem>
-                    <SelectItem value="pilar">Pilar</SelectItem>
-                    <SelectItem value="san_benito">San Benito</SelectItem>
-                    <SelectItem value="san_isidro">San Isidro</SelectItem>
-                    <SelectItem value="santa_monica">Santa Monica</SelectItem>
-                    <SelectItem value="socorro">Socorro</SelectItem>
-                    <SelectItem value="del_carmen">Del Carmen</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled={googleBusy}
+                  onClick={handleGoogleSignUp}
+                >
+                  <img
+                    src={logo}
+                    alt="Farm2Food Cycle"
+                    className="mr-2 h-4 w-4 object-contain"
+                    style={{ animation: "bounce 1s ease-in-out infinite" }}
+                  />
+                  {googleBusy ? "Connecting..." : "Continue with Google"}
+                </Button>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="role">I am a *</Label>
-                <Select value={form.role} onValueChange={(v) => set("role", v as typeof form.role)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="farmer">Farmer</SelectItem>
-                    <SelectItem value="restaurant">Hotel/Restaurant</SelectItem>
-                    <SelectItem value="lgu_admin">LGU Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={busy || isCooldownActive}>
-                {busy ? "Creating account..." : isCooldownActive ? "Please wait..." : "Create Account"}
-              </Button>
-
-              <div className="my-5 flex items-center gap-2 text-xs text-muted-foreground">
-                <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                disabled={googleBusy}
-                onClick={handleGoogleSignUp}
-              >
-                <img src={logo} alt="Siargao Loops" className="mr-2 h-4 w-4 object-contain" style={{ animation: 'bounce 1s ease-in-out infinite' }} />
-                {googleBusy ? "Connecting..." : "Continue with Google"}
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                Already have an account? <Link to="/login" className="underline font-medium">Sign in</Link>
-              </p>
-            </form>
-          </Card>
+                <p className="text-center text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link to="/login" className="underline font-medium">
+                    Sign in
+                  </Link>
+                </p>
+              </form>
+            </Card>
           </div>
         </Container>
       </div>

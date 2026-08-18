@@ -38,18 +38,18 @@ The modernization should therefore begin with correctness, trust, accessibility,
 
 ### Baseline evidence
 
-| Measure | Current evidence | Implication |
-|---|---:|---|
-| Largest route | `src/routes/auth.tsx` — approximately 2,980 lines | Auth behavior is difficult to reason about and safely change. |
-| Largest feature screens | `MarketplaceView.tsx` — approximately 2,266 lines; `PlanningForecastDashboard.tsx` — approximately 2,181 lines | Data, view state, forms, and presentation are too tightly coupled. |
-| TypeScript diagnostics | 149 | Runtime-affecting defects can be hidden by the transpile-only production build. |
-| Behavioral ESLint | 192 errors and 19 warnings | Includes conditional hooks, incomplete effect dependencies, and extensive untyped data. |
-| Homepage video | Approximately 12.5 MB | High mobile bandwidth and Largest Contentful Paint risk. |
-| Main JavaScript output | Approximately 892 KB uncompressed | Core startup includes too much eagerly loaded functionality. |
-| Current primary green on white | 3.3:1 | Fails WCAG AA for normal text. |
-| Current accent green on white | 2.28:1 | Fails WCAG AA for text. |
-| Global loading behavior | 2.5-second render delay; 5-second overlay | The product feels unavailable even when no real work is pending. |
-| Hard-coded color utilities | More than 1,100 `bg-*` and `text-*` color usages in inspected source | Visual changes and accessible theming are expensive and inconsistent. |
+| Measure                        |                                                                                               Current evidence | Implication                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------------------- |
+| Largest route                  |                                                              `src/routes/auth.tsx` — approximately 2,980 lines | Auth behavior is difficult to reason about and safely change.                           |
+| Largest feature screens        | `MarketplaceView.tsx` — approximately 2,266 lines; `PlanningForecastDashboard.tsx` — approximately 2,181 lines | Data, view state, forms, and presentation are too tightly coupled.                      |
+| TypeScript diagnostics         |                                                                                                            149 | Runtime-affecting defects can be hidden by the transpile-only production build.         |
+| Behavioral ESLint              |                                                                                     192 errors and 19 warnings | Includes conditional hooks, incomplete effect dependencies, and extensive untyped data. |
+| Homepage video                 |                                                                                          Approximately 12.5 MB | High mobile bandwidth and Largest Contentful Paint risk.                                |
+| Main JavaScript output         |                                                                              Approximately 892 KB uncompressed | Core startup includes too much eagerly loaded functionality.                            |
+| Current primary green on white |                                                                                                          3.3:1 | Fails WCAG AA for normal text.                                                          |
+| Current accent green on white  |                                                                                                         2.28:1 | Fails WCAG AA for text.                                                                 |
+| Global loading behavior        |                                                                      2.5-second render delay; 5-second overlay | The product feels unavailable even when no real work is pending.                        |
+| Hard-coded color utilities     |                                           More than 1,100 `bg-*` and `text-*` color usages in inspected source | Visual changes and accessible theming are expensive and inconsistent.                   |
 
 ## B. Strengths to retain
 
@@ -84,29 +84,29 @@ The modernization should therefore begin with correctness, trust, accessibility,
 
 Priority means implementation order. Severity reflects user or operational impact.
 
-| ID | Priority | Severity | Affected areas | Finding and user impact | Recommended direction |
-|---|---|---|---|---|---|
-| UX-01 | P1 | Critical | Root shell, `LoadingScreen` | The app intentionally postpones rendering for 2.5 seconds and keeps a decorative overlay for 5 seconds. Users may assume the service is slow or broken. | Render the shell immediately. Show route- or component-level skeletons only while real asynchronous work is pending. |
-| UX-02 | P1 | Critical | Restaurant dashboards, waste reports, waste collection | The canonical role is `restaurant`, while some screens require `hotel_restaurant`. Valid users see access-denied states. Dashboard links also target nonexistent `/waste-collections`. | Normalize legacy values once at the application boundary and use canonical roles everywhere. Point navigation to `/waste-collection`. |
-| UX-03 | P1 | Critical | `/auth`, `/login`, `/register`, email verification | Three competing auth implementations expose different roles and redirects. Verification updates component state during render, which can cause React warnings and unreliable behavior. | Build shared auth forms, role options, validation, terms, verification, and one redirect policy. Preserve legacy URLs as aliases or redirects. Move async/state effects into effects or query callbacks. |
-| UX-04 | P1 | Critical | Super-admin navigation, authorization, RLS | `super_admin` exists in schema and migrations but is not included in the normal administrative UI capability checks. Existing LGU policies are municipality-oriented. | Define explicit super-admin capabilities, island-wide filters, clear scope indicators, and narrowly reviewed RLS policies. |
-| UX-05 | P1 | Critical | Public marketplace, contact page, LGU dashboard | Mock listings appear like real records when data is absent; the contact form shows success without sending; trend labels such as “+3 today” are hard-coded. These patterns damage public-sector trust. | Label demonstrations unmistakably, connect actions to real services, and remove claims that are not derived from authoritative data. |
-| UX-06 | P1 | High | Global styles, controls, animated branding | There is no reduced-motion handling; global transitions and repeated bouncing/floating effects run continuously. Buttons, inputs, and icon controls are commonly 32–36px high. | Add `prefers-reduced-motion`, limit motion to purposeful 150–200ms transitions, and use a 44px minimum interactive target on touch interfaces. |
-| UX-07 | P1 | High | Colors, focus, status communication | Primary and accent greens fail normal-text contrast on white, focus indication is weak, and status meaning often relies on color. | Introduce WCAG AA semantic tokens, a visible multi-pixel focus ring, text/icon status cues, and automated contrast checks. |
-| UX-08 | P1 | High | Forms, notifications, marketplace, messaging | Several icon-only controls lack accessible names. Some fields rely on placeholders, and actions such as image removal become visible only on hover. | Use durable visible labels, programmatic names, inline help and errors, and touch-visible actions. |
-| UX-09 | P1 | High | Application shell and routing | Important dashboards and routes—inventory, GIS, eco-points, waste tools—are difficult to discover. `/requests` and `/trades` duplicate one screen, while `/feed` is referenced without a route. | Introduce a capability-driven information architecture, canonical `/dashboard` and `/transactions` routes, and tested aliases for legacy URLs. Remove or implement dead references. |
-| UX-10 | P1 | High | Mobile marketplace, registration, messages, AI chat | Fixed 600px panels, fixed-width marketplace cards, two-column phone forms, tiny labels, and oversized dialogs cause crowding or excessive scrolling. | Use fluid cards, viewport-safe dialogs, stacked forms, and a single-pane list/detail messaging flow on small screens. |
-| UX-11 | P1 | High | Runtime reliability | A conditional hook, stale/generated type mismatches, missing Feed imports, schema mismatches, and incomplete effect dependencies can cause broken screens or perpetual loading. | Repair runtime blockers first. Require clean TypeScript and behavioral-lint gates for touched areas, followed by repository-wide cleanup. |
-| UX-12 | P2 | High | Design system and feature styling | Hundreds of direct color classes and per-page treatments bypass semantic tokens. Similar states look and behave differently. | Define semantic color, typography, spacing, radius, elevation, motion, and status tokens; migrate incrementally through shared primitives. |
-| UX-13 | P2 | High | Public and workspace headers | Internal tools use large promotional heroes and heavy decoration. Some public pages use an eyebrow as `h1` and the actual title as `h2`. | Create separate public-hero and compact workspace-header patterns with correct heading hierarchy. |
-| UX-14 | P2 | High | LGU member and record management | Administrative records are card-only and lack scalable pagination, selection, bulk actions, and persistent filters. | Use accessible desktop tables with equivalent mobile record cards, server-aware pagination, filter summaries, and guarded bulk actions. |
-| UX-15 | P2 | High | Charts, planning, reporting | Charts depend heavily on color and lack equivalent summaries or tables. Dense fixed-size report previews do not adapt well. | Pair every chart with a plain-language summary and data table. Separate responsive on-screen reports from printable output. |
-| UX-16 | P2 | Medium | Loading, empty, error, and partial-data states | Feedback ranges from plain “Loading...” text to blank grids and toast-only failures. Recovery is inconsistent. | Standardize skeleton, empty, error, retry, permission-denied, offline, and partial-data patterns through a shared `AsyncState`. |
-| UX-17 | P2 | Medium | Authenticated localization | The language selector implies broader localization, but most workspace text is hard-coded English. | Move workspace text into the current i18n system and synchronize the document language with the selected locale. |
-| UX-18 | P2 | Medium | Performance and data fetching | Heavy video, charts, mapping, PDF libraries, repeated profile queries, and limited dynamic import use increase startup and navigation cost. | Compress media, use posters and controlled playback, lazy-load specialist libraries, and share cached typed queries. |
-| UX-19 | P2 | Medium | PWA and notification behavior | The service worker and manifest reference nonexistent `/feed`; an empty notification audio file is shipped. A failed precache can prevent installation. | Correct the cache/shortcut list and either supply valid, user-initiated audio or remove it. Test install, update, offline, and recovery behavior. |
-| UX-20 | P3 | Medium | Institutional visual tone | Repeated glass effects, large gradients, emoji decoration, excessive rounding, logo bouncing, and hover movement weaken the credibility of LGU workspaces. | Keep expressive storytelling on selected public sections; use calmer surfaces, compact density, and minimal decoration inside workspaces. |
-| UX-21 | P3 | Low | Copy, statuses, currency, dates | Raw status values, inconsistent capitalization, mixed date/currency formats, and generic empty copy reduce comprehension and polish. | Centralize human-readable labels, Philippine currency and local date formatting, status language, and contextual microcopy. |
+| ID    | Priority | Severity | Affected areas                                         | Finding and user impact                                                                                                                                                                                | Recommended direction                                                                                                                                                                                    |
+| ----- | -------- | -------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UX-01 | P1       | Critical | Root shell, `LoadingScreen`                            | The app intentionally postpones rendering for 2.5 seconds and keeps a decorative overlay for 5 seconds. Users may assume the service is slow or broken.                                                | Render the shell immediately. Show route- or component-level skeletons only while real asynchronous work is pending.                                                                                     |
+| UX-02 | P1       | Critical | Restaurant dashboards, waste reports, waste collection | The canonical role is `restaurant`, while some screens require `hotel_restaurant`. Valid users see access-denied states. Dashboard links also target nonexistent `/waste-collections`.                 | Normalize legacy values once at the application boundary and use canonical roles everywhere. Point navigation to `/waste-collection`.                                                                    |
+| UX-03 | P1       | Critical | `/auth`, `/login`, `/register`, email verification     | Three competing auth implementations expose different roles and redirects. Verification updates component state during render, which can cause React warnings and unreliable behavior.                 | Build shared auth forms, role options, validation, terms, verification, and one redirect policy. Preserve legacy URLs as aliases or redirects. Move async/state effects into effects or query callbacks. |
+| UX-04 | P1       | Critical | Super-admin navigation, authorization, RLS             | `super_admin` exists in schema and migrations but is not included in the normal administrative UI capability checks. Existing LGU policies are municipality-oriented.                                  | Define explicit super-admin capabilities, island-wide filters, clear scope indicators, and narrowly reviewed RLS policies.                                                                               |
+| UX-05 | P1       | Critical | Public marketplace, contact page, LGU dashboard        | Mock listings appear like real records when data is absent; the contact form shows success without sending; trend labels such as “+3 today” are hard-coded. These patterns damage public-sector trust. | Label demonstrations unmistakably, connect actions to real services, and remove claims that are not derived from authoritative data.                                                                     |
+| UX-06 | P1       | High     | Global styles, controls, animated branding             | There is no reduced-motion handling; global transitions and repeated bouncing/floating effects run continuously. Buttons, inputs, and icon controls are commonly 32–36px high.                         | Add `prefers-reduced-motion`, limit motion to purposeful 150–200ms transitions, and use a 44px minimum interactive target on touch interfaces.                                                           |
+| UX-07 | P1       | High     | Colors, focus, status communication                    | Primary and accent greens fail normal-text contrast on white, focus indication is weak, and status meaning often relies on color.                                                                      | Introduce WCAG AA semantic tokens, a visible multi-pixel focus ring, text/icon status cues, and automated contrast checks.                                                                               |
+| UX-08 | P1       | High     | Forms, notifications, marketplace, messaging           | Several icon-only controls lack accessible names. Some fields rely on placeholders, and actions such as image removal become visible only on hover.                                                    | Use durable visible labels, programmatic names, inline help and errors, and touch-visible actions.                                                                                                       |
+| UX-09 | P1       | High     | Application shell and routing                          | Important dashboards and routes—inventory, GIS, eco-points, waste tools—are difficult to discover. `/requests` and `/trades` duplicate one screen, while `/feed` is referenced without a route.        | Introduce a capability-driven information architecture, canonical `/dashboard` and `/transactions` routes, and tested aliases for legacy URLs. Remove or implement dead references.                      |
+| UX-10 | P1       | High     | Mobile marketplace, registration, messages, AI chat    | Fixed 600px panels, fixed-width marketplace cards, two-column phone forms, tiny labels, and oversized dialogs cause crowding or excessive scrolling.                                                   | Use fluid cards, viewport-safe dialogs, stacked forms, and a single-pane list/detail messaging flow on small screens.                                                                                    |
+| UX-11 | P1       | High     | Runtime reliability                                    | A conditional hook, stale/generated type mismatches, missing Feed imports, schema mismatches, and incomplete effect dependencies can cause broken screens or perpetual loading.                        | Repair runtime blockers first. Require clean TypeScript and behavioral-lint gates for touched areas, followed by repository-wide cleanup.                                                                |
+| UX-12 | P2       | High     | Design system and feature styling                      | Hundreds of direct color classes and per-page treatments bypass semantic tokens. Similar states look and behave differently.                                                                           | Define semantic color, typography, spacing, radius, elevation, motion, and status tokens; migrate incrementally through shared primitives.                                                               |
+| UX-13 | P2       | High     | Public and workspace headers                           | Internal tools use large promotional heroes and heavy decoration. Some public pages use an eyebrow as `h1` and the actual title as `h2`.                                                               | Create separate public-hero and compact workspace-header patterns with correct heading hierarchy.                                                                                                        |
+| UX-14 | P2       | High     | LGU member and record management                       | Administrative records are card-only and lack scalable pagination, selection, bulk actions, and persistent filters.                                                                                    | Use accessible desktop tables with equivalent mobile record cards, server-aware pagination, filter summaries, and guarded bulk actions.                                                                  |
+| UX-15 | P2       | High     | Charts, planning, reporting                            | Charts depend heavily on color and lack equivalent summaries or tables. Dense fixed-size report previews do not adapt well.                                                                            | Pair every chart with a plain-language summary and data table. Separate responsive on-screen reports from printable output.                                                                              |
+| UX-16 | P2       | Medium   | Loading, empty, error, and partial-data states         | Feedback ranges from plain “Loading...” text to blank grids and toast-only failures. Recovery is inconsistent.                                                                                         | Standardize skeleton, empty, error, retry, permission-denied, offline, and partial-data patterns through a shared `AsyncState`.                                                                          |
+| UX-17 | P2       | Medium   | Authenticated localization                             | The language selector implies broader localization, but most workspace text is hard-coded English.                                                                                                     | Move workspace text into the current i18n system and synchronize the document language with the selected locale.                                                                                         |
+| UX-18 | P2       | Medium   | Performance and data fetching                          | Heavy video, charts, mapping, PDF libraries, repeated profile queries, and limited dynamic import use increase startup and navigation cost.                                                            | Compress media, use posters and controlled playback, lazy-load specialist libraries, and share cached typed queries.                                                                                     |
+| UX-19 | P2       | Medium   | PWA and notification behavior                          | The service worker and manifest reference nonexistent `/feed`; an empty notification audio file is shipped. A failed precache can prevent installation.                                                | Correct the cache/shortcut list and either supply valid, user-initiated audio or remove it. Test install, update, offline, and recovery behavior.                                                        |
+| UX-20 | P3       | Medium   | Institutional visual tone                              | Repeated glass effects, large gradients, emoji decoration, excessive rounding, logo bouncing, and hover movement weaken the credibility of LGU workspaces.                                             | Keep expressive storytelling on selected public sections; use calmer surfaces, compact density, and minimal decoration inside workspaces.                                                                |
+| UX-21 | P3       | Low      | Copy, statuses, currency, dates                        | Raw status values, inconsistent capitalization, mixed date/currency formats, and generic empty copy reduce comprehension and polish.                                                                   | Centralize human-readable labels, Philippine currency and local date formatting, status language, and contextual microcopy.                                                                              |
 
 ## Findings by user perspective
 
@@ -243,15 +243,15 @@ The current code uses responsive grids effectively in several content areas, but
 
 Required behavior by breakpoint:
 
-| Context | 360–390px | 768px | 1024–1440px |
-|---|---|---|---|
-| Navigation | Sheet/drawer with current-page title and clear close behavior | Compact shell | Persistent role-aware sidebar where appropriate |
-| Forms | Single column; labels above fields; full-width primary action | One or two columns only when fields remain readable | Density can increase without reducing target size |
-| Messaging | One pane at a time with a clear Back action | Adaptive list/detail | Stable split pane |
-| Marketplace | Fluid cards; no fixed `w-96`; bottom-safe dialogs | Two-column where useful | Dense grid with consistent card actions |
-| Records | Mobile record cards with equivalent actions | Hybrid view | Accessible table, pagination, and sticky/visible toolbar |
-| Dialogs | Viewport margins, safe max-height, internal scrolling | Centered adaptive width | Content-based maximum width |
-| Reports | Reflowed sections and horizontal chart safeguards | Responsive preview | Full preview plus print/export controls |
+| Context     | 360–390px                                                     | 768px                                               | 1024–1440px                                              |
+| ----------- | ------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| Navigation  | Sheet/drawer with current-page title and clear close behavior | Compact shell                                       | Persistent role-aware sidebar where appropriate          |
+| Forms       | Single column; labels above fields; full-width primary action | One or two columns only when fields remain readable | Density can increase without reducing target size        |
+| Messaging   | One pane at a time with a clear Back action                   | Adaptive list/detail                                | Stable split pane                                        |
+| Marketplace | Fluid cards; no fixed `w-96`; bottom-safe dialogs             | Two-column where useful                             | Dense grid with consistent card actions                  |
+| Records     | Mobile record cards with equivalent actions                   | Hybrid view                                         | Accessible table, pagination, and sticky/visible toolbar |
+| Dialogs     | Viewport margins, safe max-height, internal scrolling         | Centered adaptive width                             | Content-based maximum width                              |
+| Reports     | Reflowed sections and horizontal chart safeguards             | Responsive preview                                  | Full preview plus print/export controls                  |
 
 Acceptance must include no horizontal page overflow at 360px, no inaccessible hover-only action, and no touch target below 44px in critical journeys.
 
@@ -277,16 +277,16 @@ The modernization target is WCAG 2.2 AA for critical journeys.
 
 ### Proposed accessible palette
 
-| Token | Value | Intended use |
-|---|---|---|
-| Primary forest | `#166534` | Primary actions, active navigation, strong brand accents |
-| Ocean teal | `#0F766E` | Secondary institutional actions and information accents |
-| Sand | `#F4EFE4` | Warm storytelling sections and subtle highlights |
-| Surface | `#FFFFFF` | Cards, dialogs, and form surfaces |
-| Background | `#F8FAF7` | Workspace and page background |
-| Text | `#172A22` | Primary text |
-| Muted text | `#52635C` | Secondary copy that must remain readable |
-| Border | `#D4DED8` | Dividers and boundaries, supplemented by shape/spacing where needed |
+| Token          | Value     | Intended use                                                        |
+| -------------- | --------- | ------------------------------------------------------------------- |
+| Primary forest | `#166534` | Primary actions, active navigation, strong brand accents            |
+| Ocean teal     | `#0F766E` | Secondary institutional actions and information accents             |
+| Sand           | `#F4EFE4` | Warm storytelling sections and subtle highlights                    |
+| Surface        | `#FFFFFF` | Cards, dialogs, and form surfaces                                   |
+| Background     | `#F8FAF7` | Workspace and page background                                       |
+| Text           | `#172A22` | Primary text                                                        |
+| Muted text     | `#52635C` | Secondary copy that must remain readable                            |
+| Border         | `#D4DED8` | Dividers and boundaries, supplemented by shape/spacing where needed |
 
 Bright greens should remain decorative or be paired with dark text; they should not be the default background for white normal-size text.
 
@@ -318,15 +318,15 @@ The existing component library should be evolved, not replaced.
 
 ### Shared patterns to introduce
 
-| Pattern | Responsibility |
-|---|---|
-| `WorkspacePageHeader` | Compact title, description, breadcrumbs where needed, scope, freshness, and primary actions |
-| `StatusBadge` | Central status labels, iconography, tone, and accessible text |
-| `AsyncState` | Skeleton, empty, error, retry, offline, permission-denied, and partial-data states |
-| `DataToolbar` | Search, filters, saved/persistent state, result count, and responsive collapse behavior |
-| `ResponsiveDataView` | Equivalent table and mobile-card representations |
-| `ConfirmDialog` | Consequences, target summary, cancellation, pending state, and guarded destructive/bulk confirmation |
-| Role capability model | Route visibility, allowed actions, verification requirements, and municipality/island scope |
+| Pattern               | Responsibility                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| `WorkspacePageHeader` | Compact title, description, breadcrumbs where needed, scope, freshness, and primary actions          |
+| `StatusBadge`         | Central status labels, iconography, tone, and accessible text                                        |
+| `AsyncState`          | Skeleton, empty, error, retry, offline, permission-denied, and partial-data states                   |
+| `DataToolbar`         | Search, filters, saved/persistent state, result count, and responsive collapse behavior              |
+| `ResponsiveDataView`  | Equivalent table and mobile-card representations                                                     |
+| `ConfirmDialog`       | Consequences, target summary, cancellation, pending state, and guarded destructive/bulk confirmation |
+| Role capability model | Route visibility, allowed actions, verification requirements, and municipality/island scope          |
 
 ### Monolith decomposition
 

@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,11 +22,21 @@ interface BuyRequestModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listing: Listing | null;
-  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["app_role"] } | null;
+  user: {
+    id: string;
+    full_name: string;
+    primary_role: Database["public"]["Enums"]["app_role"];
+  } | null;
   onSuccess?: () => void;
 }
 
-export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }: BuyRequestModalProps) {
+export function BuyRequestModal({
+  open,
+  onOpenChange,
+  listing,
+  user,
+  onSuccess,
+}: BuyRequestModalProps) {
   const { profile } = useAuth();
   const [message, setMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -37,7 +54,9 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
 
     // Check if user is verified
     if (!profile?.lgu_approved) {
-      toast.error("Your account must be verified by the LGU before you can purchase products. Please upload your government ID and wait for verification.");
+      toast.error(
+        "Your account must be verified by the LGU before you can purchase products. Please upload your government ID and wait for verification.",
+      );
       return;
     }
 
@@ -55,7 +74,11 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
         buyer_user_id: user.id,
         buyer_name: user.full_name,
         buyer_role: user.primary_role,
-        message: message || (listing.kind === "waste" ? "I'm interested in collecting this food waste." : "I'm interested in purchasing this item."),
+        message:
+          message ||
+          (listing.kind === "waste"
+            ? "I'm interested in collecting this food waste."
+            : "I'm interested in purchasing this item."),
         status: "pending" as const,
       };
 
@@ -65,7 +88,9 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
       } as any);
 
       if (error?.message?.toLowerCase().includes("quantity_kg")) {
-        const { error: fallbackError } = await supabase.from("purchase_requests").insert(basePayload as any);
+        const { error: fallbackError } = await supabase
+          .from("purchase_requests")
+          .insert(basePayload as any);
         if (fallbackError) throw fallbackError;
       } else if (error) {
         throw error;
@@ -93,7 +118,11 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
         toast.error("Your purchase request was saved, but SMS delivery is not configured yet.");
       }
 
-      toast.success(listing.kind === "waste" ? "Collection request sent successfully!" : "Purchase request sent successfully!");
+      toast.success(
+        listing.kind === "waste"
+          ? "Collection request sent successfully!"
+          : "Purchase request sent successfully!",
+      );
       setMessage("");
       onOpenChange(false);
       onSuccess?.();
@@ -110,7 +139,8 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
         <DialogHeader>
           <DialogTitle>{listing?.kind === "waste" ? "Collect Now" : "Buy Now"}</DialogTitle>
           <DialogDescription>
-            Send a {listing?.kind === "waste" ? "collection" : "purchase"} request for {listing?.title}. The seller will review your request and respond.
+            Send a {listing?.kind === "waste" ? "collection" : "purchase"} request for{" "}
+            {listing?.title}. The seller will review your request and respond.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -124,7 +154,9 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
             {listing?.kind === "waste" && (
               <div className="bg-emerald-50 p-3 rounded-lg">
                 <p className="text-sm font-medium text-emerald-700">Free Collection</p>
-                <p className="text-sm text-emerald-600">This food waste is available for collection at no cost.</p>
+                <p className="text-sm text-emerald-600">
+                  This food waste is available for collection at no cost.
+                </p>
               </div>
             )}
             <div className="grid gap-2">
@@ -142,7 +174,11 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
               <Label htmlFor="message">Message (Optional)</Label>
               <Textarea
                 id="message"
-                placeholder={listing?.kind === "waste" ? "Add a message to the seller about collection..." : "Add a message to the seller..."}
+                placeholder={
+                  listing?.kind === "waste"
+                    ? "Add a message to the seller about collection..."
+                    : "Add a message to the seller..."
+                }
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
@@ -150,7 +186,9 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
             </div>
             <div className="bg-sand/50 p-3 rounded-lg">
               <p className="text-sm text-slate-600">
-                The seller will receive your request and can approve or reject it. Once approved, you'll be able to coordinate the {listing?.kind === "waste" ? "collection" : "transaction"} details.
+                The seller will receive your request and can approve or reject it. Once approved,
+                you'll be able to coordinate the{" "}
+                {listing?.kind === "waste" ? "collection" : "transaction"} details.
               </p>
             </div>
           </div>
@@ -159,7 +197,11 @@ export function BuyRequestModal({ open, onOpenChange, listing, user, onSuccess }
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : (listing?.kind === "waste" ? "Send Collection Request" : "Send Purchase Request")}
+              {isSubmitting
+                ? "Sending..."
+                : listing?.kind === "waste"
+                  ? "Send Collection Request"
+                  : "Send Purchase Request"}
             </Button>
           </DialogFooter>
         </form>

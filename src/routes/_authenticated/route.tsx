@@ -8,17 +8,17 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/login" });
-    
+
     // Check if email is verified
     // Existing users (created before July 21, 2026) can bypass email verification
     const userCreatedAt = data.user.created_at;
-    const legacyCutoffDate = new Date('2026-07-21T00:00:00Z');
+    const legacyCutoffDate = new Date("2026-07-21T00:00:00Z");
     const isExistingUser = userCreatedAt && new Date(userCreatedAt) < legacyCutoffDate;
-    
+
     if (!data.user.email_confirmed_at && !isExistingUser) {
       throw redirect({ to: "/verify-email" as any });
     }
-    
+
     return { user: data.user };
   },
   component: AuthenticatedLayout,

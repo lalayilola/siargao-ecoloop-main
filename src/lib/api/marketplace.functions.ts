@@ -26,7 +26,7 @@ export async function createTradeRequest(data: {
 
 export async function updateTradeRequestStatus(
   requestId: string,
-  status: Database["public"]["Enums"]["trade_status"]
+  status: Database["public"]["Enums"]["trade_status"],
 ) {
   const { data, error } = await supabase
     .from("trade_requests")
@@ -84,7 +84,7 @@ export async function createPurchaseRequest(data: {
 
 export async function updatePurchaseRequestStatus(
   requestId: string,
-  status: Database["public"]["Enums"]["trade_status"]
+  status: Database["public"]["Enums"]["trade_status"],
 ) {
   const { data, error } = await supabase
     .from("purchase_requests")
@@ -131,7 +131,9 @@ export async function getOrCreateConversation(data: {
   const { data: existingConv } = await supabase
     .from("conversations")
     .select("*")
-    .or(`and(participant_1_id.eq.${data.participant_1_id},participant_2_id.eq.${data.participant_2_id}),and(participant_1_id.eq.${data.participant_2_id},participant_2_id.eq.${data.participant_1_id})`)
+    .or(
+      `and(participant_1_id.eq.${data.participant_1_id},participant_2_id.eq.${data.participant_2_id}),and(participant_1_id.eq.${data.participant_2_id},participant_2_id.eq.${data.participant_1_id})`,
+    )
     .single();
 
   if (existingConv) return existingConv;
@@ -165,11 +167,7 @@ export async function sendMessage(data: {
   content: string;
   image_url?: string | null;
 }) {
-  const { data: result, error } = await supabase
-    .from("messages")
-    .insert(data)
-    .select()
-    .single();
+  const { data: result, error } = await supabase.from("messages").insert(data).select().single();
 
   if (error) throw error;
 
@@ -273,10 +271,7 @@ export async function markAllNotificationsAsRead(userId: string) {
 }
 
 export async function deleteNotification(notificationId: string) {
-  const { error } = await supabase
-    .from("notifications")
-    .delete()
-    .eq("id", notificationId);
+  const { error } = await supabase.from("notifications").delete().eq("id", notificationId);
 
   if (error) throw error;
 }
@@ -320,7 +315,7 @@ export async function createListing(data: {
 
 export async function updateListing(
   listingId: string,
-  data: Partial<Database["public"]["Tables"]["marketplace_listings"]["Update"]>
+  data: Partial<Database["public"]["Tables"]["marketplace_listings"]["Update"]>,
 ) {
   const { data: result, error } = await supabase
     .from("marketplace_listings")
@@ -334,10 +329,7 @@ export async function updateListing(
 }
 
 export async function deleteListing(listingId: string) {
-  const { error } = await supabase
-    .from("marketplace_listings")
-    .delete()
-    .eq("id", listingId);
+  const { error } = await supabase.from("marketplace_listings").delete().eq("id", listingId);
 
   if (error) throw error;
 }
@@ -367,7 +359,9 @@ export async function getListings(filters?: {
     query = query.ilike("category", `%${filters.category}%`);
   }
   if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,seller.ilike.%${filters.search}%,barangay.ilike.%${filters.search}%`);
+    query = query.or(
+      `title.ilike.%${filters.search}%,seller.ilike.%${filters.search}%,barangay.ilike.%${filters.search}%`,
+    );
   }
 
   const { data, error } = await query;

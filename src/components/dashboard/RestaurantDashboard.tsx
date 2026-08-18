@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import { Container } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
-import {
-  UtensilsCrossed,
-  TrendingUp,
-  Package,
-  Leaf,
-} from "lucide-react";
+import { UtensilsCrossed, TrendingUp, Package, Leaf } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -102,7 +97,9 @@ export function RestaurantDashboard() {
         <Card className="p-8 text-center border-2 border-accent/30 bg-gradient-to-br from-white to-accent/10">
           <UtensilsCrossed className="h-16 w-16 text-accent mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-accent mb-2">Restaurant Dashboard</h2>
-          <p className="text-slate-600">This dashboard is only available for restaurants and hotels.</p>
+          <p className="text-slate-600">
+            This dashboard is only available for restaurants and hotels.
+          </p>
         </Card>
       </Container>
     );
@@ -111,7 +108,9 @@ export function RestaurantDashboard() {
   return (
     <Container className="py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-display font-bold text-accent mb-2">Welcome, {profile.full_name}</h1>
+        <h1 className="text-3xl font-display font-bold text-accent mb-2">
+          Welcome, {profile.full_name}
+        </h1>
         <p className="text-slate-600">Manage your produce sourcing and recent activity.</p>
       </div>
 
@@ -163,17 +162,24 @@ export function RestaurantDashboard() {
                   <div key={activity.id} className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-medium text-slate-900">Order from farmer</p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        activity.status === "scheduled" ? "bg-yellow-100 text-yellow-800" :
-                        activity.status === "collected" ? "bg-green-100 text-green-800" :
-                        activity.status === "processed" ? "bg-blue-100 text-blue-800" :
-                        "bg-slate-100 text-slate-800"
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          activity.status === "scheduled"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : activity.status === "collected"
+                              ? "bg-green-100 text-green-800"
+                              : activity.status === "processed"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-slate-100 text-slate-800"
+                        }`}
+                      >
                         {activity.status}
                       </span>
                     </div>
                     <p className="text-sm text-slate-600">Fresh produce purchase</p>
-                    <p className="text-xs text-slate-500 mt-1">{new Date(activity.created_at).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {new Date(activity.created_at).toLocaleDateString()}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -192,7 +198,9 @@ export function RestaurantDashboard() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-slate-900">Messages</h3>
-                    <p className="text-sm text-slate-600">Stay connected with farmers and suppliers</p>
+                    <p className="text-sm text-slate-600">
+                      Stay connected with farmers and suppliers
+                    </p>
                   </div>
                 </div>
               </Card>

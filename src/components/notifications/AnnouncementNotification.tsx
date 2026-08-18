@@ -24,7 +24,7 @@ export function AnnouncementNotification() {
         },
         async (payload) => {
           const newAnnouncement = payload.new as any;
-          
+
           // Don't notify if the user is the one who published it
           if (newAnnouncement.lgu_admin_id === user.id) return;
 
@@ -45,7 +45,9 @@ export function AnnouncementNotification() {
                 <Megaphone className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-slate-900">New Announcement from {adminProfile?.full_name || "LGU Admin"}</p>
+                <p className="font-semibold text-sm text-slate-900">
+                  New Announcement from {adminProfile?.full_name || "LGU Admin"}
+                </p>
                 <p className="text-xs text-slate-600 truncate">{newAnnouncement.title}</p>
               </div>
             </div>,
@@ -53,11 +55,11 @@ export function AnnouncementNotification() {
               duration: 6000,
               position: "top-right",
               style: {
-                background: 'white',
-                border: '2px solid #10b981',
-                borderRadius: '12px',
-                padding: '16px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                background: "white",
+                border: "2px solid #10b981",
+                borderRadius: "12px",
+                padding: "16px",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
               },
               action: {
                 label: "View",
@@ -65,9 +67,9 @@ export function AnnouncementNotification() {
                   window.location.href = "/announcements";
                 },
               },
-            }
+            },
           );
-        }
+        },
       )
       .subscribe();
 

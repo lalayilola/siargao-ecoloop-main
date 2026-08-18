@@ -47,7 +47,7 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/announcements")({
-  head: () => ({ meta: [{ title: "Announcements — Siargao Loops" }] }),
+  head: () => ({ meta: [{ title: "Announcements — Farm2Food Cycle" }] }),
   component: UserAnnouncements,
 });
 

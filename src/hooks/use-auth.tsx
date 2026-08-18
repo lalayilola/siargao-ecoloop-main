@@ -11,7 +11,16 @@ import {
 
 export type { AppRole } from "@/lib/roles";
 
-export type Municipality = "burgos" | "dapa" | "general_luna" | "pilar" | "san_benito" | "san_isidro" | "santa_monica" | "socorro" | "del_carmen";
+export type Municipality =
+  | "burgos"
+  | "dapa"
+  | "general_luna"
+  | "pilar"
+  | "san_benito"
+  | "san_isidro"
+  | "santa_monica"
+  | "socorro"
+  | "del_carmen";
 
 export type Profile = {
   id: string;
@@ -70,12 +79,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const normalizedProfile = prof
         ? {
             ...(prof as Profile),
-            primary_role: normalizeAppRole((prof as { primary_role?: unknown }).primary_role) ?? "resident",
+            primary_role:
+              normalizeAppRole((prof as { primary_role?: unknown }).primary_role) ?? "resident",
           }
         : null;
       const profileRole = normalizedProfile?.primary_role;
       const derivedRoles = Array.from(
-        new Set([...(metadataRole ? [metadataRole] : []), ...dbRoles, ...(profileRole ? [profileRole] : [])]),
+        new Set([
+          ...(metadataRole ? [metadataRole] : []),
+          ...dbRoles,
+          ...(profileRole ? [profileRole] : []),
+        ]),
       );
 
       setProfile(normalizedProfile);
@@ -140,9 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isSuperAdminRole(profile?.primary_role) ||
     roles.some(isSuperAdminRole);
   const isAdmin =
-    isSuperAdmin ||
-    isAdministrativeRole(profile?.primary_role) ||
-    roles.some(isAdministrativeRole);
+    isSuperAdmin || isAdministrativeRole(profile?.primary_role) || roles.some(isAdministrativeRole);
 
   return (
     <Ctx.Provider

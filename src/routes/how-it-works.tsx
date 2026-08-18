@@ -9,10 +9,17 @@ import hero from "@/assets/homepage1.jpg";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — Siargao Loops" },
-      { name: "description", content: "Four simple steps: post, match, exchange, and track. See how Siargao Loops connects farmers, restaurants, and LGUs in a circular economy." },
-      { property: "og:title", content: "How Siargao Loops works" },
-      { property: "og:description", content: "Post, match, exchange, track — the circular loop in four steps." },
+      { title: "How it works — Farm2Food Cycle" },
+      {
+        name: "description",
+        content:
+          "Four simple steps: post, match, exchange, and track. See how Farm2Food Cycle connects farmers, restaurants, and LGUs in a circular economy.",
+      },
+      { property: "og:title", content: "How Farm2Food Cycle works" },
+      {
+        property: "og:description",
+        content: "Post, match, exchange, track — the circular loop in four steps.",
+      },
     ],
   }),
   component: HowItWorks,
@@ -33,16 +40,24 @@ function HowItWorks() {
       {/* Hero Section with Background */}
       <section className="relative overflow-hidden py-20">
         <div className="absolute inset-0">
-          <img src={hero} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
+          <img
+            src={hero}
+            alt=""
+            width={1600}
+            height={1024}
+            className="h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         <Container className="relative">
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="font-display text-3xl font-semibold sm:text-4xl text-white">{t("howItWorks.hero.eyebrow")}</h1>
-            <h2 className="mt-4 font-display text-4xl font-bold sm:text-5xl text-white">{t("howItWorks.hero.title")}</h2>
-            <p className="mt-4 text-lg text-white/90">
-              {t("howItWorks.hero.subtitle")}
-            </p>
+            <h1 className="font-display text-3xl font-semibold sm:text-4xl text-white">
+              {t("howItWorks.hero.eyebrow")}
+            </h1>
+            <h2 className="mt-4 font-display text-4xl font-bold sm:text-5xl text-white">
+              {t("howItWorks.hero.title")}
+            </h2>
+            <p className="mt-4 text-lg text-white/90">{t("howItWorks.hero.subtitle")}</p>
           </div>
         </Container>
       </section>
@@ -51,7 +66,10 @@ function HowItWorks() {
         {/* Steps Grid */}
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, index) => (
-            <Card key={s.titleKey} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-primary/20">
+            <Card
+              key={s.titleKey}
+              className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-transparent hover:border-primary/20"
+            >
               <div className="flex items-start gap-4">
                 <div className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
                   <s.icon className="h-7 w-7" />
@@ -59,7 +77,9 @@ function HowItWorks() {
                 <div className="flex-1">
                   <div className="text-xs font-bold text-primary mb-1">0{index + 1}</div>
                   <h3 className="font-display text-xl font-semibold">{t(s.titleKey)}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t(s.bodyKey)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                    {t(s.bodyKey)}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -74,27 +94,39 @@ function HowItWorks() {
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             <div className="relative">
-              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">M</div>
+              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">
+                M
+              </div>
               <div className="relative">
-                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">{t("howItWorks.example.monday")}</div>
+                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">
+                  {t("howItWorks.example.monday")}
+                </div>
                 <p className="text-muted-foreground leading-relaxed">
                   {t("howItWorks.example.mondayDesc")}
                 </p>
               </div>
             </div>
             <div className="relative">
-              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">T</div>
+              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">
+                T
+              </div>
               <div className="relative">
-                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">{t("howItWorks.example.tuesday")}</div>
+                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">
+                  {t("howItWorks.example.tuesday")}
+                </div>
                 <p className="text-muted-foreground leading-relaxed">
                   {t("howItWorks.example.tuesdayDesc")}
                 </p>
               </div>
             </div>
             <div className="relative">
-              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">F</div>
+              <div className="absolute -left-4 top-0 text-6xl font-bold text-primary/10 font-display">
+                F
+              </div>
               <div className="relative">
-                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">{t("howItWorks.example.friday")}</div>
+                <div className="text-sm font-bold uppercase tracking-wider text-primary mb-3">
+                  {t("howItWorks.example.friday")}
+                </div>
                 <p className="text-muted-foreground leading-relaxed">
                   {t("howItWorks.example.fridayDesc")}
                 </p>
@@ -113,7 +145,9 @@ function HowItWorks() {
             Connect with farmers, restaurants, and your community to turn waste into harvest.
           </p>
           <Button asChild size="lg" className="rounded-full px-8">
-            <Link to="/auth">{t("howItWorks.startPost")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/auth">
+              {t("howItWorks.startPost")} <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </Container>

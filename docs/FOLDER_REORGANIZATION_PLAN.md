@@ -1,6 +1,7 @@
 # Folder Reorganization Plan
 
 ## Current Issues
+
 - Root directory cluttered with 13+ documentation files
 - Components scattered without logical grouping
 - No clear separation between feature-specific components
@@ -9,6 +10,7 @@
 ## Proposed Structure
 
 ### Documentation Organization
+
 ```
 docs/
 ├── guides/              # User guides and getting started
@@ -32,6 +34,7 @@ docs/
 ```
 
 ### Component Organization
+
 ```
 src/components/
 ├── layout/             # Layout components
@@ -87,6 +90,7 @@ src/components/
 ```
 
 ### Migration Steps
+
 1. Create new folder structure
 2. Move components to appropriate folders
 3. Update import statements in all files

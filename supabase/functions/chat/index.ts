@@ -41,17 +41,29 @@ function getFallbackResponse(message: string) {
   const lowerMessage = message.toLowerCase();
 
   // Greetings
-  if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey")) {
+  if (
+    lowerMessage.includes("hello") ||
+    lowerMessage.includes("hi") ||
+    lowerMessage.includes("hey")
+  ) {
     return "Hello! I’m Siargao Loops Assistant. I can help you find fresh produce, compost, waste materials, and other sustainable items in the marketplace. What are you looking for?";
   }
 
   // Products available
-  if (lowerMessage.includes("what") && (lowerMessage.includes("product") || lowerMessage.includes("available") || lowerMessage.includes("marketplace"))) {
+  if (
+    lowerMessage.includes("what") &&
+    (lowerMessage.includes("product") ||
+      lowerMessage.includes("available") ||
+      lowerMessage.includes("marketplace"))
+  ) {
     return "The Siargao Loops marketplace offers fresh produce (vegetables, fruits), food waste for composting, organic fertilizer, and other sustainable materials. Farmers, restaurants, and residents list items here. Browse the marketplace to see current listings!";
   }
 
   // Who buys produce
-  if (lowerMessage.includes("who") && (lowerMessage.includes("buy") || lowerMessage.includes("purchase"))) {
+  if (
+    lowerMessage.includes("who") &&
+    (lowerMessage.includes("buy") || lowerMessage.includes("purchase"))
+  ) {
     return "Residents, restaurants, hotels, and LGU staff can buy fresh produce from farmers in the marketplace. You can also barter or trade items. Check the marketplace for available listings and sellers.";
   }
 
@@ -66,17 +78,30 @@ function getFallbackResponse(message: string) {
   }
 
   // Buying/selling/trading
-  if (lowerMessage.includes("buy") || lowerMessage.includes("sell") || lowerMessage.includes("trade") || lowerMessage.includes("barter")) {
+  if (
+    lowerMessage.includes("buy") ||
+    lowerMessage.includes("sell") ||
+    lowerMessage.includes("trade") ||
+    lowerMessage.includes("barter")
+  ) {
     return "You can buy, sell, barter, or trade in the marketplace. Create listings for items you have, or browse listings from others. Transactions can be for money or barter exchanges. Check each listing for available options.";
   }
 
   // Waste management
-  if (lowerMessage.includes("waste") || lowerMessage.includes("recycle") || lowerMessage.includes("compost")) {
+  if (
+    lowerMessage.includes("waste") ||
+    lowerMessage.includes("recycle") ||
+    lowerMessage.includes("compost")
+  ) {
     return "Siargao Loops helps with waste management by connecting restaurants with farmers who can use food waste for composting. You can also find organic fertilizer listings from LGU. Use the marketplace to find waste materials or compost opportunities.";
   }
 
   // Location assistance
-  if (lowerMessage.includes("location") || lowerMessage.includes("siargao") || lowerMessage.includes("where")) {
+  if (
+    lowerMessage.includes("location") ||
+    lowerMessage.includes("siargao") ||
+    lowerMessage.includes("where")
+  ) {
     return "Siargao Loops operates across Siargao with listings from different barangays. You can filter marketplace items by location to find sellers near you. Each listing shows the seller's barangay for easy coordination.";
   }
 
@@ -115,7 +140,7 @@ async function getGeminiResponse(message: string) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
-      }
+      },
     );
 
     const responseText = await geminiResponse.text();
@@ -124,9 +149,7 @@ async function getGeminiResponse(message: string) {
       try {
         const geminiData = responseText ? JSON.parse(responseText) : {};
         const aiResponse =
-          geminiData.candidates?.[0]?.content?.parts?.[0]?.text ||
-          geminiData.output?.text ||
-          "";
+          geminiData.candidates?.[0]?.content?.parts?.[0]?.text || geminiData.output?.text || "";
 
         if (aiResponse) {
           return aiResponse;
@@ -212,7 +235,7 @@ serve(async (req) => {
         error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      500
+      500,
     );
   }
 });

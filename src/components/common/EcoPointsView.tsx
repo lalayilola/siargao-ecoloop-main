@@ -184,8 +184,12 @@ export function EcoPointsView() {
                       : "border-slate-200 bg-slate-50 opacity-50"
                   }`}
                 >
-                  <badge.icon className={`h-12 w-12 mx-auto mb-3 ${isUnlocked ? badge.iconColor : "text-slate-400"}`} />
-                  <h4 className={`font-semibold mb-1 ${isUnlocked ? "text-slate-900" : "text-slate-600"}`}>
+                  <badge.icon
+                    className={`h-12 w-12 mx-auto mb-3 ${isUnlocked ? badge.iconColor : "text-slate-400"}`}
+                  />
+                  <h4
+                    className={`font-semibold mb-1 ${isUnlocked ? "text-slate-900" : "text-slate-600"}`}
+                  >
                     {badge.name}
                   </h4>
                   <p className={`text-xs ${isUnlocked ? "text-slate-700" : "text-slate-500"}`}>
@@ -194,7 +198,9 @@ export function EcoPointsView() {
                   {!isUnlocked && (
                     <p className="text-xs text-slate-500 mt-2">({badge.requirement} required)</p>
                   )}
-                  {isUnlocked && <p className="text-xs font-semibold text-primary mt-2">✓ Unlocked</p>}
+                  {isUnlocked && (
+                    <p className="text-xs font-semibold text-primary mt-2">✓ Unlocked</p>
+                  )}
                 </Card>
               );
             })}

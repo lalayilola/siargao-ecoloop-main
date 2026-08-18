@@ -52,8 +52,9 @@ export function WasteCollectionView() {
         return;
       }
 
-      const { data: collectionData, error: collectionError } = await (supabase
-        .from("waste_collections") as any)
+      const { data: collectionData, error: collectionError } = await (
+        supabase.from("waste_collections") as any
+      )
         .select("*")
         .in("waste_report_id", reportIds);
 
@@ -95,7 +96,9 @@ export function WasteCollectionView() {
         <Card className="mx-auto max-w-xl p-8 text-center">
           <FolderOpen className="mx-auto h-12 w-12 text-accent mb-4" />
           <h2 className="text-2xl font-semibold text-accent">Collection Requests</h2>
-          <p className="text-slate-600 mt-2">This page is for restaurants to track waste pickup requests.</p>
+          <p className="text-slate-600 mt-2">
+            This page is for restaurants to track waste pickup requests.
+          </p>
         </Card>
       </Container>
     );
@@ -105,10 +108,17 @@ export function WasteCollectionView() {
     <Container className="py-12">
       <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Collection Requests</h1>
-          <p className="text-slate-600">Track your food waste reports and scheduled pickup details.</p>
+          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">
+            Collection Requests
+          </h1>
+          <p className="text-slate-600">
+            Track your food waste reports and scheduled pickup details.
+          </p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-white gap-2" onClick={() => navigate({ to: "/waste-reports" })}>
+        <Button
+          className="bg-accent hover:bg-accent/90 text-white gap-2"
+          onClick={() => navigate({ to: "/waste-reports" })}
+        >
           <Plus className="h-4 w-4" /> Request Collection
         </Button>
       </div>
@@ -121,8 +131,13 @@ export function WasteCollectionView() {
         <Card className="p-12 text-center border-2 border-accent/20">
           <MapPin className="h-16 w-16 text-slate-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-slate-900 mb-2">No collection requests yet</h2>
-          <p className="text-slate-600 mb-6">Submit a waste report so the LGU can schedule a pickup.</p>
-          <Button className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto" onClick={() => navigate({ to: "/waste-reports" })}>
+          <p className="text-slate-600 mb-6">
+            Submit a waste report so the LGU can schedule a pickup.
+          </p>
+          <Button
+            className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto"
+            onClick={() => navigate({ to: "/waste-reports" })}
+          >
             <Plus className="h-4 w-4" /> Submit a Waste Report
           </Button>
         </Card>
@@ -131,7 +146,10 @@ export function WasteCollectionView() {
           {reports.map((report) => {
             const collection = collections[report.id];
             return (
-              <Card key={report.id} className="p-6 border-2 border-accent/20 hover:border-accent/40 transition-all">
+              <Card
+                key={report.id}
+                className="p-6 border-2 border-accent/20 hover:border-accent/40 transition-all"
+              >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -147,13 +165,17 @@ export function WasteCollectionView() {
                         {new Date(report.collection_date).toLocaleDateString()}
                       </span>
                       <span>{report.quantity_kg} kg</span>
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}
+                      >
                         {report.status}
                       </span>
                     </div>
                     {collection && (
                       <p className="text-sm text-slate-600">
-                        Collection scheduled: {new Date(collection.scheduled_date).toLocaleDateString()} • Status: {collection.status}
+                        Collection scheduled:{" "}
+                        {new Date(collection.scheduled_date).toLocaleDateString()} • Status:{" "}
+                        {collection.status}
                       </p>
                     )}
                   </div>

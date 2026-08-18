@@ -1,5 +1,6 @@
 const SUPABASE_URL = "https://ientovkdqwiqqlphqgrr.supabase.co";
-const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllbnRvdmtkcXdpcXFscGhxZ3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjA3MzUsImV4cCI6MjA5Nzg5NjczNX0.nwZvZNkK9uZfZk-oslYN2vAb8rmnVTqVd0r7kSPKgUE";
+const SERVICE_ROLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllbnRvdmtkcXdpcXFscGhxZ3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjA3MzUsImV4cCI6MjA5Nzg5NjczNX0.nwZvZNkK9uZfZk-oslYN2vAb8rmnVTqVd0r7kSPKgUE";
 
 async function createStorageBucket() {
   console.log("Creating storage bucket 'uploads'...");
@@ -7,14 +8,14 @@ async function createStorageBucket() {
   try {
     // Create the bucket
     const response = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: 'uploads',
-        name: 'uploads',
+        id: "uploads",
+        name: "uploads",
         public: true,
       }),
     });
@@ -71,10 +72,10 @@ async function createStorageBucket() {
     console.log("Setting up RLS policies...");
     for (const policy of policies) {
       const policyResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_policy`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           policy_name: policy.name,
@@ -85,7 +86,7 @@ async function createStorageBucket() {
           with_check: policy.definition.with_check,
         }),
       });
-      console.log(`  ${policy.name}: ${policyResponse.ok ? '✓' : '✗'}`);
+      console.log(`  ${policy.name}: ${policyResponse.ok ? "✓" : "✗"}`);
     }
 
     console.log("\n✓ Storage bucket setup complete!");

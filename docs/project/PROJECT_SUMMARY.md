@@ -56,6 +56,7 @@
 ## 🛠️ Technology Stack
 
 ### Frontend
+
 ✅ React 18+ with TypeScript
 ✅ TanStack Router for routing
 ✅ TanStack Query for data caching
@@ -65,6 +66,7 @@
 ✅ Lucide React icons
 
 ### Backend
+
 ✅ Supabase (PostgreSQL database)
 ✅ Supabase Auth (authentication)
 ✅ Supabase Storage (file uploads)
@@ -72,6 +74,7 @@
 ✅ Database triggers (automation)
 
 ### Infrastructure
+
 ✅ Vite build tooling
 ✅ ESLint for code quality
 ✅ TypeScript for type safety
@@ -110,6 +113,7 @@
 ### What You Can Do Right Now
 
 1. **Start Development**
+
    ```bash
    bun install
    bun dev
@@ -141,18 +145,18 @@
 
 ## 🎯 Key Features Summary
 
-| Category | Status | Count |
-|----------|--------|-------|
-| User Roles | ✅ Complete | 4 (Farmer, Restaurant, Resident, LGU) |
-| Portals | ✅ Complete | 3 (Farmer, Restaurant, LGU) |
-| Main Pages | ✅ Complete | 20+ pages |
-| Components | ✅ Complete | 38 components |
-| Routes | ✅ Complete | 34 authenticated routes |
-| Database Tables | ✅ Complete | 14+ tables |
-| Real-Time Features | ✅ Complete | Messages, Notifications, Feed |
-| Gamification | ✅ Complete | Points system + 4 badges |
-| Analytics | ✅ Complete | Dashboard with charts |
-| Mobile Responsive | ✅ Complete | All breakpoints |
+| Category           | Status      | Count                                 |
+| ------------------ | ----------- | ------------------------------------- |
+| User Roles         | ✅ Complete | 4 (Farmer, Restaurant, Resident, LGU) |
+| Portals            | ✅ Complete | 3 (Farmer, Restaurant, LGU)           |
+| Main Pages         | ✅ Complete | 20+ pages                             |
+| Components         | ✅ Complete | 38 components                         |
+| Routes             | ✅ Complete | 34 authenticated routes               |
+| Database Tables    | ✅ Complete | 14+ tables                            |
+| Real-Time Features | ✅ Complete | Messages, Notifications, Feed         |
+| Gamification       | ✅ Complete | Points system + 4 badges              |
+| Analytics          | ✅ Complete | Dashboard with charts                 |
+| Mobile Responsive  | ✅ Complete | All breakpoints                       |
 
 ---
 
@@ -171,6 +175,7 @@
 ## 📈 Next Steps (Optional)
 
 ### Enhancement Opportunities
+
 - [ ] GIS Map Integration (Leaflet)
 - [ ] Environmental Impact Metrics
 - [ ] Mobile App (React Native)
@@ -182,6 +187,7 @@
 - [ ] Offline support
 
 ### Monitoring & Maintenance
+
 - [ ] Set up error logging (Sentry)
 - [ ] Configure analytics (Google Analytics)
 - [ ] Monitor performance (Vercel Analytics)
@@ -194,6 +200,7 @@
 ## 🎓 For Users
 
 ### Getting Started
+
 1. Read `GETTING_STARTED.md`
 2. Install dependencies with `bun install`
 3. Configure `.env.local`
@@ -202,6 +209,7 @@
 6. Visit `http://localhost:5173`
 
 ### Testing
+
 1. Create accounts with different roles
 2. Follow workflows in `FEATURE_VERIFICATION_CHECKLIST.md`
 3. Test all features
@@ -253,13 +261,13 @@
 
 ## 📞 Support Resources
 
-| Resource | Link |
-|----------|------|
-| Supabase Docs | https://supabase.com/docs |
-| React Documentation | https://react.dev |
-| Tailwind CSS | https://tailwindcss.com |
-| TanStack | https://tanstack.com |
-| TypeScript | https://www.typescriptlang.org |
+| Resource            | Link                           |
+| ------------------- | ------------------------------ |
+| Supabase Docs       | https://supabase.com/docs      |
+| React Documentation | https://react.dev              |
+| Tailwind CSS        | https://tailwindcss.com        |
+| TanStack            | https://tanstack.com           |
+| TypeScript          | https://www.typescriptlang.org |
 
 ---
 
@@ -280,18 +288,18 @@
 
 ## 🚀 Launch Readiness
 
-| Item | Status |
-|------|--------|
-| Frontend | ✅ 100% Complete |
-| Backend | ✅ 100% Complete |
-| Database | ✅ 100% Complete |
-| Authentication | ✅ 100% Complete |
-| Real-Time | ✅ 100% Complete |
-| Storage | ✅ 100% Complete |
-| UI/UX | ✅ 100% Complete |
-| Documentation | ✅ 100% Complete |
-| Testing | ✅ Ready for verification |
-| Deployment | ✅ Ready |
+| Item           | Status                    |
+| -------------- | ------------------------- |
+| Frontend       | ✅ 100% Complete          |
+| Backend        | ✅ 100% Complete          |
+| Database       | ✅ 100% Complete          |
+| Authentication | ✅ 100% Complete          |
+| Real-Time      | ✅ 100% Complete          |
+| Storage        | ✅ 100% Complete          |
+| UI/UX          | ✅ 100% Complete          |
+| Documentation  | ✅ 100% Complete          |
+| Testing        | ✅ Ready for verification |
+| Deployment     | ✅ Ready                  |
 
 ---
 
@@ -315,6 +323,7 @@
 **Siargao Loops is a complete, production-ready full-stack application** that successfully implements a circular food waste management ecosystem for Siargao.
 
 The application:
+
 - ✅ Connects all three stakeholders (Farmers, Restaurants, LGU)
 - ✅ Manages the complete waste-to-compost cycle
 - ✅ Provides real-time communication

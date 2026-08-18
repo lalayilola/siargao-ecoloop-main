@@ -51,7 +51,7 @@ export function NotificationsView() {
     }
 
     setNotifications((current) =>
-      current.map((n) => (n.id === notificationId ? { ...n, read_at: now } : n))
+      current.map((n) => (n.id === notificationId ? { ...n, read_at: now } : n)),
     );
   };
 
@@ -76,10 +76,7 @@ export function NotificationsView() {
   };
 
   const deleteNotification = async (notificationId: string) => {
-    const { error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", notificationId);
+    const { error } = await supabase.from("notifications").delete().eq("id", notificationId);
 
     if (error) {
       toast.error("Failed to delete notification");
@@ -134,9 +131,7 @@ export function NotificationsView() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-primary" />
-            <span className="font-semibold">
-              {unreadCount > 0 && `${unreadCount} unread`}
-            </span>
+            <span className="font-semibold">{unreadCount > 0 && `${unreadCount} unread`}</span>
           </div>
           {unreadCount > 0 && (
             <Button
@@ -172,7 +167,9 @@ export function NotificationsView() {
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-medium text-slate-900">{notification.title}</p>
                       {!notification.read_at && (
-                        <Badge variant="default" className="text-xs">New</Badge>
+                        <Badge variant="default" className="text-xs">
+                          New
+                        </Badge>
                       )}
                     </div>
                     <p className="text-sm text-slate-600 mb-2">{notification.message}</p>

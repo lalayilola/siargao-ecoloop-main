@@ -4,8 +4,11 @@ import { WasteReportsView } from "@/components/waste/WasteReportsView";
 export const Route = createFileRoute("/_authenticated/waste-reports")({
   head: () => ({
     meta: [
-      { title: "Waste Reports — Siargao Loops" },
-      { name: "description", content: "Submit and track food waste reports for composting collection." },
+      { title: "Waste Reports — Farm2Food Cycle" },
+      {
+        name: "description",
+        content: "Submit and track food waste reports for composting collection.",
+      },
       { property: "og:title", content: "Waste Reports" },
     ],
   }),

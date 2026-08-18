@@ -25,10 +25,7 @@ export function GISMapView() {
           .not("latitude", "is", null)
           .not("longitude", "is", null)
           .order("created_at", { ascending: false }),
-        supabase
-          .from("food_waste_reports")
-          .select("*")
-          .order("created_at", { ascending: false }),
+        supabase.from("food_waste_reports").select("*").order("created_at", { ascending: false }),
       ]);
 
       setLoading(false);
@@ -116,16 +113,29 @@ export function GISMapView() {
                   <h3 className="text-lg font-semibold">Marketplace locations</h3>
                 </div>
                 {marketplaceLocations.length === 0 ? (
-                  <p className="text-sm text-slate-600">No marketplace locations with coordinates available.</p>
+                  <p className="text-sm text-slate-600">
+                    No marketplace locations with coordinates available.
+                  </p>
                 ) : (
                   <div className="space-y-3">
                     {marketplaceLocations.slice(0, 6).map((item) => (
                       <Card key={item.id} className="p-4 border border-primary/10 bg-primary/5">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm text-slate-500">{item.kind === "compost" ? "Compost" : item.kind === "waste" ? "Waste" : "Produce"}</p>
+                            <p className="text-sm text-slate-500">
+                              {item.kind === "compost"
+                                ? "Compost"
+                                : item.kind === "waste"
+                                  ? "Waste"
+                                  : "Produce"}
+                            </p>
                             <p className="font-semibold text-slate-900">{item.title}</p>
-                            <p className="text-xs text-slate-500">{item.location_name || item.barangay || item.location_address || "No location name"}</p>
+                            <p className="text-xs text-slate-500">
+                              {item.location_name ||
+                                item.barangay ||
+                                item.location_address ||
+                                "No location name"}
+                            </p>
                           </div>
                           <div className="text-right text-xs text-slate-500">
                             {item.latitude?.toFixed(3)}, {item.longitude?.toFixed(3)}

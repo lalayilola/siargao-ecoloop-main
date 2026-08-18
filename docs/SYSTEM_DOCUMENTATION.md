@@ -1,6 +1,7 @@
 # Siargao Loops - Complete System Documentation
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Architecture](#architecture)
 3. [Technology Stack](#technology-stack)
@@ -21,6 +22,7 @@
 Siargao Loops is a circular food economy platform designed for the Siargao community. It connects farmers, restaurants, hotels, residents, and local government units (LGUs) to reduce food waste, promote sustainable practices, and create a local circular economy.
 
 ### Key Objectives
+
 - Reduce food waste through redistribution and composting
 - Connect local producers with consumers
 - Provide LGU oversight and planning tools
@@ -32,6 +34,7 @@ Siargao Loops is a circular food economy platform designed for the Siargao commu
 ## Architecture
 
 ### Frontend Architecture
+
 - **Framework**: React with TypeScript
 - **Routing**: TanStack Router (file-based routing)
 - **State Management**: React hooks and custom hooks
@@ -39,6 +42,7 @@ Siargao Loops is a circular food economy platform designed for the Siargao commu
 - **Build Tool**: Vite
 
 ### Backend Architecture
+
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **Real-time**: Supabase Realtime subscriptions
@@ -46,6 +50,7 @@ Siargao Loops is a circular food economy platform designed for the Siargao commu
 - **API**: RESTful via Supabase client
 
 ### System Flow
+
 ```
 User → Authentication → Role-based Dashboard → Feature Access → Data Operations → Database
 ```
@@ -55,6 +60,7 @@ User → Authentication → Role-based Dashboard → Feature Access → Data Ope
 ## Technology Stack
 
 ### Frontend
+
 - **React 18+**: UI framework
 - **TypeScript**: Type safety
 - **TanStack Router**: File-based routing with type safety
@@ -66,6 +72,7 @@ User → Authentication → Role-based Dashboard → Feature Access → Data Ope
 - **Zod**: Schema validation
 
 ### Backend
+
 - **Supabase**: Backend-as-a-Service
   - PostgreSQL database
   - Authentication system
@@ -74,6 +81,7 @@ User → Authentication → Role-based Dashboard → Feature Access → Data Ope
   - Row Level Security (RLS)
 
 ### Development Tools
+
 - **Vite**: Build tool and dev server
 - **ESLint**: Code linting
 - **Prettier**: Code formatting
@@ -132,6 +140,7 @@ siargao-ecoloop-main/
 ## Core Features
 
 ### 1. User Roles & Authentication
+
 - **Farmers**: Post produce listings, manage inventory, view harvest forecasts
 - **Restaurants**: Browse marketplace, post waste reports, purchase produce
 - **Hotels**: Post waste reports, manage compost collection
@@ -139,6 +148,7 @@ siargao-ecoloop-main/
 - **LGU Admins**: User management, announcements, reports, planning dashboard
 
 ### 2. Marketplace System
+
 - **Produce Marketplace**: Fresh local produce listings
 - **Food Waste Marketplace**: Available food waste for compost/animal feed
 - **Trade Requests**: Barter system between users
@@ -146,45 +156,53 @@ siargao-ecoloop-main/
 - **Listing Management**: Create, edit, delete listings with images
 
 ### 3. Waste Management
+
 - **Waste Reports**: Submit food waste reports
 - **Collection Requests**: Schedule waste collection pickups
 - **Compost Inventory**: Track compost production and distribution
 - **LGU Oversight**: Monitor waste collection across barangays
 
 ### 4. Planning & Forecasting
+
 - **Harvest Forecasts**: Farmers post expected harvests
 - **LGU Distributions**: LGU posts upcoming distributions
 - **Projected Waste Reports**: Hotel owners post projected waste
 - **GIS Map**: Visual monitoring of waste management
 
 ### 5. Messaging System
+
 - **Real-time Chat**: Direct messaging between users
 - **Message Notifications**: Real-time message alerts
 - **Conversation Management**: Organized message threads
 
 ### 6. Social Feed
+
 - **Posts**: Share updates and achievements
 - **Comments**: Engage with posts
 - **Reactions**: Like and react to posts
 - **Feed Filtering**: Filter by content type
 
 ### 7. Notifications
+
 - **System Notifications**: Platform announcements
 - **Activity Notifications**: Trade requests, messages, etc.
 - **Notification Management**: Mark as read, delete
 
 ### 8. Eco Points & Gamification
+
 - **Points System**: Earn points for sustainable actions
 - **Achievements**: Unlock badges and achievements
 - **Leaderboards**: Compare sustainability scores
 
 ### 9. Theme Customization
+
 - **Font Selection**: Choose from multiple fonts
 - **Color Themes**: Select color schemes
 - **Dark Mode**: Toggle dark/light mode
 - **Custom Backgrounds**: Upload custom backgrounds
 
 ### 10. User Profiles
+
 - **Profile Management**: Edit personal information
 - **LGU Verification**: Government ID verification
 - **Location Settings**: Set municipality and barangay
@@ -197,6 +215,7 @@ siargao-ecoloop-main/
 ### Core Tables
 
 #### profiles
+
 ```sql
 - id: UUID (primary key, references auth.users)
 - full_name: TEXT
@@ -215,6 +234,7 @@ siargao-ecoloop-main/
 ```
 
 #### marketplace_listings
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID (references profiles)
@@ -233,6 +253,7 @@ siargao-ecoloop-main/
 ```
 
 #### trade_requests
+
 ```sql
 - id: UUID (primary key)
 - from_user_id: UUID
@@ -245,6 +266,7 @@ siargao-ecoloop-main/
 ```
 
 #### food_waste_reports
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -259,6 +281,7 @@ siargao-ecoloop-main/
 ```
 
 #### waste_collections
+
 ```sql
 - id: UUID (primary key)
 - waste_report_id: UUID
@@ -269,6 +292,7 @@ siargao-ecoloop-main/
 ```
 
 #### harvest_forecasts
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -283,6 +307,7 @@ siargao-ecoloop-main/
 ```
 
 #### lgu_distributions
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -300,6 +325,7 @@ siargao-ecoloop-main/
 ```
 
 #### projected_waste_reports
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -315,6 +341,7 @@ siargao-ecoloop-main/
 ```
 
 #### announcements
+
 ```sql
 - id: UUID (primary key)
 - title: TEXT
@@ -325,6 +352,7 @@ siargao-ecoloop-main/
 ```
 
 #### notifications
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -336,6 +364,7 @@ siargao-ecoloop-main/
 ```
 
 #### messages
+
 ```sql
 - id: UUID (primary key)
 - from_user_id: UUID
@@ -346,6 +375,7 @@ siargao-ecoloop-main/
 ```
 
 #### feed_posts
+
 ```sql
 - id: UUID (primary key)
 - user_id: UUID
@@ -355,6 +385,7 @@ siargao-ecoloop-main/
 ```
 
 #### feed_comments
+
 ```sql
 - id: UUID (primary key)
 - post_id: UUID
@@ -364,6 +395,7 @@ siargao-ecoloop-main/
 ```
 
 #### feed_reactions
+
 ```sql
 - id: UUID (primary key)
 - post_id: UUID
@@ -376,57 +408,64 @@ siargao-ecoloop-main/
 ## API Integration
 
 ### Supabase Client Configuration
+
 ```typescript
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
 
 ### Common Database Operations
 
 #### Query Data
+
 ```typescript
 const { data, error } = await supabase
-  .from('marketplace_listings')
-  .select('*')
-  .eq('status', 'active')
+  .from("marketplace_listings")
+  .select("*")
+  .eq("status", "active");
 ```
 
 #### Insert Data
+
 ```typescript
 const { data, error } = await supabase
-  .from('marketplace_listings')
+  .from("marketplace_listings")
   .insert([{ title, description, kind, price }])
-  .select()
+  .select();
 ```
 
 #### Update Data
+
 ```typescript
 const { data, error } = await supabase
-  .from('marketplace_listings')
-  .update({ status: 'sold' })
-  .eq('id', listingId)
+  .from("marketplace_listings")
+  .update({ status: "sold" })
+  .eq("id", listingId);
 ```
 
 #### Delete Data
+
 ```typescript
-const { error } = await supabase
-  .from('marketplace_listings')
-  .delete()
-  .eq('id', listingId)
+const { error } = await supabase.from("marketplace_listings").delete().eq("id", listingId);
 ```
 
 #### Real-time Subscriptions
+
 ```typescript
 const subscription = supabase
-  .channel('notifications')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
-    // Handle new notification
-  })
-  .subscribe()
+  .channel("notifications")
+  .on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "notifications" },
+    (payload) => {
+      // Handle new notification
+    },
+  )
+  .subscribe();
 ```
 
 ---
@@ -434,6 +473,7 @@ const subscription = supabase
 ## Authentication & Authorization
 
 ### Authentication Flow
+
 1. User registers with email/password
 2. Email verification required
 3. User selects role (farmer, restaurant, etc.)
@@ -441,6 +481,7 @@ const subscription = supabase
 5. Access granted based on role
 
 ### Row Level Security (RLS)
+
 - All tables have RLS enabled
 - Policies restrict access based on:
   - User authentication
@@ -449,6 +490,7 @@ const subscription = supabase
   - Municipality/barangay
 
 ### Role-Based Access Control
+
 ```typescript
 // Example: Only farmers can create harvest forecasts
 CREATE POLICY "Farmers can create harvest forecasts"
@@ -467,53 +509,63 @@ WITH CHECK (
 ## Component Organization
 
 ### Layout Components (`src/components/layout/`)
+
 - **SiteHeader**: Main navigation header
 - **SiteFooter**: Footer with links and info
 - **AppSidebar**: Sidebar navigation
 - **Section**: Container and page hero components
 
 ### Dashboard Components (`src/components/dashboard/`)
+
 - **FarmerDashboard**: Farmer-specific dashboard
 - **RestaurantDashboard**: Restaurant-specific dashboard
 - **HotelDashboard**: Hotel-specific dashboard
 - **LGUWasteCollectionView**: LGU waste management view
 
 ### Marketplace Components (`src/components/marketplace/`)
+
 - **MarketplaceView**: Main marketplace interface
 - **ListingCard**: Individual listing display
 - **BuyRequestModal**: Purchase request dialog
 - **TradeRequestModal**: Trade request dialog
 
 ### Messaging Components (`src/components/messaging/`)
+
 - **ChatMessenger**: Real-time chat interface
 - **MessagesView**: Message inbox
 - **MessageNotification**: Message alert component
 
 ### Notification Components (`src/components/notifications/`)
+
 - **NotificationBell**: Notification icon with badge
 - **NotificationListener**: Real-time notification listener
 - **NotificationsView**: Notification center
 - **AnnouncementNotification**: Announcement display
 
 ### Waste Components (`src/components/waste/`)
+
 - **WasteCollectionView**: Waste collection management
 - **WasteReportsView**: Waste reporting interface
 - **ProduceInventoryView**: Inventory management
 
 ### Feed Components (`src/components/feed/`)
+
 - **FeedView**: Social feed display
 - **PostCard**: Individual post display
 - **FeedComments**: Comment section
 - **FeedReactions**: Reaction buttons
 
 ### Planning Components (`src/components/planning/`)
+
 - **PlanningForecastDashboard**: Planning dashboard
 - **GISMapView**: GIS map interface
 
 ### Auth Components (`src/components/auth/`)
+
 - **LocationPicker**: Location selection component
 
 ### Common Components (`src/components/common/`)
+
 - **LoadingScreen**: Loading animation
 - **LanguageSelector**: Language switcher
 - **ThemeCustomizer**: Theme settings
@@ -529,12 +581,14 @@ WITH CHECK (
 ## Development Workflow
 
 ### Getting Started
+
 1. Clone the repository
 2. Install dependencies: `bun install`
 3. Set up environment variables
 4. Run development server: `bun run dev`
 
 ### Environment Variables
+
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -542,11 +596,13 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ```
 
 ### Code Style
+
 - ESLint for linting
 - Prettier for formatting
 - TypeScript for type safety
 
 ### Git Workflow
+
 - Main branch: production
 - Feature branches: feature/description
 - Pull requests for code review
@@ -556,11 +612,13 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ## Deployment
 
 ### Vercel Deployment
+
 1. Connect repository to Vercel
 2. Configure environment variables
 3. Deploy automatically on push to main
 
 ### Supabase Setup
+
 1. Create Supabase project
 2. Run migrations in order
 3. Set up storage buckets
@@ -574,21 +632,25 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ### Common Issues
 
 #### Authentication Errors
+
 - Check email verification status
 - Verify RLS policies
 - Check environment variables
 
 #### Database Connection Issues
+
 - Verify Supabase URL and key
 - Check network connectivity
 - Review Supabase status
 
 #### Build Errors
+
 - Clear node_modules and reinstall
 - Check TypeScript errors
 - Verify all imports
 
 #### Real-time Not Working
+
 - Enable real-time on Supabase tables
 - Check subscription setup
 - Verify RLS policies allow real-time---
@@ -596,12 +658,14 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ## Additional Resources
 
 ### Documentation
+
 - [User Guides](docs/guides/)
 - [Development Docs](docs/development/)
 - [Project Documentation](docs/project/)
 - [Feature Documentation](docs/features/)
 
 ### External Links
+
 - [Supabase Documentation](https://supabase.com/docs)
 - [TanStack Router](https://tanstack.com/router)
 - [shadcn/ui](https://ui.shadcn.com)
@@ -612,6 +676,7 @@ VITE_SUPABASE_STORAGE_BUCKET=uploads
 ## Support
 
 For issues or questions:
+
 1. Check existing documentation
 2. Review troubleshooting section
 3. Check Supabase dashboard for errors
@@ -629,4 +694,4 @@ For issues or questions:
 
 ---
 
-*Last Updated: July 14, 2026*
+_Last Updated: July 14, 2026_

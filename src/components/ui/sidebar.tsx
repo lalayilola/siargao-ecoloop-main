@@ -91,28 +91,28 @@ const SidebarProvider = React.forwardRef<
     // Prevent body scroll when mobile sidebar is open
     React.useEffect(() => {
       if (isMobile && openMobile) {
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.width = "100%";
         document.body.style.top = `-${window.scrollY}px`;
       } else {
         const scrollY = document.body.style.top;
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.top = '';
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
+        document.body.style.top = "";
         if (scrollY) {
-          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+          window.scrollTo(0, parseInt(scrollY || "0") * -1);
         }
       }
       return () => {
         const scrollY = document.body.style.top;
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.top = '';
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
+        document.body.style.top = "";
         if (scrollY) {
-          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+          window.scrollTo(0, parseInt(scrollY || "0") * -1);
         }
       };
     }, [isMobile, openMobile]);

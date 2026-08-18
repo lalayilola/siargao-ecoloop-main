@@ -64,84 +64,97 @@ export function FeedReactions({ postId }: FeedReactionsProps) {
 
     try {
       // Use REST API to bypass schema cache
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+      const supabaseKey =
+        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
       if (userReaction?.reaction_type === reactionType) {
         // Remove reaction if clicking the same one
-        const response = await fetch(`${supabaseUrl}/rest/v1/feed_reactions?id=eq.${userReaction.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': supabaseKey,
+        const response = await fetch(
+          `${supabaseUrl}/rest/v1/feed_reactions?id=eq.${userReaction.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session?.access_token}`,
+              apikey: supabaseKey,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(errorText || 'Failed to delete reaction');
+          throw new Error(errorText || "Failed to delete reaction");
         }
 
         setReactions(reactions.filter((r) => r.id !== userReaction.id));
         setUserReaction(null);
       } else if (userReaction) {
         // Change reaction if clicking a different one
-        const response = await fetch(`${supabaseUrl}/rest/v1/feed_reactions?id=eq.${userReaction.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': supabaseKey,
-            'Prefer': 'return=representation',
+        const response = await fetch(
+          `${supabaseUrl}/rest/v1/feed_reactions?id=eq.${userReaction.id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.access_token}`,
+              apikey: supabaseKey,
+              Prefer: "return=representation",
+            },
+            body: JSON.stringify({ reaction_type: reactionType } as any),
           },
-          body: JSON.stringify({ reaction_type: reactionType } as any),
-        });
+        );
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(errorText || 'Failed to update reaction');
+          throw new Error(errorText || "Failed to update reaction");
         }
 
         const data = await response.json();
-        setReactions(
-          reactions.map((r) => (r.id === userReaction.id ? (data[0] as Reaction) : r))
-        );
+        setReactions(reactions.map((r) => (r.id === userReaction.id ? (data[0] as Reaction) : r)));
         setUserReaction(data[0] as Reaction);
       } else {
         // Add new reaction - check if user already has one first
-        const checkResponse = await fetch(`${supabaseUrl}/rest/v1/feed_reactions?post_id=eq.${postId}&user_id=eq.${user.id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': supabaseKey,
+        const checkResponse = await fetch(
+          `${supabaseUrl}/rest/v1/feed_reactions?post_id=eq.${postId}&user_id=eq.${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session?.access_token}`,
+              apikey: supabaseKey,
+            },
           },
-        });
+        );
 
         if (checkResponse.ok) {
           const existingData = await checkResponse.json();
           if (existingData && existingData.length > 0) {
             // User already has a reaction, update it instead
             const existingReaction = existingData[0];
-            const updateResponse = await fetch(`${supabaseUrl}/rest/v1/feed_reactions?id=eq.${existingReaction.id}`, {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session?.access_token}`,
-                'apikey': supabaseKey,
-                'Prefer': 'return=representation',
+            const updateResponse = await fetch(
+              `${supabaseUrl}/rest/v1/feed_reactions?id=eq.${existingReaction.id}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session?.access_token}`,
+                  apikey: supabaseKey,
+                  Prefer: "return=representation",
+                },
+                body: JSON.stringify({ reaction_type: reactionType } as any),
               },
-              body: JSON.stringify({ reaction_type: reactionType } as any),
-            });
+            );
 
             if (!updateResponse.ok) {
               const errorText = await updateResponse.text();
-              throw new Error(errorText || 'Failed to update reaction');
+              throw new Error(errorText || "Failed to update reaction");
             }
 
             const data = await updateResponse.json();
             setReactions(
-              reactions.map((r) => (r.id === existingReaction.id ? (data[0] as Reaction) : r))
+              reactions.map((r) => (r.id === existingReaction.id ? (data[0] as Reaction) : r)),
             );
             setUserReaction(data[0] as Reaction);
             return;
@@ -150,12 +163,12 @@ export function FeedReactions({ postId }: FeedReactionsProps) {
 
         // No existing reaction, add new one
         const response = await fetch(`${supabaseUrl}/rest/v1/feed_reactions`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': supabaseKey,
-            'Prefer': 'return=representation',
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+            apikey: supabaseKey,
+            Prefer: "return=representation",
           },
           body: JSON.stringify({
             post_id: postId,
@@ -166,7 +179,7 @@ export function FeedReactions({ postId }: FeedReactionsProps) {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(errorText || 'Failed to add reaction');
+          throw new Error(errorText || "Failed to add reaction");
         }
 
         const data = await response.json();
@@ -215,7 +228,9 @@ export function FeedReactions({ postId }: FeedReactionsProps) {
           >
             <span className="text-lg">{emoji}</span>
             <span className="text-sm">{label}</span>
-            {count > 0 && <span className="text-xs bg-primary/20 px-2 py-0.5 rounded-full">{count}</span>}
+            {count > 0 && (
+              <span className="text-xs bg-primary/20 px-2 py-0.5 rounded-full">{count}</span>
+            )}
           </Button>
         );
       })}

@@ -16,7 +16,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
+function MapClickHandler({
+  onLocationSelect,
+}: {
+  onLocationSelect: (lat: number, lng: number) => void;
+}) {
   useMapEvents({
     click(event: L.LeafletMouseEvent) {
       onLocationSelect(event.latlng.lat, event.latlng.lng);
@@ -27,7 +31,7 @@ function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number,
 
 export function LocationPickerClient({ onLocationSelect, initialLocation }: LocationPickerProps) {
   const [position, setPosition] = useState<[number, number]>(
-    initialLocation ? [initialLocation.latitude, initialLocation.longitude] : [9.8, 125.5] // Default to Siargao
+    initialLocation ? [initialLocation.latitude, initialLocation.longitude] : [9.8, 125.5], // Default to Siargao
   );
   const [locationName, setLocationName] = useState("");
   const [locationAddress, setLocationAddress] = useState("");
@@ -44,10 +48,10 @@ export function LocationPickerClient({ onLocationSelect, initialLocation }: Loca
     setLoading(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
       );
       const data = await response.json();
-      
+
       setLocationName(data.display_name || "Unknown Location");
       setLocationAddress(data.display_name || "");
     } catch (error) {
@@ -61,14 +65,14 @@ export function LocationPickerClient({ onLocationSelect, initialLocation }: Loca
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
       );
       const data = await response.json();
-      
+
       if (data && data.length > 0) {
         const result = data[0];
         const lat = parseFloat(result.lat);

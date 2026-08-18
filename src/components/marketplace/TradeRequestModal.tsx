@@ -1,10 +1,23 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,11 +30,22 @@ interface TradeRequestModalProps {
   onOpenChange: (open: boolean) => void;
   listing: Listing | null;
   userListings: Listing[];
-  user: { id: string; full_name: string; primary_role: Database["public"]["Enums"]["app_role"] } | null;
+  user: {
+    id: string;
+    full_name: string;
+    primary_role: Database["public"]["Enums"]["app_role"];
+  } | null;
   onSuccess?: () => void;
 }
 
-export function TradeRequestModal({ open, onOpenChange, listing, userListings, user, onSuccess }: TradeRequestModalProps) {
+export function TradeRequestModal({
+  open,
+  onOpenChange,
+  listing,
+  userListings,
+  user,
+  onSuccess,
+}: TradeRequestModalProps) {
   const { profile } = useAuth();
   const [offeredItemId, setOfferedItemId] = useState<string>("");
   const [message, setMessage] = useState("");
@@ -40,15 +64,17 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
 
     // Check if user is verified
     if (!profile?.lgu_approved) {
-      toast.error("Your account must be verified by the LGU before you can send trade requests. Please upload your government ID and wait for verification.");
+      toast.error(
+        "Your account must be verified by the LGU before you can send trade requests. Please upload your government ID and wait for verification.",
+      );
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const offeredItem = userListings.find(l => l.id === offeredItemId);
-      
+      const offeredItem = userListings.find((l) => l.id === offeredItemId);
+
       const { error } = await supabase.from("trade_requests").insert({
         listing_id: listing.id,
         requester_user_id: user.id,
@@ -90,7 +116,8 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
         <DialogHeader>
           <DialogTitle>Request Trade</DialogTitle>
           <DialogDescription>
-            Send a trade request for {listing?.title}. The seller will review your offer and respond.
+            Send a trade request for {listing?.title}. The seller will review your offer and
+            respond.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -121,11 +148,15 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="" disabled>No listings available</SelectItem>
+                    <SelectItem value="" disabled>
+                      No listings available
+                    </SelectItem>
                   )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-slate-500">Select one of your listings to offer in exchange</p>
+              <p className="text-xs text-slate-500">
+                Select one of your listings to offer in exchange
+              </p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="message">Message</Label>
@@ -142,7 +173,10 @@ export function TradeRequestModal({ open, onOpenChange, listing, userListings, u
                 <p className="text-sm font-medium text-slate-700 mb-2">Seller accepts:</p>
                 <div className="flex flex-wrap gap-1">
                   {listing.acceptable_exchanges.map((exchange, idx) => (
-                    <span key={idx} className="text-xs bg-white px-2 py-1 rounded-full border border-primary/30">
+                    <span
+                      key={idx}
+                      className="text-xs bg-white px-2 py-1 rounded-full border border-primary/30"
+                    >
                       {exchange}
                     </span>
                   ))}

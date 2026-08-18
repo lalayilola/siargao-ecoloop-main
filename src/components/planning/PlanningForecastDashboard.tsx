@@ -9,12 +9,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getSupabaseErrorMessage } from "@/lib/supabase-error";
-import { Calendar, Sprout, Truck, Trash2, Plus, Edit, Trash, CheckCircle, Clock, AlertCircle, MessageCircle, MapPin, Package, TrendingUp, BarChart3, Filter, Scale } from "lucide-react";
+import {
+  Calendar,
+  Sprout,
+  Truck,
+  Trash2,
+  Plus,
+  Edit,
+  Trash,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  MessageCircle,
+  MapPin,
+  Package,
+  TrendingUp,
+  BarChart3,
+  Filter,
+  Scale,
+} from "lucide-react";
 
 interface HarvestForecast {
   id: string;
@@ -79,7 +110,8 @@ export function PlanningForecastDashboard() {
   const [showLGUHarvestView, setShowLGUHarvestView] = useState(false);
 
   // Distribution filters
-  const [filterDistributionMunicipality, setFilterDistributionMunicipality] = useState<string>("all");
+  const [filterDistributionMunicipality, setFilterDistributionMunicipality] =
+    useState<string>("all");
   const [filterDistributionType, setFilterDistributionType] = useState<string>("all");
   const [filterDistributionStatus, setFilterDistributionStatus] = useState<string>("all");
 
@@ -145,8 +177,15 @@ export function PlanningForecastDashboard() {
   });
 
   const municipalities = [
-    "burgos", "dapa", "general_luna", "pilar", "san_benito", 
-    "san_isidro", "santa_monica", "socorro", "del_carmen"
+    "burgos",
+    "dapa",
+    "general_luna",
+    "pilar",
+    "san_benito",
+    "san_isidro",
+    "santa_monica",
+    "socorro",
+    "del_carmen",
   ];
 
   useEffect(() => {
@@ -155,7 +194,9 @@ export function PlanningForecastDashboard() {
 
   const loadData = useCallback(async () => {
     if (!profile) {
-      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
+      setLoadError(
+        "Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.",
+      );
       setLoading(false);
       return;
     }
@@ -168,7 +209,12 @@ export function PlanningForecastDashboard() {
     try {
       // Load harvest forecasts (visible to farmers, restaurants, residents, and LGU)
       // Residents can view harvest forecasts from all municipalities to enable cross-municipality buying
-      if (profile.primary_role === "farmer" || profile.primary_role === "restaurant" || profile.primary_role === "resident" || profile.primary_role === "lgu_admin") {
+      if (
+        profile.primary_role === "farmer" ||
+        profile.primary_role === "restaurant" ||
+        profile.primary_role === "resident" ||
+        profile.primary_role === "lgu_admin"
+      ) {
         const { data: harvestData, error: harvestError } = await supabase
           .from("harvest_forecasts")
           .select("*")
@@ -207,7 +253,9 @@ export function PlanningForecastDashboard() {
           query = query.eq("user_id", user.id);
         }
 
-        const { data: wasteData, error: wasteError } = await query.abortSignal(abortController.signal);
+        const { data: wasteData, error: wasteError } = await query.abortSignal(
+          abortController.signal,
+        );
 
         if (wasteError) throw wasteError;
 
@@ -231,7 +279,9 @@ export function PlanningForecastDashboard() {
     if (authLoading) return;
 
     if (!profile) {
-      setLoadError("Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.");
+      setLoadError(
+        "Your account profile could not be loaded. Refresh the page or update your profile before opening Planning & Forecast.",
+      );
       setLoading(false);
       return;
     }
@@ -301,7 +351,8 @@ export function PlanningForecastDashboard() {
     if (!editingHarvest || !user) return;
 
     try {
-      const imageUrls = harvestImages.length > 0 ? await uploadImages(harvestImages) : editingHarvest.images;
+      const imageUrls =
+        harvestImages.length > 0 ? await uploadImages(harvestImages) : editingHarvest.images;
 
       const { error } = await supabase
         .from("harvest_forecasts")
@@ -370,7 +421,9 @@ export function PlanningForecastDashboard() {
         target_beneficiaries: distributionForm.target_beneficiaries,
         municipality: distributionForm.municipality,
         barangay: distributionForm.barangay,
-        quantity_available: distributionForm.quantity_available ? parseInt(distributionForm.quantity_available) : null,
+        quantity_available: distributionForm.quantity_available
+          ? parseInt(distributionForm.quantity_available)
+          : null,
         images: imageUrls.length > 0 ? imageUrls : null,
       });
 
@@ -401,7 +454,10 @@ export function PlanningForecastDashboard() {
     if (!editingDistribution || !user) return;
 
     try {
-      const imageUrls = distributionImages.length > 0 ? await uploadImages(distributionImages) : editingDistribution.images;
+      const imageUrls =
+        distributionImages.length > 0
+          ? await uploadImages(distributionImages)
+          : editingDistribution.images;
 
       const { error } = await supabase
         .from("lgu_distributions")
@@ -414,7 +470,9 @@ export function PlanningForecastDashboard() {
           target_beneficiaries: distributionForm.target_beneficiaries,
           municipality: distributionForm.municipality,
           barangay: distributionForm.barangay,
-          quantity_available: distributionForm.quantity_available ? parseInt(distributionForm.quantity_available) : null,
+          quantity_available: distributionForm.quantity_available
+            ? parseInt(distributionForm.quantity_available)
+            : null,
           images: imageUrls,
         })
         .eq("id", editingDistribution.id);
@@ -463,7 +521,11 @@ export function PlanningForecastDashboard() {
     if (!user || !profile) return;
 
     const estimatedQuantity = parseFloat(wasteForm.estimated_quantity_kg);
-    if (!wasteForm.estimated_quantity_kg || Number.isNaN(estimatedQuantity) || estimatedQuantity <= 0) {
+    if (
+      !wasteForm.estimated_quantity_kg ||
+      Number.isNaN(estimatedQuantity) ||
+      estimatedQuantity <= 0
+    ) {
       toast.error("Please enter a valid estimated quantity.");
       return;
     }
@@ -483,18 +545,21 @@ export function PlanningForecastDashboard() {
     try {
       const imageUrls = await uploadImages(wasteImages);
 
-      const { data: insertedWaste, error } = await supabase.from("projected_waste_reports").insert({
-        user_id: user.id,
-        business_name: profile.full_name,
-        business_type: "restaurant",
-        estimated_quantity_kg: estimatedQuantity,
-        projected_date: wasteForm.projected_date,
-        waste_type: wasteForm.waste_type,
-        municipality: wasteForm.municipality,
-        barangay: wasteForm.barangay,
-        notes: wasteForm.notes || null,
-        images: imageUrls.length > 0 ? imageUrls : null,
-      }).select();
+      const { data: insertedWaste, error } = await supabase
+        .from("projected_waste_reports")
+        .insert({
+          user_id: user.id,
+          business_name: profile.full_name,
+          business_type: "restaurant",
+          estimated_quantity_kg: estimatedQuantity,
+          projected_date: wasteForm.projected_date,
+          waste_type: wasteForm.waste_type,
+          municipality: wasteForm.municipality,
+          barangay: wasteForm.barangay,
+          notes: wasteForm.notes || null,
+          images: imageUrls.length > 0 ? imageUrls : null,
+        })
+        .select();
 
       if (error) throw error;
 
@@ -527,7 +592,11 @@ export function PlanningForecastDashboard() {
     if (!editingWaste || !user) return;
 
     const estimatedQuantity = parseFloat(wasteForm.estimated_quantity_kg);
-    if (!wasteForm.estimated_quantity_kg || Number.isNaN(estimatedQuantity) || estimatedQuantity <= 0) {
+    if (
+      !wasteForm.estimated_quantity_kg ||
+      Number.isNaN(estimatedQuantity) ||
+      estimatedQuantity <= 0
+    ) {
       toast.error("Please enter a valid estimated quantity.");
       return;
     }
@@ -545,7 +614,8 @@ export function PlanningForecastDashboard() {
     }
 
     try {
-      const imageUrls = wasteImages.length > 0 ? await uploadImages(wasteImages) : editingWaste.images;
+      const imageUrls =
+        wasteImages.length > 0 ? await uploadImages(wasteImages) : editingWaste.images;
 
       const { error } = await supabase
         .from("projected_waste_reports")
@@ -651,7 +721,11 @@ export function PlanningForecastDashboard() {
   // Filter harvest forecasts for LGU admin
   const filteredHarvestForecasts = harvestForecasts.filter((forecast) => {
     if (filterMunicipality !== "all" && forecast.municipality !== filterMunicipality) return false;
-    if (filterCropType !== "all" && forecast.crop_type.toLowerCase() !== filterCropType.toLowerCase()) return false;
+    if (
+      filterCropType !== "all" &&
+      forecast.crop_type.toLowerCase() !== filterCropType.toLowerCase()
+    )
+      return false;
     if (filterStatus !== "all" && forecast.status !== filterStatus) return false;
     return true;
   });
@@ -669,10 +743,13 @@ export function PlanningForecastDashboard() {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       return harvestDate >= now && harvestDate <= endOfMonth;
     }).length,
-    byMunicipality: harvestForecasts.reduce((acc, f) => {
-      acc[f.municipality] = (acc[f.municipality] || 0) + f.estimated_quantity_kg;
-      return acc;
-    }, {} as Record<string, number>),
+    byMunicipality: harvestForecasts.reduce(
+      (acc, f) => {
+        acc[f.municipality] = (acc[f.municipality] || 0) + f.estimated_quantity_kg;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   };
 
   // Calculate distribution statistics
@@ -685,10 +762,13 @@ export function PlanningForecastDashboard() {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       return distDate >= now && distDate <= endOfMonth;
     }).length,
-    byMunicipality: lguDistributions.reduce((acc, d) => {
-      acc[d.municipality] = (acc[d.municipality] || 0) + (d.quantity_available || 0);
-      return acc;
-    }, {} as Record<string, number>),
+    byMunicipality: lguDistributions.reduce(
+      (acc, d) => {
+        acc[d.municipality] = (acc[d.municipality] || 0) + (d.quantity_available || 0);
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   };
 
   // Calculate waste statistics
@@ -701,36 +781,50 @@ export function PlanningForecastDashboard() {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       return wasteDate >= now && wasteDate <= endOfMonth;
     }).length,
-    byMunicipality: projectedWaste.reduce((acc, w) => {
-      acc[w.municipality] = (acc[w.municipality] || 0) + w.estimated_quantity_kg;
-      return acc;
-    }, {} as Record<string, number>),
+    byMunicipality: projectedWaste.reduce(
+      (acc, w) => {
+        acc[w.municipality] = (acc[w.municipality] || 0) + w.estimated_quantity_kg;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   };
 
   // Filter distributions
   const filteredDistributions = lguDistributions.filter((dist) => {
-    if (filterDistributionMunicipality !== "all" && dist.municipality !== filterDistributionMunicipality) return false;
-    if (filterDistributionType !== "all" && dist.distribution_type !== filterDistributionType) return false;
-    if (filterDistributionStatus !== "all" && dist.status !== filterDistributionStatus) return false;
+    if (
+      filterDistributionMunicipality !== "all" &&
+      dist.municipality !== filterDistributionMunicipality
+    )
+      return false;
+    if (filterDistributionType !== "all" && dist.distribution_type !== filterDistributionType)
+      return false;
+    if (filterDistributionStatus !== "all" && dist.status !== filterDistributionStatus)
+      return false;
     return true;
   });
 
   // Filter waste
   const filteredWaste = projectedWaste.filter((waste) => {
-    if (filterWasteMunicipality !== "all" && waste.municipality !== filterWasteMunicipality) return false;
+    if (filterWasteMunicipality !== "all" && waste.municipality !== filterWasteMunicipality)
+      return false;
     if (filterWasteType !== "all" && waste.waste_type !== filterWasteType) return false;
     if (filterWasteStatus !== "all" && waste.status !== filterWasteStatus) return false;
     return true;
   });
 
   // Get unique distribution types and waste types
-  const uniqueDistributionTypes = Array.from(new Set(lguDistributions.map((d) => d.distribution_type)));
+  const uniqueDistributionTypes = Array.from(
+    new Set(lguDistributions.map((d) => d.distribution_type)),
+  );
   const uniqueWasteTypes = Array.from(new Set(projectedWaste.map((w) => w.waste_type)));
 
   const handleMessageClick = (targetUserId: string, targetUserName: string) => {
     if (!user || user.id === targetUserId) return;
     if (!profile?.lgu_approved) {
-      toast.error("Your account must be verified by the LGU before you can send messages. Please upload your government ID in your profile.");
+      toast.error(
+        "Your account must be verified by the LGU before you can send messages. Please upload your government ID in your profile.",
+      );
       return;
     }
     navigate({ to: "/messages", search: { userId: targetUserId } });
@@ -744,11 +838,15 @@ export function PlanningForecastDashboard() {
     try {
       const uploadPromises = files.map(async (file) => {
         const filePath = `forecasts/${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
+        const { data: publicData } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(uploadData.path ?? filePath);
         return publicData.publicUrl;
       });
 
@@ -797,10 +895,16 @@ export function PlanningForecastDashboard() {
           </Card>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className={`grid w-full max-w-3xl mx-auto ${
-              (profile?.primary_role === "farmer" || profile?.primary_role === "restaurant") ? "grid-cols-2" : "grid-cols-3"
-            }`}>
-              {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin" || profile?.primary_role === "restaurant") && (
+            <TabsList
+              className={`grid w-full max-w-3xl mx-auto ${
+                profile?.primary_role === "farmer" || profile?.primary_role === "restaurant"
+                  ? "grid-cols-2"
+                  : "grid-cols-3"
+              }`}
+            >
+              {(profile?.primary_role === "farmer" ||
+                profile?.primary_role === "lgu_admin" ||
+                profile?.primary_role === "restaurant") && (
                 <TabsTrigger value="lgu-harvests">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Harvest Forecast
@@ -812,7 +916,8 @@ export function PlanningForecastDashboard() {
                   LGU Distributions
                 </TabsTrigger>
               )}
-              {(profile?.primary_role === "lgu_admin" || profile?.primary_role === "restaurant") && (
+              {(profile?.primary_role === "lgu_admin" ||
+                profile?.primary_role === "restaurant") && (
                 <TabsTrigger value="waste">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Projected Waste
@@ -821,10 +926,16 @@ export function PlanningForecastDashboard() {
             </TabsList>
 
             {/* Harvest Forecast Tab (for farmers, LGU admin, and restaurant owners) */}
-            {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin" || profile?.primary_role === "restaurant") && (
+            {(profile?.primary_role === "farmer" ||
+              profile?.primary_role === "lgu_admin" ||
+              profile?.primary_role === "restaurant") && (
               <TabsContent value="lgu-harvests" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">{isLGUAdmin || profile?.primary_role === "restaurant" ? "Farmers' Harvest Forecast" : "My Harvest Forecasts"}</h2>
+                  <h2 className="text-2xl font-bold">
+                    {isLGUAdmin || profile?.primary_role === "restaurant"
+                      ? "Farmers' Harvest Forecast"
+                      : "My Harvest Forecasts"}
+                  </h2>
                   {canCreateHarvest && (
                     <Button onClick={() => setShowHarvestDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
@@ -842,7 +953,9 @@ export function PlanningForecastDashboard() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total Forecasts</p>
-                        <p className="text-2xl font-bold text-green-900">{harvestStats.totalForecasts}</p>
+                        <p className="text-2xl font-bold text-green-900">
+                          {harvestStats.totalForecasts}
+                        </p>
                       </div>
                     </div>
                   </Card>
@@ -853,7 +966,9 @@ export function PlanningForecastDashboard() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total Quantity</p>
-                        <p className="text-2xl font-bold text-blue-900">{harvestStats.totalQuantity.toLocaleString()} kg</p>
+                        <p className="text-2xl font-bold text-blue-900">
+                          {harvestStats.totalQuantity.toLocaleString()} kg
+                        </p>
                       </div>
                     </div>
                   </Card>
@@ -864,7 +979,9 @@ export function PlanningForecastDashboard() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">This Month</p>
-                        <p className="text-2xl font-bold text-amber-900">{harvestStats.upcomingThisMonth}</p>
+                        <p className="text-2xl font-bold text-amber-900">
+                          {harvestStats.upcomingThisMonth}
+                        </p>
                       </div>
                     </div>
                   </Card>
@@ -875,7 +992,9 @@ export function PlanningForecastDashboard() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Municipalities</p>
-                        <p className="text-2xl font-bold text-purple-900">{Object.keys(harvestStats.byMunicipality).length}</p>
+                        <p className="text-2xl font-bold text-purple-900">
+                          {Object.keys(harvestStats.byMunicipality).length}
+                        </p>
                       </div>
                     </div>
                   </Card>
@@ -897,7 +1016,9 @@ export function PlanningForecastDashboard() {
                         <SelectContent>
                           <SelectItem value="all">All Municipalities</SelectItem>
                           {municipalities.map((m) => (
-                            <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                            <SelectItem key={m} value={m}>
+                              {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -911,7 +1032,9 @@ export function PlanningForecastDashboard() {
                         <SelectContent>
                           <SelectItem value="all">All Crops</SelectItem>
                           {uniqueCropTypes.map((crop) => (
-                            <SelectItem key={crop} value={crop}>{crop}</SelectItem>
+                            <SelectItem key={crop} value={crop}>
+                              {crop}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -943,7 +1066,7 @@ export function PlanningForecastDashboard() {
                     {Object.entries(harvestStats.byMunicipality).map(([municipality, quantity]) => (
                       <div key={municipality} className="flex items-center gap-4">
                         <div className="w-40 text-sm font-medium">
-                          {municipality.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                          {municipality.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                         </div>
                         <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
                           <div
@@ -951,7 +1074,9 @@ export function PlanningForecastDashboard() {
                             style={{ width: `${(quantity / harvestStats.totalQuantity) * 100}%` }}
                           />
                         </div>
-                        <div className="w-24 text-sm font-bold text-right">{quantity.toLocaleString()} kg</div>
+                        <div className="w-24 text-sm font-bold text-right">
+                          {quantity.toLocaleString()} kg
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -966,7 +1091,10 @@ export function PlanningForecastDashboard() {
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {filteredHarvestForecasts.map((forecast) => (
-                      <Card key={forecast.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <Card
+                        key={forecast.id}
+                        className="overflow-hidden hover:shadow-lg transition-shadow"
+                      >
                         {forecast.images && forecast.images.length > 0 && (
                           <div className="relative h-48 bg-gray-100">
                             <img
@@ -993,9 +1121,13 @@ export function PlanningForecastDashboard() {
                                 </Link>
                               </div>
                             </div>
-                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                              forecast.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                            }`}>
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full font-medium ${
+                                forecast.status === "active"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
                               {forecast.status}
                             </span>
                           </div>
@@ -1004,20 +1136,28 @@ export function PlanningForecastDashboard() {
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Quantity:</span>
-                            <span className="font-semibold">{forecast.estimated_quantity_kg} kg</span>
+                            <span className="font-semibold">
+                              {forecast.estimated_quantity_kg} kg
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Harvest Date:</span>
-                            <span className="font-semibold">{new Date(forecast.projected_harvest_date).toLocaleDateString()}</span>
+                            <span className="font-semibold">
+                              {new Date(forecast.projected_harvest_date).toLocaleDateString()}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Location:</span>
-                            <span className="font-semibold">{forecast.barangay}, {forecast.municipality}</span>
+                            <span className="font-semibold">
+                              {forecast.barangay}, {forecast.municipality}
+                            </span>
                           </div>
                           {forecast.notes && (
-                            <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">{forecast.notes}</p>
+                            <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">
+                              {forecast.notes}
+                            </p>
                           )}
                           {user && user.id === forecast.user_id && (
                             <div className="flex gap-2 pt-3 mt-3 border-t">
@@ -1072,7 +1212,9 @@ export function PlanningForecastDashboard() {
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Total Distributions</p>
-                            <p className="text-2xl font-bold text-blue-900">{distributionStats.totalDistributions}</p>
+                            <p className="text-2xl font-bold text-blue-900">
+                              {distributionStats.totalDistributions}
+                            </p>
                           </div>
                         </div>
                       </Card>
@@ -1083,7 +1225,9 @@ export function PlanningForecastDashboard() {
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Total Quantity</p>
-                            <p className="text-2xl font-bold text-green-900">{distributionStats.totalQuantity.toLocaleString()} units</p>
+                            <p className="text-2xl font-bold text-green-900">
+                              {distributionStats.totalQuantity.toLocaleString()} units
+                            </p>
                           </div>
                         </div>
                       </Card>
@@ -1094,7 +1238,9 @@ export function PlanningForecastDashboard() {
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">This Month</p>
-                            <p className="text-2xl font-bold text-amber-900">{distributionStats.upcomingThisMonth}</p>
+                            <p className="text-2xl font-bold text-amber-900">
+                              {distributionStats.upcomingThisMonth}
+                            </p>
                           </div>
                         </div>
                       </Card>
@@ -1105,7 +1251,9 @@ export function PlanningForecastDashboard() {
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Municipalities</p>
-                            <p className="text-2xl font-bold text-purple-900">{Object.keys(distributionStats.byMunicipality).length}</p>
+                            <p className="text-2xl font-bold text-purple-900">
+                              {Object.keys(distributionStats.byMunicipality).length}
+                            </p>
                           </div>
                         </div>
                       </Card>
@@ -1120,35 +1268,48 @@ export function PlanningForecastDashboard() {
                       <div className="grid gap-4 md:grid-cols-3">
                         <div>
                           <Label htmlFor="filter-dist-municipality">Municipality</Label>
-                          <Select value={filterDistributionMunicipality} onValueChange={setFilterDistributionMunicipality}>
+                          <Select
+                            value={filterDistributionMunicipality}
+                            onValueChange={setFilterDistributionMunicipality}
+                          >
                             <SelectTrigger id="filter-dist-municipality">
                               <SelectValue placeholder="All municipalities" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="all">All Municipalities</SelectItem>
                               {municipalities.map((m) => (
-                                <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                                <SelectItem key={m} value={m}>
+                                  {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
                           <Label htmlFor="filter-dist-type">Distribution Type</Label>
-                          <Select value={filterDistributionType} onValueChange={setFilterDistributionType}>
+                          <Select
+                            value={filterDistributionType}
+                            onValueChange={setFilterDistributionType}
+                          >
                             <SelectTrigger id="filter-dist-type">
                               <SelectValue placeholder="All types" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="all">All Types</SelectItem>
                               {uniqueDistributionTypes.map((type) => (
-                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                <SelectItem key={type} value={type}>
+                                  {type}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
                           <Label htmlFor="filter-dist-status">Status</Label>
-                          <Select value={filterDistributionStatus} onValueChange={setFilterDistributionStatus}>
+                          <Select
+                            value={filterDistributionStatus}
+                            onValueChange={setFilterDistributionStatus}
+                          >
                             <SelectTrigger id="filter-dist-status">
                               <SelectValue placeholder="All statuses" />
                             </SelectTrigger>
@@ -1170,20 +1331,28 @@ export function PlanningForecastDashboard() {
                         <h3 className="text-lg font-bold">Distributions by Municipality</h3>
                       </div>
                       <div className="space-y-3">
-                        {Object.entries(distributionStats.byMunicipality).map(([municipality, quantity]) => (
-                          <div key={municipality} className="flex items-center gap-4">
-                            <div className="w-40 text-sm font-medium">
-                              {municipality.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                        {Object.entries(distributionStats.byMunicipality).map(
+                          ([municipality, quantity]) => (
+                            <div key={municipality} className="flex items-center gap-4">
+                              <div className="w-40 text-sm font-medium">
+                                {municipality
+                                  .replace("_", " ")
+                                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+                              </div>
+                              <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                <div
+                                  className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full"
+                                  style={{
+                                    width: `${(quantity / distributionStats.totalQuantity) * 100}%`,
+                                  }}
+                                />
+                              </div>
+                              <div className="w-24 text-sm font-bold text-right">
+                                {quantity.toLocaleString()} units
+                              </div>
                             </div>
-                            <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                              <div
-                                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full"
-                                style={{ width: `${(quantity / distributionStats.totalQuantity) * 100}%` }}
-                              />
-                            </div>
-                            <div className="w-24 text-sm font-bold text-right">{quantity.toLocaleString()} units</div>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     </Card>
                   </div>
@@ -1198,7 +1367,11 @@ export function PlanningForecastDashboard() {
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2">
                     {filteredDistributions.map((dist) => (
-                      <Card key={dist.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedDistribution(dist)}>
+                      <Card
+                        key={dist.id}
+                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => setSelectedDistribution(dist)}
+                      >
                         {dist.images && dist.images.length > 0 && (
                           <div className="relative h-48 bg-gray-100">
                             <img
@@ -1225,10 +1398,15 @@ export function PlanningForecastDashboard() {
                                 </Link>
                               </div>
                             </div>
-                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                              dist.status === "upcoming" ? "bg-blue-100 text-blue-800" :
-                              dist.status === "distributed" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                            }`}>
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full font-medium ${
+                                dist.status === "upcoming"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : dist.status === "distributed"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
                               {dist.status}
                             </span>
                           </div>
@@ -1237,12 +1415,16 @@ export function PlanningForecastDashboard() {
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Type:</span>
-                            <span className="font-semibold capitalize">{dist.distribution_type}</span>
+                            <span className="font-semibold capitalize">
+                              {dist.distribution_type}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Date:</span>
-                            <span className="font-semibold">{new Date(dist.distribution_date).toLocaleDateString()}</span>
+                            <span className="font-semibold">
+                              {new Date(dist.distribution_date).toLocaleDateString()}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -1256,7 +1438,9 @@ export function PlanningForecastDashboard() {
                               <span className="font-semibold">{dist.quantity_available} units</span>
                             </div>
                           )}
-                          <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">{dist.description}</p>
+                          <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">
+                            {dist.description}
+                          </p>
                         </div>
                         {user && user.id !== dist.user_id && (
                           <div className="p-4 border-t bg-gray-50">
@@ -1326,7 +1510,9 @@ export function PlanningForecastDashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Total Reports</p>
-                          <p className="text-2xl font-bold text-red-900">{wasteStats.totalReports}</p>
+                          <p className="text-2xl font-bold text-red-900">
+                            {wasteStats.totalReports}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -1337,7 +1523,9 @@ export function PlanningForecastDashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Total Quantity</p>
-                          <p className="text-2xl font-bold text-orange-900">{wasteStats.totalQuantity.toLocaleString()} kg</p>
+                          <p className="text-2xl font-bold text-orange-900">
+                            {wasteStats.totalQuantity.toLocaleString()} kg
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -1348,7 +1536,9 @@ export function PlanningForecastDashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">This Month</p>
-                          <p className="text-2xl font-bold text-yellow-900">{wasteStats.upcomingThisMonth}</p>
+                          <p className="text-2xl font-bold text-yellow-900">
+                            {wasteStats.upcomingThisMonth}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -1359,7 +1549,9 @@ export function PlanningForecastDashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Municipalities</p>
-                          <p className="text-2xl font-bold text-purple-900">{Object.keys(wasteStats.byMunicipality).length}</p>
+                          <p className="text-2xl font-bold text-purple-900">
+                            {Object.keys(wasteStats.byMunicipality).length}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -1374,14 +1566,19 @@ export function PlanningForecastDashboard() {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
                         <Label htmlFor="filter-waste-municipality">Municipality</Label>
-                        <Select value={filterWasteMunicipality} onValueChange={setFilterWasteMunicipality}>
+                        <Select
+                          value={filterWasteMunicipality}
+                          onValueChange={setFilterWasteMunicipality}
+                        >
                           <SelectTrigger id="filter-waste-municipality">
                             <SelectValue placeholder="All municipalities" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">All Municipalities</SelectItem>
                             {municipalities.map((m) => (
-                              <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                              <SelectItem key={m} value={m}>
+                                {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -1395,7 +1592,9 @@ export function PlanningForecastDashboard() {
                           <SelectContent>
                             <SelectItem value="all">All Types</SelectItem>
                             {uniqueWasteTypes.map((type) => (
-                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                              <SelectItem key={type} value={type}>
+                                {type}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -1413,7 +1612,11 @@ export function PlanningForecastDashboard() {
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2">
                     {filteredWaste.map((waste) => (
-                      <Card key={waste.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedWaste(waste)}>
+                      <Card
+                        key={waste.id}
+                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => setSelectedWaste(waste)}
+                      >
                         {waste.images && waste.images.length > 0 && (
                           <div className="relative h-48 bg-gray-100">
                             <img
@@ -1446,7 +1649,9 @@ export function PlanningForecastDashboard() {
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Date:</span>
-                            <span className="font-semibold">{new Date(waste.projected_date).toLocaleDateString()}</span>
+                            <span className="font-semibold">
+                              {new Date(waste.projected_date).toLocaleDateString()}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
@@ -1456,10 +1661,14 @@ export function PlanningForecastDashboard() {
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">Location:</span>
-                            <span className="font-semibold">{waste.barangay}, {waste.municipality}</span>
+                            <span className="font-semibold">
+                              {waste.barangay}, {waste.municipality}
+                            </span>
                           </div>
                           {waste.notes && (
-                            <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">{waste.notes}</p>
+                            <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">
+                              {waste.notes}
+                            </p>
                           )}
                         </div>
                         {user && user.id === waste.user_id && (
@@ -1499,26 +1708,33 @@ export function PlanningForecastDashboard() {
       </Container>
 
       {/* Harvest Forecast Dialog */}
-      <Dialog open={showHarvestDialog} onOpenChange={(open) => {
-        setShowHarvestDialog(open);
-        if (!open) {
-          setEditingHarvest(null);
-          setHarvestForm({
-            crop_type: "",
-            estimated_quantity_kg: "",
-            projected_harvest_date: "",
-            municipality: "general_luna",
-            barangay: "",
-            notes: "",
-          });
-          setHarvestImages([]);
-        }
-      }}>
+      <Dialog
+        open={showHarvestDialog}
+        onOpenChange={(open) => {
+          setShowHarvestDialog(open);
+          if (!open) {
+            setEditingHarvest(null);
+            setHarvestForm({
+              crop_type: "",
+              estimated_quantity_kg: "",
+              projected_harvest_date: "",
+              municipality: "general_luna",
+              barangay: "",
+              notes: "",
+            });
+            setHarvestImages([]);
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingHarvest ? "Edit Harvest Forecast" : "Add Harvest Forecast"}</DialogTitle>
+            <DialogTitle>
+              {editingHarvest ? "Edit Harvest Forecast" : "Add Harvest Forecast"}
+            </DialogTitle>
             <DialogDescription>
-              {editingHarvest ? "Update your harvest forecast details" : "Post your expected harvest to help buyers plan ahead"}
+              {editingHarvest
+                ? "Update your harvest forecast details"
+                : "Post your expected harvest to help buyers plan ahead"}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
@@ -1537,7 +1753,9 @@ export function PlanningForecastDashboard() {
                 id="quantity"
                 type="number"
                 value={harvestForm.estimated_quantity_kg}
-                onChange={(e) => setHarvestForm({ ...harvestForm, estimated_quantity_kg: e.target.value })}
+                onChange={(e) =>
+                  setHarvestForm({ ...harvestForm, estimated_quantity_kg: e.target.value })
+                }
                 placeholder="e.g., 500"
               />
             </div>
@@ -1547,16 +1765,25 @@ export function PlanningForecastDashboard() {
                 id="harvest_date"
                 type="date"
                 value={harvestForm.projected_harvest_date}
-                onChange={(e) => setHarvestForm({ ...harvestForm, projected_harvest_date: e.target.value })}
+                onChange={(e) =>
+                  setHarvestForm({ ...harvestForm, projected_harvest_date: e.target.value })
+                }
               />
             </div>
             <div>
               <Label htmlFor="municipality">Municipality</Label>
-              <Select value={harvestForm.municipality} onValueChange={(v) => setHarvestForm({ ...harvestForm, municipality: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={harvestForm.municipality}
+                onValueChange={(v) => setHarvestForm({ ...harvestForm, municipality: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {municipalities.map((m) => (
-                    <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                    <SelectItem key={m} value={m}>
+                      {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1595,45 +1822,68 @@ export function PlanningForecastDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowHarvestDialog(false)}>Cancel</Button>
-            <Button onClick={editingHarvest ? handleUpdateHarvestForecast : handleCreateHarvestForecast} disabled={uploading}>
-              {uploading ? "Uploading images..." : editingHarvest ? "Update Forecast" : "Create Forecast"}
+            <Button variant="outline" onClick={() => setShowHarvestDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={editingHarvest ? handleUpdateHarvestForecast : handleCreateHarvestForecast}
+              disabled={uploading}
+            >
+              {uploading
+                ? "Uploading images..."
+                : editingHarvest
+                  ? "Update Forecast"
+                  : "Create Forecast"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* LGU Distribution Dialog */}
-      <Dialog open={showDistributionDialog} onOpenChange={(open) => {
-        setShowDistributionDialog(open);
-        if (!open) {
-          setEditingDistribution(null);
-          setDistributionForm({
-            distribution_type: "fertilizer",
-            title: "",
-            description: "",
-            distribution_date: "",
-            location: "",
-            target_beneficiaries: ["farmer"],
-            municipality: "general_luna",
-            barangay: [],
-            quantity_available: "",
-          });
-          setDistributionImages([]);
-        }
-      }}>
+      <Dialog
+        open={showDistributionDialog}
+        onOpenChange={(open) => {
+          setShowDistributionDialog(open);
+          if (!open) {
+            setEditingDistribution(null);
+            setDistributionForm({
+              distribution_type: "fertilizer",
+              title: "",
+              description: "",
+              distribution_date: "",
+              location: "",
+              target_beneficiaries: ["farmer"],
+              municipality: "general_luna",
+              barangay: [],
+              quantity_available: "",
+            });
+            setDistributionImages([]);
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingDistribution ? "Edit LGU Distribution" : "Add LGU Distribution"}</DialogTitle>
+            <DialogTitle>
+              {editingDistribution ? "Edit LGU Distribution" : "Add LGU Distribution"}
+            </DialogTitle>
             <DialogDescription>
-              {editingDistribution ? "Update your distribution details" : "Post upcoming fertilizer distributions or agricultural assistance programs"}
+              {editingDistribution
+                ? "Update your distribution details"
+                : "Post upcoming fertilizer distributions or agricultural assistance programs"}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label htmlFor="distribution_type">Distribution Type</Label>
-              <Select value={distributionForm.distribution_type} onValueChange={(v) => setDistributionForm({ ...distributionForm, distribution_type: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={distributionForm.distribution_type}
+                onValueChange={(v) =>
+                  setDistributionForm({ ...distributionForm, distribution_type: v })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="fertilizer">Fertilizer</SelectItem>
                   <SelectItem value="seeds">Seeds</SelectItem>
@@ -1647,7 +1897,9 @@ export function PlanningForecastDashboard() {
               <Input
                 id="title"
                 value={distributionForm.title}
-                onChange={(e) => setDistributionForm({ ...distributionForm, title: e.target.value })}
+                onChange={(e) =>
+                  setDistributionForm({ ...distributionForm, title: e.target.value })
+                }
                 placeholder="e.g., Free Fertilizer Distribution Program"
               />
             </div>
@@ -1656,7 +1908,9 @@ export function PlanningForecastDashboard() {
               <Textarea
                 id="description"
                 value={distributionForm.description}
-                onChange={(e) => setDistributionForm({ ...distributionForm, description: e.target.value })}
+                onChange={(e) =>
+                  setDistributionForm({ ...distributionForm, description: e.target.value })
+                }
                 placeholder="Describe the distribution program"
               />
             </div>
@@ -1666,7 +1920,9 @@ export function PlanningForecastDashboard() {
                 id="distribution_date"
                 type="date"
                 value={distributionForm.distribution_date}
-                onChange={(e) => setDistributionForm({ ...distributionForm, distribution_date: e.target.value })}
+                onChange={(e) =>
+                  setDistributionForm({ ...distributionForm, distribution_date: e.target.value })
+                }
               />
             </div>
             <div>
@@ -1674,7 +1930,9 @@ export function PlanningForecastDashboard() {
               <Input
                 id="location"
                 value={distributionForm.location}
-                onChange={(e) => setDistributionForm({ ...distributionForm, location: e.target.value })}
+                onChange={(e) =>
+                  setDistributionForm({ ...distributionForm, location: e.target.value })
+                }
                 placeholder="e.g., Municipal Hall"
               />
             </div>
@@ -1684,17 +1942,26 @@ export function PlanningForecastDashboard() {
                 id="quantity"
                 type="number"
                 value={distributionForm.quantity_available}
-                onChange={(e) => setDistributionForm({ ...distributionForm, quantity_available: e.target.value })}
+                onChange={(e) =>
+                  setDistributionForm({ ...distributionForm, quantity_available: e.target.value })
+                }
                 placeholder="e.g., 100"
               />
             </div>
             <div>
               <Label htmlFor="municipality">Municipality</Label>
-              <Select value={distributionForm.municipality} onValueChange={(v) => setDistributionForm({ ...distributionForm, municipality: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={distributionForm.municipality}
+                onValueChange={(v) => setDistributionForm({ ...distributionForm, municipality: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {municipalities.map((m) => (
-                    <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                    <SelectItem key={m} value={m}>
+                      {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1715,8 +1982,19 @@ export function PlanningForecastDashboard() {
                 {distributionImages.length === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="text-center text-primary/60">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8 mx-auto mb-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                       <p className="text-sm">Click to upload images</p>
                       <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
@@ -1726,41 +2004,58 @@ export function PlanningForecastDashboard() {
               </div>
               {distributionImages.length > 0 && (
                 <div className="mt-2 text-sm text-primary/70 font-medium">
-                  {distributionImages.length} image{distributionImages.length !== 1 ? 's' : ''} selected
+                  {distributionImages.length} image{distributionImages.length !== 1 ? "s" : ""}{" "}
+                  selected
                 </div>
               )}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDistributionDialog(false)}>Cancel</Button>
-            <Button onClick={editingDistribution ? handleUpdateDistribution : handleCreateDistribution} disabled={uploading}>
-              {uploading ? "Uploading images..." : editingDistribution ? "Update Distribution" : "Create Distribution"}
+            <Button variant="outline" onClick={() => setShowDistributionDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={editingDistribution ? handleUpdateDistribution : handleCreateDistribution}
+              disabled={uploading}
+            >
+              {uploading
+                ? "Uploading images..."
+                : editingDistribution
+                  ? "Update Distribution"
+                  : "Create Distribution"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Projected Waste Dialog */}
-      <Dialog open={showWasteDialog} onOpenChange={(open) => {
-        setShowWasteDialog(open);
-        if (!open) {
-          setEditingWaste(null);
-          setWasteForm({
-            estimated_quantity_kg: "",
-            projected_date: "",
-            waste_type: "food",
-            municipality: "general_luna",
-            barangay: "",
-            notes: "",
-          });
-          setWasteImages([]);
-        }
-      }}>
+      <Dialog
+        open={showWasteDialog}
+        onOpenChange={(open) => {
+          setShowWasteDialog(open);
+          if (!open) {
+            setEditingWaste(null);
+            setWasteForm({
+              estimated_quantity_kg: "",
+              projected_date: "",
+              waste_type: "food",
+              municipality: "general_luna",
+              barangay: "",
+              notes: "",
+            });
+            setWasteImages([]);
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingWaste ? "Edit Projected Waste Report" : "Add Projected Waste Report"}</DialogTitle>
+            <DialogTitle>
+              {editingWaste ? "Edit Projected Waste Report" : "Add Projected Waste Report"}
+            </DialogTitle>
             <DialogDescription>
-              {editingWaste ? "Update your waste projection details" : "Report expected food waste to help LGU plan for recovery and management"}
+              {editingWaste
+                ? "Update your waste projection details"
+                : "Report expected food waste to help LGU plan for recovery and management"}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
@@ -1770,7 +2065,9 @@ export function PlanningForecastDashboard() {
                 id="waste_quantity"
                 type="number"
                 value={wasteForm.estimated_quantity_kg}
-                onChange={(e) => setWasteForm({ ...wasteForm, estimated_quantity_kg: e.target.value })}
+                onChange={(e) =>
+                  setWasteForm({ ...wasteForm, estimated_quantity_kg: e.target.value })
+                }
                 placeholder="e.g., 50"
               />
             </div>
@@ -1785,8 +2082,13 @@ export function PlanningForecastDashboard() {
             </div>
             <div>
               <Label htmlFor="waste_type">Waste Type</Label>
-              <Select value={wasteForm.waste_type} onValueChange={(v) => setWasteForm({ ...wasteForm, waste_type: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={wasteForm.waste_type}
+                onValueChange={(v) => setWasteForm({ ...wasteForm, waste_type: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="food">Food Waste</SelectItem>
                   <SelectItem value="organic">Organic Waste</SelectItem>
@@ -1796,11 +2098,18 @@ export function PlanningForecastDashboard() {
             </div>
             <div>
               <Label htmlFor="waste_municipality">Municipality</Label>
-              <Select value={wasteForm.municipality} onValueChange={(v) => setWasteForm({ ...wasteForm, municipality: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={wasteForm.municipality}
+                onValueChange={(v) => setWasteForm({ ...wasteForm, municipality: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {municipalities.map((m) => (
-                    <SelectItem key={m} value={m}>{m.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                    <SelectItem key={m} value={m}>
+                      {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1839,8 +2148,13 @@ export function PlanningForecastDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowWasteDialog(false)}>Cancel</Button>
-            <Button onClick={editingWaste ? handleUpdateProjectedWaste : handleCreateProjectedWaste} disabled={uploading}>
+            <Button variant="outline" onClick={() => setShowWasteDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={editingWaste ? handleUpdateProjectedWaste : handleCreateProjectedWaste}
+              disabled={uploading}
+            >
               {uploading ? "Uploading images..." : editingWaste ? "Update Report" : "Submit Report"}
             </Button>
           </DialogFooter>
@@ -1875,19 +2189,51 @@ export function PlanningForecastDashboard() {
                   {selectedHarvest.images.length > 1 && (
                     <>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev - 1 + selectedHarvest.images!.length) % selectedHarvest.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (prev) =>
+                              (prev - 1 + selectedHarvest.images!.length) %
+                              selectedHarvest.images!.length,
+                          )
+                        }
                         className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
                         </svg>
                       </button>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev + 1) % selectedHarvest.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (prev) => (prev + 1) % selectedHarvest.images!.length,
+                          )
+                        }
                         className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -1911,19 +2257,28 @@ export function PlanningForecastDashboard() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Quantity:</span>
-                        <span className="font-medium">{selectedHarvest.estimated_quantity_kg} kg</span>
+                        <span className="font-medium">
+                          {selectedHarvest.estimated_quantity_kg} kg
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Harvest Date:</span>
-                        <span className="font-medium">{new Date(selectedHarvest.projected_harvest_date).toLocaleDateString()}</span>
+                        <span className="font-medium">
+                          {new Date(selectedHarvest.projected_harvest_date).toLocaleDateString()}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
-                        <span className="font-medium">{selectedHarvest.barangay}, {selectedHarvest.municipality.replace('_', ' ')}</span>
+                        <span className="font-medium">
+                          {selectedHarvest.barangay},{" "}
+                          {selectedHarvest.municipality.replace("_", " ")}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Status:</span>
-                        <span className={`font-medium capitalize ${selectedHarvest.status === 'active' ? 'text-green-600' : 'text-gray-600'}`}>
+                        <span
+                          className={`font-medium capitalize ${selectedHarvest.status === "active" ? "text-green-600" : "text-gray-600"}`}
+                        >
                           {selectedHarvest.status}
                         </span>
                       </div>
@@ -1986,19 +2341,51 @@ export function PlanningForecastDashboard() {
                   {selectedDistribution.images.length > 1 && (
                     <>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev - 1 + selectedDistribution.images!.length) % selectedDistribution.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (prev) =>
+                              (prev - 1 + selectedDistribution.images!.length) %
+                              selectedDistribution.images!.length,
+                          )
+                        }
                         className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
                         </svg>
                       </button>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev + 1) % selectedDistribution.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (prev) => (prev + 1) % selectedDistribution.images!.length,
+                          )
+                        }
                         className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -2022,11 +2409,15 @@ export function PlanningForecastDashboard() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Type:</span>
-                        <span className="font-medium capitalize">{selectedDistribution.distribution_type}</span>
+                        <span className="font-medium capitalize">
+                          {selectedDistribution.distribution_type}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Date:</span>
-                        <span className="font-medium">{new Date(selectedDistribution.distribution_date).toLocaleDateString()}</span>
+                        <span className="font-medium">
+                          {new Date(selectedDistribution.distribution_date).toLocaleDateString()}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
@@ -2035,15 +2426,22 @@ export function PlanningForecastDashboard() {
                       {selectedDistribution.quantity_available && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Available:</span>
-                          <span className="font-medium">{selectedDistribution.quantity_available} units</span>
+                          <span className="font-medium">
+                            {selectedDistribution.quantity_available} units
+                          </span>
                         </div>
                       )}
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Status:</span>
-                        <span className={`font-medium capitalize ${
-                          selectedDistribution.status === 'upcoming' ? 'text-blue-600' :
-                          selectedDistribution.status === 'distributed' ? 'text-green-600' : 'text-gray-600'
-                        }`}>
+                        <span
+                          className={`font-medium capitalize ${
+                            selectedDistribution.status === "upcoming"
+                              ? "text-blue-600"
+                              : selectedDistribution.status === "distributed"
+                                ? "text-green-600"
+                                : "text-gray-600"
+                          }`}
+                        >
                           {selectedDistribution.status}
                         </span>
                       </div>
@@ -2054,7 +2452,9 @@ export function PlanningForecastDashboard() {
                 <div className="space-y-4">
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Description</h3>
-                    <p className="text-sm text-muted-foreground">{selectedDistribution.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDistribution.description}
+                    </p>
                   </div>
 
                   {user && user.id !== selectedDistribution.user_id && (
@@ -2062,7 +2462,10 @@ export function PlanningForecastDashboard() {
                       className="w-full"
                       onClick={() => {
                         setSelectedDistribution(null);
-                        handleMessageClick(selectedDistribution.user_id, selectedDistribution.lgu_name);
+                        handleMessageClick(
+                          selectedDistribution.user_id,
+                          selectedDistribution.lgu_name,
+                        );
                       }}
                     >
                       <MessageCircle className="mr-2 h-4 w-4" />
@@ -2104,19 +2507,49 @@ export function PlanningForecastDashboard() {
                   {selectedWaste.images.length > 1 && (
                     <>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev - 1 + selectedWaste.images!.length) % selectedWaste.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (prev) =>
+                              (prev - 1 + selectedWaste.images!.length) %
+                              selectedWaste.images!.length,
+                          )
+                        }
                         className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
                         </svg>
                       </button>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev + 1) % selectedWaste.images!.length)}
+                        onClick={() =>
+                          setCurrentImageIndex((prev) => (prev + 1) % selectedWaste.images!.length)
+                        }
                         className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -2140,11 +2573,15 @@ export function PlanningForecastDashboard() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Estimated:</span>
-                        <span className="font-medium">{selectedWaste.estimated_quantity_kg} kg</span>
+                        <span className="font-medium">
+                          {selectedWaste.estimated_quantity_kg} kg
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Date:</span>
-                        <span className="font-medium">{new Date(selectedWaste.projected_date).toLocaleDateString()}</span>
+                        <span className="font-medium">
+                          {new Date(selectedWaste.projected_date).toLocaleDateString()}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Type:</span>
@@ -2152,7 +2589,9 @@ export function PlanningForecastDashboard() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
-                        <span className="font-medium">{selectedWaste.barangay}, {selectedWaste.municipality.replace('_', ' ')}</span>
+                        <span className="font-medium">
+                          {selectedWaste.barangay}, {selectedWaste.municipality.replace("_", " ")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2165,7 +2604,6 @@ export function PlanningForecastDashboard() {
                       <p className="text-sm text-muted-foreground">{selectedWaste.notes}</p>
                     </div>
                   )}
-
                 </div>
               </div>
             </>

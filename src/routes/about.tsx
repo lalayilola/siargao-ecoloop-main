@@ -8,10 +8,14 @@ import restaurantBg from "@/assets/restaurant.jpg";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Siargao Loops" },
-      { name: "description", content: "Our mission to build a circular food economy in Siargao through community partnership and sustainable farming." },
-      { property: "og:title", content: "About Siargao Loops" },
-      { property: "og:description", content: "How we turn island food waste into local harvest." },
+      { title: "About — Farm2Food Cycle" },
+      {
+        name: "description",
+        content:
+          "Our mission to build a circular food economy through community partnership and sustainable farming.",
+      },
+      { property: "og:title", content: "About Farm2Food Cycle" },
+      { property: "og:description", content: "How we turn food waste into local harvest." },
     ],
   }),
   component: AboutPage,
@@ -22,7 +26,11 @@ function AboutPage() {
 
   const principles = [
     { icon: Recycle, titleKey: "about.principles.divert", bodyKey: "about.principles.divertDesc" },
-    { icon: Sprout, titleKey: "about.principles.regenerate", bodyKey: "about.principles.regenerateDesc" },
+    {
+      icon: Sprout,
+      titleKey: "about.principles.regenerate",
+      bodyKey: "about.principles.regenerateDesc",
+    },
     { icon: Users, titleKey: "about.principles.connect", bodyKey: "about.principles.connectDesc" },
     { icon: Leaf, titleKey: "about.principles.sustain", bodyKey: "about.principles.sustainDesc" },
   ];
@@ -39,29 +47,35 @@ function AboutPage() {
       {/* Hero Section with Background */}
       <section className="relative overflow-hidden py-20">
         <div className="absolute inset-0">
-          <img src={restaurantBg} alt="" width={1600} height={1024} className="h-full w-full object-cover" />
+          <img
+            src={restaurantBg}
+            alt=""
+            width={1600}
+            height={1024}
+            className="h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         <Container className="relative">
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="font-display text-3xl font-semibold sm:text-4xl text-white">{t("about.hero.eyebrow")}</h1>
-            <h2 className="mt-4 font-display text-4xl font-bold sm:text-5xl text-white">{t("about.hero.title")}</h2>
-            <p className="mt-4 text-lg text-white/90">
-              {t("about.hero.subtitle")}
-            </p>
+            <h1 className="font-display text-3xl font-semibold sm:text-4xl text-white">
+              {t("about.hero.eyebrow")}
+            </h1>
+            <h2 className="mt-4 font-display text-4xl font-bold sm:text-5xl text-white">
+              {t("about.hero.title")}
+            </h2>
+            <p className="mt-4 text-lg text-white/90">{t("about.hero.subtitle")}</p>
           </div>
         </Container>
       </section>
       <Container className="grid gap-10 py-16 md:grid-cols-2">
         <div>
           <h2 className="font-display text-2xl font-semibold">{t("about.mission.title")}</h2>
-          <p className="mt-3 text-muted-foreground">
-            {t("about.mission.description")}
-          </p>
-          <h2 className="mt-10 font-display text-2xl font-semibold">{t("about.whyItMatters.title")}</h2>
-          <p className="mt-3 text-muted-foreground">
-            {t("about.whyItMatters.description")}
-          </p>
+          <p className="mt-3 text-muted-foreground">{t("about.mission.description")}</p>
+          <h2 className="mt-10 font-display text-2xl font-semibold">
+            {t("about.whyItMatters.title")}
+          </h2>
+          <p className="mt-3 text-muted-foreground">{t("about.whyItMatters.description")}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {principles.map((p) => (

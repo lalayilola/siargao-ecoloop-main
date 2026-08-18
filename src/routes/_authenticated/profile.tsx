@@ -20,7 +20,7 @@ import { Link } from "@tanstack/react-router";
 const STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "My profile — Siargao Loops" }] }),
+  head: () => ({ meta: [{ title: "My profile — Farm2Food Cycle" }] }),
   component: ProfilePage,
   validateSearch: (search: Record<string, unknown>) => ({
     userId: typeof search.userId === "string" ? search.userId : undefined,
@@ -47,10 +47,16 @@ function ProfilePage() {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
-  const [otherUserProfile, setOtherUserProfile] = useState<Database["public"]["Tables"]["profiles"]["Row"] | null>(null);
+  const [otherUserProfile, setOtherUserProfile] = useState<
+    Database["public"]["Tables"]["profiles"]["Row"] | null
+  >(null);
   const [showChat, setShowChat] = useState(false);
   const [loadingOtherProfile, setLoadingOtherProfile] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -59,7 +65,9 @@ function ProfilePage() {
   const [validIdPreview, setValidIdPreview] = useState<string | null>(null);
   const [uploadingValidId, setUploadingValidId] = useState(false);
   const [validIdSaved, setValidIdSaved] = useState(false);
-  const [userListings, setUserListings] = useState<Database["public"]["Tables"]["marketplace_listings"]["Row"][]>([]);
+  const [userListings, setUserListings] = useState<
+    Database["public"]["Tables"]["marketplace_listings"]["Row"][]
+  >([]);
   const [loadingListings, setLoadingListings] = useState(false);
 
   useEffect(() => {
@@ -218,8 +226,7 @@ function ProfilePage() {
 
       const coverUrl = publicData.publicUrl;
 
-      const { error: updateError } = await (supabase
-        .from("profiles") as any)
+      const { error: updateError } = await (supabase.from("profiles") as any)
         .update({ cover_photo_url: coverUrl })
         .eq("id", user.id);
 
@@ -253,8 +260,7 @@ function ProfilePage() {
 
       const idUrl = publicData.publicUrl;
 
-      const { error: updateError } = await (supabase
-        .from("profiles") as any)
+      const { error: updateError } = await (supabase.from("profiles") as any)
         .update({ government_id_url: idUrl })
         .eq("id", user.id);
 
@@ -281,8 +287,12 @@ function ProfilePage() {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+
+    if (
+      !passwordForm.currentPassword ||
+      !passwordForm.newPassword ||
+      !passwordForm.confirmPassword
+    ) {
       toast.error(t("profile.fillAllPasswordFields") || "Please fill in all password fields");
       return;
     }
@@ -300,7 +310,7 @@ function ProfilePage() {
     setUpdatingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({
-        password: passwordForm.newPassword
+        password: passwordForm.newPassword,
       });
 
       if (error) throw error;
@@ -308,7 +318,9 @@ function ProfilePage() {
       toast.success(t("profile.passwordUpdated") || "Password updated successfully");
       setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err: any) {
-      toast.error((err?.message ?? t("profile.passwordUpdateFailed")) || "Failed to update password");
+      toast.error(
+        (err?.message ?? t("profile.passwordUpdateFailed")) || "Failed to update password",
+      );
     } finally {
       setUpdatingPassword(false);
     }
@@ -325,14 +337,20 @@ function ProfilePage() {
             {isOwnProfile ? t("profile.yourProfile") : `${displayProfile?.full_name}'s profile`}
           </h1>
           <p className="text-white/80 text-lg">
-            {isOwnProfile ? "Manage your profile and account settings" : "View user profile and listings"}
+            {isOwnProfile
+              ? "Manage your profile and account settings"
+              : "View user profile and listings"}
           </p>
         </div>
       </div>
       <Container className="py-8 bg-[#F7FBF8] -mt-8 relative z-10">
         {!isOwnProfile && (
           <div className="mb-4">
-            <Button variant="ghost" size="sm" onClick={() => router.navigate({ to: "/profile", search: { userId: undefined } })}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.navigate({ to: "/profile", search: { userId: undefined } })}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("profile.backToMyProfile")}
             </Button>
@@ -374,27 +392,41 @@ function ProfilePage() {
               <div className="flex-1 pt-4">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-3">{displayProfile?.full_name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                      {displayProfile?.full_name}
+                    </h1>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {displayProfile?.primary_role === "lgu_admin" ? (
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-300 px-3 py-1 text-sm font-medium">
+                        <Badge
+                          variant="secondary"
+                          className="bg-emerald-100 text-emerald-700 border-emerald-300 px-3 py-1 text-sm font-medium"
+                        >
                           LGU Admin
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 text-sm font-medium">
+                        <Badge
+                          variant="outline"
+                          className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 text-sm font-medium"
+                        >
                           {displayProfile?.primary_role}
                         </Badge>
                       )}
-                      {displayProfile?.primary_role !== "lgu_admin" && displayProfile?.lgu_approved ? (
+                      {displayProfile?.primary_role !== "lgu_admin" &&
+                      displayProfile?.lgu_approved ? (
                         <Badge className="bg-emerald-500 text-white border-emerald-600 px-3 py-1 text-sm font-medium">
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Verified
                         </Badge>
-                      ) : displayProfile?.primary_role !== "lgu_admin" && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 px-3 py-1 text-sm font-medium">
-                          <XCircle className="h-3 w-3 mr-1" />
-                          Not Verified
-                        </Badge>
+                      ) : (
+                        displayProfile?.primary_role !== "lgu_admin" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-amber-50 text-amber-700 border-amber-300 px-3 py-1 text-sm font-medium"
+                          >
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Not Verified
+                          </Badge>
+                        )
                       )}
                     </div>
                     <div className="text-sm text-gray-600 mb-4">
@@ -434,7 +466,9 @@ function ProfilePage() {
                         <span className="text-xl">📦</span>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-emerald-700">{userListings.length}</div>
+                        <div className="text-2xl font-bold text-emerald-700">
+                          {userListings.length}
+                        </div>
                         <div className="text-sm text-gray-600">Listings</div>
                       </div>
                     </div>
@@ -443,7 +477,9 @@ function ProfilePage() {
                     <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                          <span className="text-xl">{displayProfile?.lgu_approved ? "✓" : "—"}</span>
+                          <span className="text-xl">
+                            {displayProfile?.lgu_approved ? "✓" : "—"}
+                          </span>
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-emerald-700">
@@ -461,7 +497,9 @@ function ProfilePage() {
                       </div>
                       <div>
                         <div className="text-lg font-bold text-emerald-700">
-                          {displayProfile?.municipality?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()) || "—"}
+                          {displayProfile?.municipality
+                            ?.replace(/_/g, " ")
+                            .replace(/\b\w/g, (char) => char.toUpperCase()) || "—"}
                         </div>
                         <div className="text-sm text-gray-600">Municipality</div>
                       </div>
@@ -492,7 +530,9 @@ function ProfilePage() {
                   }
                   if (!user) return;
                   setBusy(true);
-                  const { error } = await (supabase.from("profiles") as any).update(parsed.data).eq("id", user.id);
+                  const { error } = await (supabase.from("profiles") as any)
+                    .update(parsed.data)
+                    .eq("id", user.id);
                   setBusy(false);
                   if (error) toast.error(error.message);
                   else {
@@ -503,41 +543,91 @@ function ProfilePage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <Label htmlFor="fn" className="text-sm font-medium text-gray-700">{t("profile.fullName")}</Label>
-                    <Input id="fn" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
+                    <Label htmlFor="fn" className="text-sm font-medium text-gray-700">
+                      {t("profile.fullName")}
+                    </Label>
+                    <Input
+                      id="fn"
+                      value={form.full_name}
+                      onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                      className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all"
+                    />
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="ph" className="text-sm font-medium text-gray-700">{t("profile.phone")}</Label>
-                    <Input id="ph" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
+                    <Label htmlFor="ph" className="text-sm font-medium text-gray-700">
+                      {t("profile.phone")}
+                    </Label>
+                    <Input
+                      id="ph"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all"
+                    />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <Label htmlFor="brgy" className="text-sm font-medium text-gray-700">{t("profile.barangay")}</Label>
-                  <Input id="brgy" value={form.barangay} onChange={(e) => setForm({ ...form, barangay: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
+                  <Label htmlFor="brgy" className="text-sm font-medium text-gray-700">
+                    {t("profile.barangay")}
+                  </Label>
+                  <Input
+                    id="brgy"
+                    value={form.barangay}
+                    onChange={(e) => setForm({ ...form, barangay: e.target.value })}
+                    className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all"
+                  />
                 </div>
                 <div className="space-y-3">
-                  <Label htmlFor="ad" className="text-sm font-medium text-gray-700">{t("profile.address")}</Label>
-                  <Input id="ad" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all" />
+                  <Label htmlFor="ad" className="text-sm font-medium text-gray-700">
+                    {t("profile.address")}
+                  </Label>
+                  <Input
+                    id="ad"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 h-12 rounded-xl transition-all"
+                  />
                 </div>
-                <Button type="submit" disabled={busy} className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">{busy ? t("profile.saving") : t("profile.saveChanges")}</Button>
+                <Button
+                  type="submit"
+                  disabled={busy}
+                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {busy ? t("profile.saving") : t("profile.saveChanges")}
+                </Button>
               </form>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.fullName")}</Label>
-                  <div className="text-base font-semibold text-gray-900">{displayProfile?.full_name}</div>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
+                    {t("profile.fullName")}
+                  </Label>
+                  <div className="text-base font-semibold text-gray-900">
+                    {displayProfile?.full_name}
+                  </div>
                 </div>
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.phone")}</Label>
-                  <div className="text-base font-semibold text-gray-900">{displayProfile?.phone}</div>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
+                    {t("profile.phone")}
+                  </Label>
+                  <div className="text-base font-semibold text-gray-900">
+                    {displayProfile?.phone}
+                  </div>
                 </div>
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.barangay")}</Label>
-                  <div className="text-base font-semibold text-gray-900">{displayProfile?.barangay}</div>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
+                    {t("profile.barangay")}
+                  </Label>
+                  <div className="text-base font-semibold text-gray-900">
+                    {displayProfile?.barangay}
+                  </div>
                 </div>
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">{t("profile.address")}</Label>
-                  <div className="text-base font-semibold text-gray-900">{displayProfile?.address}</div>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 block">
+                    {t("profile.address")}
+                  </Label>
+                  <div className="text-base font-semibold text-gray-900">
+                    {displayProfile?.address}
+                  </div>
                 </div>
               </div>
             )}
@@ -566,7 +656,12 @@ function ProfilePage() {
                       )}
                       <div className="mt-4 flex gap-3">
                         <label className="cursor-pointer">
-                          <Button size="sm" variant="outline" className="border-2 border-[#D8F3DC] text-emerald-700 hover:bg-emerald-50 rounded-xl" asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-2 border-[#D8F3DC] text-emerald-700 hover:bg-emerald-50 rounded-xl"
+                            asChild
+                          >
                             <span>
                               <Upload className="h-4 w-4 mr-2" />
                               Replace ID
@@ -594,10 +689,18 @@ function ProfilePage() {
                   ) : (
                     <div className="border-2 border-dashed border-[#D8F3DC] rounded-2xl p-8 text-center bg-emerald-50/50 hover:bg-emerald-50 transition-colors">
                       <Upload className="h-16 w-16 mx-auto mb-4 text-emerald-400" />
-                      <p className="text-base font-medium text-gray-700 mb-2">Drag & Drop your Valid ID or Click to Upload</p>
-                      <p className="text-sm text-gray-500 mb-4">Supported formats: PNG, JPG, PDF • Max size: 5MB</p>
+                      <p className="text-base font-medium text-gray-700 mb-2">
+                        Drag & Drop your Valid ID or Click to Upload
+                      </p>
+                      <p className="text-sm text-gray-500 mb-4">
+                        Supported formats: PNG, JPG, PDF • Max size: 5MB
+                      </p>
                       <label className="cursor-pointer">
-                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 rounded-xl shadow-md hover:shadow-lg transition-all" asChild>
+                        <Button
+                          size="lg"
+                          className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 rounded-xl shadow-md hover:shadow-lg transition-all"
+                          asChild
+                        >
                           <span>
                             <Upload className="h-5 w-5 mr-2" />
                             Upload Valid ID
@@ -633,10 +736,7 @@ function ProfilePage() {
                   <span className="text-3xl">🔒</span>
                   {t("profile.changePassword")}
                 </h2>
-                <form
-                  className="space-y-6"
-                  onSubmit={handlePasswordChange}
-                >
+                <form className="space-y-6" onSubmit={handlePasswordChange}>
                   <div className="space-y-3">
                     <Label htmlFor="current-password">{t("profile.currentPassword")}</Label>
                     <div className="relative">
@@ -644,7 +744,9 @@ function ProfilePage() {
                         id="current-password"
                         type={showCurrentPassword ? "text" : "password"}
                         value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        onChange={(e) =>
+                          setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
+                        }
                         className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                         placeholder={t("profile.enterCurrentPassword")}
                       />
@@ -653,7 +755,11 @@ function ProfilePage() {
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        {showCurrentPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -665,7 +771,9 @@ function ProfilePage() {
                           id="new-password"
                           type={showNewPassword ? "text" : "password"}
                           value={passwordForm.newPassword}
-                          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                          onChange={(e) =>
+                            setPasswordForm({ ...passwordForm, newPassword: e.target.value })
+                          }
                           className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                           placeholder={t("profile.enterNewPassword")}
                         />
@@ -674,13 +782,25 @@ function ProfilePage() {
                           onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                       {passwordForm.newPassword && (
                         <div className="text-xs text-gray-500 mt-2">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={passwordForm.newPassword.length >= 6 ? "text-emerald-600" : "text-gray-400"}>✓</span>
+                            <span
+                              className={
+                                passwordForm.newPassword.length >= 6
+                                  ? "text-emerald-600"
+                                  : "text-gray-400"
+                              }
+                            >
+                              ✓
+                            </span>
                             <span>At least 6 characters</span>
                           </div>
                         </div>
@@ -693,7 +813,9 @@ function ProfilePage() {
                           id="confirm-password"
                           type={showConfirmPassword ? "text" : "password"}
                           value={passwordForm.confirmPassword}
-                          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                          onChange={(e) =>
+                            setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
+                          }
                           className="border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 pr-12 h-12 rounded-xl transition-all"
                           placeholder={t("profile.confirmNewPassword")}
                         />
@@ -702,13 +824,25 @@ function ProfilePage() {
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
                         </button>
                       </div>
                       {passwordForm.confirmPassword && (
                         <div className="text-xs text-gray-500 mt-2">
                           <div className="flex items-center gap-2">
-                            <span className={passwordForm.newPassword === passwordForm.confirmPassword ? "text-emerald-600" : "text-gray-400"}>✓</span>
+                            <span
+                              className={
+                                passwordForm.newPassword === passwordForm.confirmPassword
+                                  ? "text-emerald-600"
+                                  : "text-gray-400"
+                              }
+                            >
+                              ✓
+                            </span>
                             <span>Passwords match</span>
                           </div>
                         </div>
@@ -780,8 +914,8 @@ function ProfilePage() {
                   {isOwnProfile ? "No Listings Yet" : "No Listings Available"}
                 </h3>
                 <p className="text-gray-600 mb-8 text-lg">
-                  {isOwnProfile 
-                    ? "Start by creating your first listing to showcase your products." 
+                  {isOwnProfile
+                    ? "Start by creating your first listing to showcase your products."
                     : `${displayProfile?.full_name} hasn't posted any listings yet.`}
                 </p>
                 {isOwnProfile && (

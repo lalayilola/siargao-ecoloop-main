@@ -37,15 +37,16 @@ export function FarmerDashboard() {
 
     const loadDashboardData = async () => {
       try {
-        const [{ data: listings, error: listingsError }, { data: trades, error: tradesError }] = await Promise.all([
-          supabase.from("marketplace_listings").select("*").eq("user_id", user.id),
-          supabase
-            .from("trades")
-            .select("*")
-            .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
-            .order("created_at", { ascending: false })
-            .limit(5),
-        ]);
+        const [{ data: listings, error: listingsError }, { data: trades, error: tradesError }] =
+          await Promise.all([
+            supabase.from("marketplace_listings").select("*").eq("user_id", user.id),
+            supabase
+              .from("trades")
+              .select("*")
+              .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+              .order("created_at", { ascending: false })
+              .limit(5),
+          ]);
 
         if (listingsError) {
           console.error("Error loading marketplace listings:", listingsError);
@@ -58,7 +59,7 @@ export function FarmerDashboard() {
         const activeListings = listingList.filter((l) => l.kind === "produce");
         const completedTrades = (trades ?? []) as Trade[];
         const completedOrders = completedTrades.filter((t) => t.status === "completed");
-        
+
         // Calculate total sales from completed trades
         const totalSales = completedOrders.reduce((sum, trade) => {
           const price = parseFloat(trade.from_gives.replace(/[^0-9.]/g, "")) || 0;
@@ -66,8 +67,9 @@ export function FarmerDashboard() {
         }, 0);
 
         // Calculate sustainability score based on activity
-        const sustainabilityScore = Math.min(100, 
-          50 + (activeListings.length * 5) + (completedOrders.length * 3)
+        const sustainabilityScore = Math.min(
+          100,
+          50 + activeListings.length * 5 + completedOrders.length * 3,
         );
 
         setStats({
@@ -132,7 +134,9 @@ export function FarmerDashboard() {
         <h1 className="text-3xl font-display font-bold text-primary mb-2">
           Welcome, {profile.full_name}
         </h1>
-        <p className="text-slate-600">Manage your produce listings and recent community activity.</p>
+        <p className="text-slate-600">
+          Manage your produce listings and recent community activity.
+        </p>
       </div>
 
       {/* Circular Economy Workflow */}
@@ -193,16 +197,23 @@ export function FarmerDashboard() {
                       <p className="font-medium text-slate-900">
                         {activity.from_name} → {activity.to_name}
                       </p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        activity.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                        activity.status === "accepted" ? "bg-green-100 text-green-800" :
-                        activity.status === "completed" ? "bg-blue-100 text-blue-800" :
-                        "bg-slate-100 text-slate-800"
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          activity.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : activity.status === "accepted"
+                              ? "bg-green-100 text-green-800"
+                              : activity.status === "completed"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-slate-100 text-slate-800"
+                        }`}
+                      >
                         {activity.status}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-600">{activity.from_gives} for {activity.to_gives}</p>
+                    <p className="text-sm text-slate-600">
+                      {activity.from_gives} for {activity.to_gives}
+                    </p>
                     <p className="text-xs text-slate-500 mt-1">
                       {new Date(activity.created_at).toLocaleDateString()}
                     </p>

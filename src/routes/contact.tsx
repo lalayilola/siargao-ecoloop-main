@@ -12,10 +12,17 @@ import { useLanguage } from "@/hooks/use-language";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Siargao Loops" },
-      { name: "description", content: "Get in touch with the Siargao Loops team — LGU partnerships, community rollouts, media and general questions." },
-      { property: "og:title", content: "Contact Siargao Loops" },
-      { property: "og:description", content: "We'd love to hear from you. Reach the Siargao Loops team here." },
+      { title: "Contact — Farm2Food Cycle" },
+      {
+        name: "description",
+        content:
+          "Get in touch with the Farm2Food Cycle team — LGU partnerships, community rollouts, media and general questions.",
+      },
+      { property: "og:title", content: "Contact Farm2Food Cycle" },
+      {
+        property: "og:description",
+        content: "We'd love to hear from you. Reach the Farm2Food Cycle team here.",
+      },
     ],
   }),
   component: ContactPage,
@@ -56,7 +63,9 @@ function ContactPage() {
               <MapPin className="mt-0.5 h-5 w-5 text-primary" />
               <div>
                 <div className="font-semibold">{t("contact.office")}</div>
-                <div className="text-sm text-muted-foreground">Tourism Road, General Luna, Siargao Island</div>
+                <div className="text-sm text-muted-foreground">
+                  Tourism Road, General Luna, Siargao Island
+                </div>
               </div>
             </div>
           </Card>
@@ -65,7 +74,9 @@ function ContactPage() {
           {sent ? (
             <div className="grid place-items-center py-10 text-center">
               <CheckCircle2 className="h-10 w-10 text-primary" />
-              <h3 className="mt-3 font-display text-xl font-semibold">{t("contact.messageSent")}</h3>
+              <h3 className="mt-3 font-display text-xl font-semibold">
+                {t("contact.messageSent")}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">{t("contact.messageSentDesc")}</p>
             </div>
           ) : (
@@ -95,7 +106,9 @@ function ContactPage() {
                 <Label htmlFor="msg">{t("contact.message")}</Label>
                 <Textarea id="msg" rows={5} required />
               </div>
-              <Button type="submit" className="rounded-full" size="lg">{t("contact.sendMessage")}</Button>
+              <Button type="submit" className="rounded-full" size="lg">
+                {t("contact.sendMessage")}
+              </Button>
               <p className="text-xs text-muted-foreground">{t("contact.demoForm")}</p>
             </form>
           )}

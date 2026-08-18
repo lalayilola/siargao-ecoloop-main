@@ -4,7 +4,7 @@ import { WasteCollectionView } from "@/components/waste/WasteCollectionView";
 export const Route = createFileRoute("/_authenticated/waste-collection")({
   head: () => ({
     meta: [
-      { title: "Collection Requests — Siargao Loops" },
+      { title: "Collection Requests — Farm2Food Cycle" },
       { name: "description", content: "Schedule and manage waste collection pickups." },
       { property: "og:title", content: "Collection Requests" },
     ],

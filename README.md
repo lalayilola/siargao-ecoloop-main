@@ -17,12 +17,15 @@ Siargao Loops is a **fully-built, production-ready full-stack web application** 
 ## ⚡ Quick Start
 
 ### 1️⃣ Read (5 minutes)
+
 → [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)
 
 ### 2️⃣ Setup (20 minutes)
+
 → [GETTING_STARTED.md](GETTING_STARTED.md)
 
 ### 3️⃣ Deploy (10 minutes)
+
 → See deployment section in GETTING_STARTED.md
 
 ---
@@ -31,24 +34,26 @@ Siargao Loops is a **fully-built, production-ready full-stack web application** 
 
 **Start with one of these based on your role:**
 
-| Your Role | Start Here | Then Read |
-|-----------|-----------|-----------|
-| **Developer** | [GETTING_STARTED.md](GETTING_STARTED.md) | [QUICK_REFERENCE.md](QUICK_REFERENCE.md) |
-| **QA/Tester** | [FEATURE_VERIFICATION_CHECKLIST.md](FEATURE_VERIFICATION_CHECKLIST.md) | [GETTING_STARTED.md](GETTING_STARTED.md) |
-| **Product Manager** | [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md) | [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) |
-| **Executive** | [README_OVERVIEW.md](README_OVERVIEW.md) | [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) |
-| **Lost?** | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) | [VISUAL_SUMMARY.md](VISUAL_SUMMARY.md) |
+| Your Role           | Start Here                                                             | Then Read                                |
+| ------------------- | ---------------------------------------------------------------------- | ---------------------------------------- |
+| **Developer**       | [GETTING_STARTED.md](GETTING_STARTED.md)                               | [QUICK_REFERENCE.md](QUICK_REFERENCE.md) |
+| **QA/Tester**       | [FEATURE_VERIFICATION_CHECKLIST.md](FEATURE_VERIFICATION_CHECKLIST.md) | [GETTING_STARTED.md](GETTING_STARTED.md) |
+| **Product Manager** | [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)                         | [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) |
+| **Executive**       | [README_OVERVIEW.md](README_OVERVIEW.md)                               | [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) |
+| **Lost?**           | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)                       | [VISUAL_SUMMARY.md](VISUAL_SUMMARY.md)   |
 
 ---
 
 ## ✨ What's Included
 
 ### 🎮 3 Complete Portal Systems
+
 - ✅ **Farmer Portal** - Manage inventory, orders, compost
 - ✅ **Restaurant Portal** - Browse produce, manage waste, schedule collection
 - ✅ **LGU Admin Portal** - Analytics, monitoring, reporting
 
 ### 🌐 5 Community Features
+
 - ✅ **EcoFeed** - Social posts with comments and likes
 - ✅ **Marketplace** - Buy, sell, trade produce
 - ✅ **Messaging** - Real-time in-app chat
@@ -56,6 +61,7 @@ Siargao Loops is a **fully-built, production-ready full-stack web application** 
 - ✅ **Eco Points** - Gamification with badges
 
 ### 🛠️ Technical Stack
+
 - ✅ **Frontend**: React 18+ with TypeScript
 - ✅ **Backend**: Supabase (PostgreSQL + Auth + Storage)
 - ✅ **Styling**: Tailwind CSS + Shadcn/ui
@@ -64,6 +70,7 @@ Siargao Loops is a **fully-built, production-ready full-stack web application** 
 - ✅ **Real-time**: Supabase Subscriptions
 
 ### 📊 By The Numbers
+
 - **38 React components**
 - **34+ authenticated routes**
 - **14+ database tables**
@@ -78,6 +85,7 @@ Siargao Loops is a **fully-built, production-ready full-stack web application** 
 ## 🚀 Deployment Ready
 
 Everything needed is included:
+
 - ✅ Complete source code
 - ✅ Database schema & migrations
 - ✅ Authentication configured
@@ -137,6 +145,7 @@ Every step is tracked, real-time, and generates eco points.
 ## 👥 User Experience
 
 ### 🌾 Farmers
+
 - View marketplace
 - List produce
 - Receive purchase requests
@@ -145,6 +154,7 @@ Every step is tracked, real-time, and generates eco points.
 - Earn eco points
 
 ### 🏢 Restaurants
+
 - Browse produce
 - Place purchase requests
 - Track orders
@@ -153,6 +163,7 @@ Every step is tracked, real-time, and generates eco points.
 - Earn eco points
 
 ### 🏛️ LGU Admin
+
 - View analytics
 - Monitor waste
 - Manage collections
@@ -161,6 +172,7 @@ Every step is tracked, real-time, and generates eco points.
 - Post announcements
 
 ### 👥 All Users
+
 - Participate in community feed
 - Access marketplace
 - Send messages
@@ -173,6 +185,7 @@ Every step is tracked, real-time, and generates eco points.
 ## 🎓 Key Features
 
 ### Marketplace System
+
 - Create/edit listings
 - Multiple transaction types
 - Image uploads
@@ -181,6 +194,7 @@ Every step is tracked, real-time, and generates eco points.
 - Real-time messaging
 
 ### Communication
+
 - In-app messaging
 - Real-time chat
 - Read status tracking
@@ -188,6 +202,7 @@ Every step is tracked, real-time, and generates eco points.
 - Auto-notifications
 
 ### Waste Management
+
 - Report submissions
 - Collection scheduling
 - Status tracking
@@ -195,12 +210,14 @@ Every step is tracked, real-time, and generates eco points.
 - Real-time updates
 
 ### Gamification
+
 - Automatic point tracking
 - 4 achievement badges
 - Point breakdown by category
 - Leaderboard potential
 
 ### Analytics
+
 - Real-time dashboards
 - Waste statistics
 - Transaction reports
@@ -212,6 +229,7 @@ Every step is tracked, real-time, and generates eco points.
 ## 🚦 Getting Started
 
 ### Option 1: Quick Local Test (30 minutes)
+
 ```bash
 npm install
 # Create .env.local with Supabase credentials
@@ -220,6 +238,7 @@ npm run dev
 ```
 
 ### Option 2: Full Setup & Deployment (1 hour)
+
 1. Read [GETTING_STARTED.md](GETTING_STARTED.md)
 2. Install dependencies
 3. Configure database
@@ -228,6 +247,7 @@ npm run dev
 6. Deploy
 
 ### Option 3: Understanding First (1 hour)
+
 1. Read [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)
 2. Read [README_OVERVIEW.md](README_OVERVIEW.md)
 3. Review [IMPLEMENTATION_COMPLETE.md](IMPLEMENTATION_COMPLETE.md)
@@ -252,17 +272,17 @@ npm run dev
 
 ## 📊 Project Status
 
-| Component | Status |
-|-----------|--------|
-| Frontend | ✅ 100% Complete |
-| Backend | ✅ 100% Complete |
-| Database | ✅ 100% Complete |
-| Authentication | ✅ 100% Complete |
-| Real-time | ✅ 100% Complete |
-| Gamification | ✅ 100% Complete |
-| Analytics | ✅ 100% Complete |
-| Documentation | ✅ 100% Complete |
-| **OVERALL** | **✅ 100% READY** |
+| Component      | Status            |
+| -------------- | ----------------- |
+| Frontend       | ✅ 100% Complete  |
+| Backend        | ✅ 100% Complete  |
+| Database       | ✅ 100% Complete  |
+| Authentication | ✅ 100% Complete  |
+| Real-time      | ✅ 100% Complete  |
+| Gamification   | ✅ 100% Complete  |
+| Analytics      | ✅ 100% Complete  |
+| Documentation  | ✅ 100% Complete  |
+| **OVERALL**    | **✅ 100% READY** |
 
 ---
 
@@ -343,16 +363,16 @@ npm run dev
 
 ## 📞 Quick Links
 
-| Need | Document |
-|------|----------|
-| Quick overview | [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md) |
-| Setup guide | [GETTING_STARTED.md](GETTING_STARTED.md) |
-| All features | [IMPLEMENTATION_COMPLETE.md](IMPLEMENTATION_COMPLETE.md) |
-| Testing | [FEATURE_VERIFICATION_CHECKLIST.md](FEATURE_VERIFICATION_CHECKLIST.md) |
-| Development | [QUICK_REFERENCE.md](QUICK_REFERENCE.md) |
-| Executive info | [README_OVERVIEW.md](README_OVERVIEW.md) |
-| Navigation | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) |
-| Visual guide | [VISUAL_SUMMARY.md](VISUAL_SUMMARY.md) |
+| Need           | Document                                                               |
+| -------------- | ---------------------------------------------------------------------- |
+| Quick overview | [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)                         |
+| Setup guide    | [GETTING_STARTED.md](GETTING_STARTED.md)                               |
+| All features   | [IMPLEMENTATION_COMPLETE.md](IMPLEMENTATION_COMPLETE.md)               |
+| Testing        | [FEATURE_VERIFICATION_CHECKLIST.md](FEATURE_VERIFICATION_CHECKLIST.md) |
+| Development    | [QUICK_REFERENCE.md](QUICK_REFERENCE.md)                               |
+| Executive info | [README_OVERVIEW.md](README_OVERVIEW.md)                               |
+| Navigation     | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)                       |
+| Visual guide   | [VISUAL_SUMMARY.md](VISUAL_SUMMARY.md)                                 |
 
 ---
 
@@ -364,6 +384,7 @@ No additional development work needed.
 Deploy with confidence today.
 
 ### Start Here:
+
 👉 **[COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)** ⭐
 
 ---
@@ -424,9 +445,10 @@ siargao-ecoloop-main/
 
 **Welcome! Let's build a sustainable future together.** 🌱🚀
 
-*Version: 1.0.0 | Status: Production Ready | Last Updated: 2026-06-23*
+_Version: 1.0.0 | Status: Production Ready | Last Updated: 2026-06-23_
 
 ---
 
 ### 🚀 Begin Here:
+
 **[→ COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)**

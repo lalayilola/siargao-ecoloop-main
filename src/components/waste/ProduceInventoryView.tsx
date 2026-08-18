@@ -3,17 +3,15 @@ import { Container, PageHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
-  Filter,
-  Sprout,
-  Package
-} from "lucide-react";
+import { Plus, Edit, Trash2, Search, Filter, Sprout, Package } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,7 +21,9 @@ export function ProduceInventoryView() {
   const { user, profile } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "available" | "reserved" | "sold">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "available" | "reserved" | "sold">(
+    "all",
+  );
   const [filterKind, setFilterKind] = useState<"all" | "produce" | "waste">("all");
 
   useEffect(() => {
@@ -49,25 +49,22 @@ export function ProduceInventoryView() {
   const handleDelete = async (listingId: string) => {
     if (!confirm("Are you sure you want to delete this listing?")) return;
 
-    const { error } = await supabase
-      .from("marketplace_listings")
-      .delete()
-      .eq("id", listingId);
+    const { error } = await supabase.from("marketplace_listings").delete().eq("id", listingId);
 
     if (error) {
       toast.error(`Failed to delete listing: ${error.message}`);
       return;
     }
 
-    setListings(prev => prev.filter(l => l.id !== listingId));
+    setListings((prev) => prev.filter((l) => l.id !== listingId));
     toast.success("Listing deleted");
   };
 
   const filteredListings = listings.filter((listing) => {
-    const matchesSearch = 
+    const matchesSearch =
       listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.category?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = filterStatus === "all" || listing.status === filterStatus;
     const matchesKind = filterKind === "all" || listing.kind === filterKind;
 
@@ -88,7 +85,9 @@ export function ProduceInventoryView() {
   };
 
   const totalQuantity = listings.reduce((sum, l) => sum + (l.kg || 0), 0);
-  const availableQuantity = listings.filter(l => l.status === "available").reduce((sum, l) => sum + (l.kg || 0), 0);
+  const availableQuantity = listings
+    .filter((l) => l.status === "available")
+    .reduce((sum, l) => sum + (l.kg || 0), 0);
 
   if (!profile || profile.primary_role !== "farmer") {
     return (
@@ -198,7 +197,10 @@ export function ProduceInventoryView() {
         ) : (
           <div className="space-y-4">
             {filteredListings.map((listing) => (
-              <Card key={listing.id} className="p-6 border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10">
+              <Card
+                key={listing.id}
+                className="p-6 border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10"
+              >
                 <div className="flex flex-col md:flex-row gap-4">
                   {listing.image && (
                     <img
@@ -211,11 +213,11 @@ export function ProduceInventoryView() {
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">{listing.title}</h3>
-                        <p className="text-sm text-slate-600">{listing.category || "No category"}</p>
+                        <p className="text-sm text-slate-600">
+                          {listing.category || "No category"}
+                        </p>
                       </div>
-                      <Badge className={getStatusColor(listing.status)}>
-                        {listing.status}
-                      </Badge>
+                      <Badge className={getStatusColor(listing.status)}>{listing.status}</Badge>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div>
@@ -235,10 +237,16 @@ export function ProduceInventoryView() {
                         <p className="font-medium text-slate-900">{listing.barangay}</p>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">{listing.description}</p>
+                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                      {listing.description}
+                    </p>
                     <div className="flex gap-2">
                       <Link to="/marketplace" className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full border-primary/40 text-primary hover:bg-primary/10">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-primary/40 text-primary hover:bg-primary/10"
+                        >
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </Button>

@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Plus, Trash2, CalendarDays, MapPin } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,7 +64,12 @@ export function WasteReportsView() {
     event.preventDefault();
     if (!user || !profile) return;
 
-    if (!wasteType.trim() || quantityKg <= 0 || !collectionDate.trim() || !collectionAddress.trim()) {
+    if (
+      !wasteType.trim() ||
+      quantityKg <= 0 ||
+      !collectionDate.trim() ||
+      !collectionAddress.trim()
+    ) {
       toast.error("Please fill in all waste report fields.");
       return;
     }
@@ -103,7 +115,9 @@ export function WasteReportsView() {
         <Card className="mx-auto max-w-xl p-8 text-center">
           <Trash2 className="mx-auto h-12 w-12 text-accent mb-4" />
           <h2 className="text-2xl font-semibold text-primary">Waste Reports</h2>
-          <p className="text-slate-600 mt-2">Restaurant accounts can log food waste so collection teams can schedule pickup.</p>
+          <p className="text-slate-600 mt-2">
+            Restaurant accounts can log food waste so collection teams can schedule pickup.
+          </p>
         </Card>
       </Container>
     );
@@ -131,7 +145,10 @@ export function WasteReportsView() {
           <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Waste Reports</h1>
           <p className="text-slate-600">Submit and track food waste for composting collection.</p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-white gap-2" onClick={() => setShowForm(true)}>
+        <Button
+          className="bg-accent hover:bg-accent/90 text-white gap-2"
+          onClick={() => setShowForm(true)}
+        >
           <Plus className="h-4 w-4" /> Submit Report
         </Button>
       </div>
@@ -140,7 +157,9 @@ export function WasteReportsView() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Submit a Waste Report</DialogTitle>
-            <DialogDescription>Share the waste details so LGU collection teams can schedule a pickup.</DialogDescription>
+            <DialogDescription>
+              Share the waste details so LGU collection teams can schedule a pickup.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -216,15 +235,23 @@ export function WasteReportsView() {
         <Card className="p-12 text-center border-2 border-accent/20">
           <Trash2 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-slate-900 mb-2">No reports yet</h2>
-          <p className="text-slate-600 mb-6">Submit your first food waste report and get collection scheduled.</p>
-          <Button className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto" onClick={() => setShowForm(true)}>
+          <p className="text-slate-600 mb-6">
+            Submit your first food waste report and get collection scheduled.
+          </p>
+          <Button
+            className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto"
+            onClick={() => setShowForm(true)}
+          >
             <Plus className="h-4 w-4" /> Submit First Report
           </Button>
         </Card>
       ) : (
         <div className="space-y-4">
           {reports.map((report) => (
-            <Card key={report.id} className="p-6 border-2 border-accent/20 hover:border-accent/40 transition-all">
+            <Card
+              key={report.id}
+              className="p-6 border-2 border-accent/20 hover:border-accent/40 transition-all"
+            >
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
@@ -246,10 +273,14 @@ export function WasteReportsView() {
                   </div>
                 </div>
                 <div className="flex flex-col items-start gap-2 sm:items-end">
-                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}
+                  >
                     {report.status}
                   </span>
-                  <p className="text-xs text-slate-500">Submitted: {new Date(report.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-500">
+                    Submitted: {new Date(report.created_at).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             </Card>

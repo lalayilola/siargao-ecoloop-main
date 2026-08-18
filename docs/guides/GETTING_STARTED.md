@@ -18,11 +18,13 @@ cd siargao-ecoloop-main
 ### 2. Install Dependencies
 
 Using Bun (recommended):
+
 ```bash
 bun install
 ```
 
 Or using npm:
+
 ```bash
 npm install
 ```
@@ -70,11 +72,13 @@ supabase db push
 ### 6. Start Development Server
 
 Using Bun:
+
 ```bash
 bun dev
 ```
 
 Or using npm:
+
 ```bash
 npm run dev
 ```
@@ -126,14 +130,16 @@ siargao-ecoloop-main/
 ## User Roles & Access
 
 ### Farmer
+
 - **Route**: `/dashboard/farmer`
-- **Features**: 
+- **Features**:
   - Produce inventory
   - Order management
   - Compost purchasing
   - Community participation
 
 ### Restaurant/Hotel
+
 - **Route**: `/dashboard/restaurant`
 - **Features**:
   - Browse & purchase produce
@@ -142,6 +148,7 @@ siargao-ecoloop-main/
   - Community participation
 
 ### LGU Admin
+
 - **Route**: `/dashboard`
 - **Features**:
   - System analytics
@@ -151,6 +158,7 @@ siargao-ecoloop-main/
   - Reports & statistics
 
 ### Resident (Local User)
+
 - **Route**: Community section
 - **Features**:
   - Browse marketplace
@@ -172,6 +180,7 @@ siargao-ecoloop-main/
 ### Test Workflows
 
 #### Produce Listing Workflow
+
 1. Login as Farmer
 2. Go to Produce Inventory
 3. Create a new listing
@@ -181,6 +190,7 @@ siargao-ecoloop-main/
 7. Verify notifications
 
 #### Waste Management Workflow
+
 1. Login as Restaurant
 2. Submit waste report
 3. Schedule collection
@@ -189,6 +199,7 @@ siargao-ecoloop-main/
 6. Monitor collection
 
 #### Community Engagement
+
 1. Any user goes to `/feed`
 2. Create a post with optional image
 3. Like and comment on other posts
@@ -200,25 +211,33 @@ siargao-ecoloop-main/
 ## Common Issues & Troubleshooting
 
 ### Issue: "Supabase connection failed"
-**Solution**: 
+
+**Solution**:
+
 - Verify VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local
 - Check Supabase project is active
 - Verify API keys are correct
 
 ### Issue: "File upload fails"
+
 **Solution**:
+
 - Ensure `uploads` bucket exists in Supabase Storage
 - Check bucket policies allow authenticated uploads
 - Verify VITE_SUPABASE_STORAGE_BUCKET matches bucket name
 
 ### Issue: "Routes not loading"
+
 **Solution**:
+
 - Clear browser cache
 - Restart dev server
 - Check database migrations were applied
 
 ### Issue: "Images not displaying"
+
 **Solution**:
+
 - Verify image URLs in database are correct
 - Check Supabase Storage URL format
 - Ensure signed URLs if private bucket
@@ -230,11 +249,13 @@ siargao-ecoloop-main/
 ### Build the Application
 
 Using Bun:
+
 ```bash
 bun build
 ```
 
 Or using npm:
+
 ```bash
 npm run build
 ```
@@ -244,24 +265,28 @@ Output will be in `dist/` directory.
 ### Deployment Options
 
 #### Vercel (Recommended)
+
 ```bash
 npm install -g vercel
 vercel
 ```
 
 #### Netlify
+
 ```bash
 npm install -g netlify-cli
 netlify deploy
 ```
 
 #### Docker
+
 ```bash
 docker build -t siargao-loops .
 docker run -p 80:5173 siargao-loops
 ```
 
 #### Traditional Hosting
+
 - Upload `dist/` to web server
 - Configure web server for SPA routing
 - Set environment variables on server
@@ -306,38 +331,42 @@ Apply migrations in order using Supabase CLI or manually.
 
 ## Key Features Overview
 
-| Feature | Location | Notes |
-|---------|----------|-------|
-| Marketplace | `/marketplace` | Browse & trade/purchase produce |
-| Feed | `/feed` | Community posts & interactions |
-| Eco Points | `/eco-points` | Gamification system |
-| Notifications | `/notifications` | Real-time notifications |
-| Messages | `/messages` | In-app chat |
-| Waste Reports | `/waste-reports` | Report food waste |
-| Analytics | `/dashboard` | LGU admin analytics |
-| Compost | `/compost-marketplace` | Compost inventory |
+| Feature       | Location               | Notes                           |
+| ------------- | ---------------------- | ------------------------------- |
+| Marketplace   | `/marketplace`         | Browse & trade/purchase produce |
+| Feed          | `/feed`                | Community posts & interactions  |
+| Eco Points    | `/eco-points`          | Gamification system             |
+| Notifications | `/notifications`       | Real-time notifications         |
+| Messages      | `/messages`            | In-app chat                     |
+| Waste Reports | `/waste-reports`       | Report food waste               |
+| Analytics     | `/dashboard`           | LGU admin analytics             |
+| Compost       | `/compost-marketplace` | Compost inventory               |
 
 ---
 
 ## Development Tips
 
 ### Code Organization
+
 - Components: One component per file
 - Hooks: In `src/hooks/` directory
 - API functions: In `src/lib/api/` directory
 - Utils: In `src/lib/` directory
 
 ### TypeScript
+
 - Type definitions in `src/integrations/supabase/types.ts`
 - Use types for database tables
 - Import from types file
 
 ### Styling
+
 - Use Tailwind classes
 - Color system: primary (green), accent (orange)
 - Dark mode ready with color system
 
 ### Performance
+
 - TanStack Query for caching
 - Lazy loading components
 - Image optimization

@@ -2,7 +2,20 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Scale, ShoppingCart, GitCompareArrows, MessageCircle, Edit3, Trash2, Heart, Eye, Star, CheckCircle } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Scale,
+  ShoppingCart,
+  GitCompareArrows,
+  MessageCircle,
+  Edit3,
+  Trash2,
+  Heart,
+  Eye,
+  Star,
+  CheckCircle,
+} from "lucide-react";
 import { mediaSrc } from "@/components/common/Media";
 import type { MediaKey } from "@/components/common/Media";
 import { roleMeta } from "@/data/mock";
@@ -56,24 +69,30 @@ export function ListingCard({
   const [isFavorited, setIsFavorited] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const isOwner = user?.id === item.user_id;
-  const meta = roleMeta[item.role as keyof typeof roleMeta] || { label: item.role, color: 'bg-gray-100 text-gray-700 border-gray-300' };
-  
+  const meta = roleMeta[item.role as keyof typeof roleMeta] || {
+    label: item.role,
+    color: "bg-gray-100 text-gray-700 border-gray-300",
+  };
+
   // Get all images from the listing
-  const allImages = (item as any).images && Array.isArray((item as any).images) && (item as any).images.length > 0 
-    ? (item as any).images 
-    : item.image 
-      ? [item.image] 
-      : [];
-  
+  const allImages =
+    (item as any).images && Array.isArray((item as any).images) && (item as any).images.length > 0
+      ? (item as any).images
+      : item.image
+        ? [item.image]
+        : [];
+
   // Process images to get proper URLs
-  const processedImages = allImages.map((img: any) => {
-    if (typeof img === "string" && (img.startsWith("http") || img.startsWith("/"))) {
-      return img;
-    } else {
-      return mediaSrc(img as MediaKey | undefined);
-    }
-  }).filter(Boolean);
-  
+  const processedImages = allImages
+    .map((img: any) => {
+      if (typeof img === "string" && (img.startsWith("http") || img.startsWith("/"))) {
+        return img;
+      } else {
+        return mediaSrc(img as MediaKey | undefined);
+      }
+    })
+    .filter(Boolean);
+
   const currentImage = processedImages[currentImageIndex] || processedImages[0];
 
   const getTransactionTypeLabel = (type: string) => {
@@ -99,20 +118,22 @@ export function ListingCard({
     >
       <div className="relative h-56 w-full overflow-hidden rounded-t-lg">
         {currentImage ? (
-          <img 
-            src={currentImage} 
-            alt="" 
-            loading="lazy" 
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          <img
+            src={currentImage}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
           <div className="h-full w-full bg-gray-100 flex items-center justify-center">
             <span className="text-gray-400 text-sm">No image</span>
           </div>
         )}
-        
+
         {/* Quick actions overlay */}
-        <div className={`absolute top-3 right-3 flex gap-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div
+          className={`absolute top-3 right-3 flex gap-2 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
+        >
           <button
             onClick={(event) => {
               event.stopPropagation();
@@ -120,7 +141,9 @@ export function ListingCard({
             }}
             className="bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all hover:scale-110"
           >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+            <Heart
+              className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+            />
           </button>
           <button
             onClick={(event) => {
@@ -136,19 +159,45 @@ export function ListingCard({
         {processedImages.length > 1 && (
           <>
             <button
-              onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? processedImages.length - 1 : prev - 1))}
+              onClick={() =>
+                setCurrentImageIndex((prev) => (prev === 0 ? processedImages.length - 1 : prev - 1))
+              }
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <button
-              onClick={() => setCurrentImageIndex((prev) => (prev === processedImages.length - 1 ? 0 : prev + 1))}
+              onClick={() =>
+                setCurrentImageIndex((prev) => (prev === processedImages.length - 1 ? 0 : prev + 1))
+              }
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
@@ -174,7 +223,7 @@ export function ListingCard({
         {/* Price */}
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-emerald-600">
-            {item.kind === "waste" ? "Free" : (item.price ? `₱${item.price}` : "Free")}
+            {item.kind === "waste" ? "Free" : item.price ? `₱${item.price}` : "Free"}
           </span>
           {item.kind !== "waste" && item.price && (
             <span className="text-sm text-gray-500">/ kg</span>
@@ -202,7 +251,11 @@ export function ListingCard({
           {/* Profile picture */}
           <div className="h-6 w-6 rounded-full overflow-hidden bg-gradient-to-br from-emerald-500 to-green-600 flex-shrink-0">
             {item.profiles?.profile_picture_url ? (
-              <img src={item.profiles.profile_picture_url} alt={item.seller} className="h-full w-full object-cover" />
+              <img
+                src={item.profiles.profile_picture_url}
+                alt={item.seller}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="h-full w-full flex items-center justify-center font-semibold text-white text-xs">
                 {sellerInitials}
@@ -256,16 +309,19 @@ export function ListingCard({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete listing?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. The listing will be removed from the marketplace.
+                      This action cannot be undone. The listing will be removed from the
+                      marketplace.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={async () => {
-                      setIsDeleting(true);
-                      await onDelete();
-                      setIsDeleting(false);
-                    }}>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        setIsDeleting(true);
+                        await onDelete();
+                        setIsDeleting(false);
+                      }}
+                    >
                       {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -300,7 +356,8 @@ export function ListingCard({
                   onBuy();
                 }}
               >
-                <ShoppingCart className="h-3 w-3 mr-1" /> {item.kind === "waste" ? "Collect" : "Buy"}
+                <ShoppingCart className="h-3 w-3 mr-1" />{" "}
+                {item.kind === "waste" ? "Collect" : "Buy"}
               </Button>
             )}
           </div>

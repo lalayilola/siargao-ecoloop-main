@@ -15,16 +15,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-export function LocationViewClient({ latitude, longitude, locationName, locationAddress, onClose }: LocationViewProps) {
+export function LocationViewClient({
+  latitude,
+  longitude,
+  locationName,
+  locationAddress,
+  onClose,
+}: LocationViewProps) {
   const [mapLoading, setMapLoading] = useState(true);
   const openInMaps = () => {
     // Open in Google Maps
-    window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+    window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, "_blank");
   };
 
   const openDirections = () => {
     // Open directions in Google Maps
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`, '_blank');
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`,
+      "_blank",
+    );
   };
 
   return (
@@ -75,9 +84,7 @@ export function LocationViewClient({ latitude, longitude, locationName, location
       {/* Location Info */}
       <div className="space-y-2">
         <p className="font-medium">{locationName}</p>
-        {locationAddress && (
-          <p className="text-sm text-muted-foreground">{locationAddress}</p>
-        )}
+        {locationAddress && <p className="text-sm text-muted-foreground">{locationAddress}</p>}
         <p className="text-xs text-muted-foreground">
           Coordinates: {latitude.toFixed(6)}, {longitude.toFixed(6)}
         </p>

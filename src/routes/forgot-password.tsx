@@ -13,8 +13,8 @@ import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Forgot Password — Siargao Loops" },
-      { name: "description", content: "Reset your Siargao Loops password via email." },
+      { title: "Forgot Password — Farm2Food Cycle" },
+      { name: "description", content: "Reset your Farm2Food Cycle password via email." },
     ],
   }),
   component: ForgotPasswordPage,
@@ -66,12 +66,12 @@ function ForgotPasswordPage() {
                   <Label htmlFor="email">Email Address *</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      required 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)} 
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="pl-9"
                       placeholder="juan@example.com"
                     />
@@ -83,7 +83,10 @@ function ForgotPasswordPage() {
                 </Button>
 
                 <div className="flex items-center justify-center text-sm">
-                  <Link to="/login" className="flex items-center text-muted-foreground hover:underline">
+                  <Link
+                    to="/login"
+                    className="flex items-center text-muted-foreground hover:underline"
+                  >
                     <ArrowLeft className="mr-1 h-4 w-4" />
                     Back to Sign In
                   </Link>
@@ -107,8 +110,8 @@ function ForgotPasswordPage() {
                 </div>
 
                 <div className="space-y-2 pt-4">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => {
                       setEmailSent(false);

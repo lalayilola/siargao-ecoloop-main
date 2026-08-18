@@ -3,11 +3,35 @@ import { useEffect, useState, useRef } from "react";
 import { Container, PremiumHero } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Download, AlertCircle, Users, Recycle, TrendingUp, Leaf, Printer, X, CheckCircle2, ZoomIn, ZoomOut, Maximize2, RefreshCw, DollarSign, Trash2, ShoppingBag } from "lucide-react";
+import {
+  FileText,
+  Download,
+  AlertCircle,
+  Users,
+  Recycle,
+  TrendingUp,
+  Leaf,
+  Printer,
+  X,
+  CheckCircle2,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  RefreshCw,
+  DollarSign,
+  Trash2,
+  ShoppingBag,
+} from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 
@@ -34,10 +58,34 @@ function ReportsGeneration() {
   });
 
   const reportTypes = [
-    { id: "diversion", label: "Municipality Circular Economy", icon: Recycle, description: "Track produce sales, fertilizer, and waste collection by municipality", metrics: ["Sales", "Waste", "Compost"] },
-    { id: "users", label: "Member Statistics", icon: Users, description: "Farmers, restaurant owners and buyers registered in the municipality", metrics: ["Members", "Roles", "Growth"] },
-    { id: "transactions", label: "Marketplace Activity", icon: TrendingUp, description: "Purchases, sales and exchanges recorded within the municipality", metrics: ["Volume", "Revenue", "Rate"] },
-    { id: "impact", label: "Impact Summary", icon: Leaf, description: "Circular economy outcomes and environmental impact", metrics: ["CO2", "Waste", "Impact"] },
+    {
+      id: "diversion",
+      label: "Municipality Circular Economy",
+      icon: Recycle,
+      description: "Track produce sales, fertilizer, and waste collection by municipality",
+      metrics: ["Sales", "Waste", "Compost"],
+    },
+    {
+      id: "users",
+      label: "Member Statistics",
+      icon: Users,
+      description: "Farmers, restaurant owners and buyers registered in the municipality",
+      metrics: ["Members", "Roles", "Growth"],
+    },
+    {
+      id: "transactions",
+      label: "Marketplace Activity",
+      icon: TrendingUp,
+      description: "Purchases, sales and exchanges recorded within the municipality",
+      metrics: ["Volume", "Revenue", "Rate"],
+    },
+    {
+      id: "impact",
+      label: "Impact Summary",
+      icon: Leaf,
+      description: "Circular economy outcomes and environmental impact",
+      metrics: ["CO2", "Waste", "Impact"],
+    },
   ];
 
   const dateRanges = [
@@ -64,7 +112,12 @@ function ReportsGeneration() {
     const loadSummary = async () => {
       try {
         const municipality = profile.municipality;
-        const [{ data: profilesData }, { data: listingsData }, { data: purchasesData }, { data: wasteReportsData }] = await Promise.all([
+        const [
+          { data: profilesData },
+          { data: listingsData },
+          { data: purchasesData },
+          { data: wasteReportsData },
+        ] = await Promise.all([
           supabase.from("profiles").select("*").eq("municipality", municipality),
           supabase.from("marketplace_listings").select("*"),
           supabase.from("purchase_requests").select("*"),
@@ -72,7 +125,13 @@ function ReportsGeneration() {
         ]);
 
         const profiles = (profilesData || []) as Array<{ id: string; municipality: string | null }>;
-        const listings = (listingsData || []) as Array<{ id: string; user_id: string; municipality: string | null; kind: string; price: string | null }>;
+        const listings = (listingsData || []) as Array<{
+          id: string;
+          user_id: string;
+          municipality: string | null;
+          kind: string;
+          price: string | null;
+        }>;
         const purchases = (purchasesData || []) as any[];
         const wasteReports = (wasteReportsData || []) as any[];
 
@@ -83,7 +142,9 @@ function ReportsGeneration() {
         });
         const listingIds = new Set(municipalityListings.map((listing) => listing.id));
 
-        const municipalityPurchases = purchases.filter((purchase) => listingIds.has(purchase.listing_id));
+        const municipalityPurchases = purchases.filter((purchase) =>
+          listingIds.has(purchase.listing_id),
+        );
         const municipalityWasteReports = wasteReports.filter((report) => {
           const owner = profiles.find((member) => member.id === report.restaurant_id);
           return owner?.municipality === municipality;
@@ -101,7 +162,7 @@ function ReportsGeneration() {
           .reduce((sum: number, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "produce") return sum;
-            return sum + (Number(purchase.quantity_kg || 0) * parsePrice(listing.price));
+            return sum + Number(purchase.quantity_kg || 0) * parsePrice(listing.price);
           }, 0);
 
         const compostSales = municipalityPurchases
@@ -109,7 +170,7 @@ function ReportsGeneration() {
           .reduce((sum: number, purchase) => {
             const listing = listings.find((item) => item.id === purchase.listing_id);
             if (!listing || listing.kind !== "compost") return sum;
-            return sum + (Number(purchase.quantity_kg || 0) * parsePrice(listing.price));
+            return sum + Number(purchase.quantity_kg || 0) * parsePrice(listing.price);
           }, 0);
 
         const wasteCollected = municipalityWasteReports
@@ -117,7 +178,9 @@ function ReportsGeneration() {
           .reduce((sum: number, report) => sum + Number(report.quantity_kg || 0), 0);
 
         setReportSummary({
-          municipality: municipality.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
+          municipality: municipality
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase()),
           members: profiles.length,
           listings: municipalityListings.length,
           freshProduceSales,
@@ -153,15 +216,22 @@ function ReportsGeneration() {
         pdf.setFontSize(26);
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(255, 255, 255);
-        pdf.text("SIARGAO LOOPS", selectedPageSize.width / 2, 18, { align: "center" });
+        pdf.text("FARM2FOOD CYCLE", selectedPageSize.width / 2, 18, { align: "center" });
 
         pdf.setFontSize(11);
         pdf.setFont("helvetica", "normal");
-        pdf.text("Circular Food Economy Platform", selectedPageSize.width / 2, 26, { align: "center" });
+        pdf.text("Circular Food Economy Platform", selectedPageSize.width / 2, 26, {
+          align: "center",
+        });
 
         pdf.setFontSize(9);
         pdf.setFont("helvetica", "italic");
-        pdf.text("Republic of the Philippines • Province of Surigao del Norte", selectedPageSize.width / 2, 34, { align: "center" });
+        pdf.text(
+          "Republic of the Philippines • Province of Surigao del Norte",
+          selectedPageSize.width / 2,
+          34,
+          { align: "center" },
+        );
 
         // Document title with underline
         pdf.setTextColor(0, 0, 0);
@@ -176,7 +246,12 @@ function ReportsGeneration() {
         pdf.setFontSize(12);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(80, 80, 80);
-        pdf.text(`${reportSummary.municipality} • ${new Date().toLocaleDateString()}`, selectedPageSize.width / 2, 70, { align: "center" });
+        pdf.text(
+          `${reportSummary.municipality} • ${new Date().toLocaleDateString()}`,
+          selectedPageSize.width / 2,
+          70,
+          { align: "center" },
+        );
 
         // Report configuration section with background
         pdf.setFillColor(245, 245, 245);
@@ -232,9 +307,25 @@ function ReportsGeneration() {
         pdf.text(String(reportSummary.members), 25, yPos + 38);
 
         pdf.setFillColor(239, 246, 255);
-        pdf.roundedRect(selectedPageSize.width / 2 + 5, yPos + 18, (selectedPageSize.width - 50) / 2, 25, 3, 3, "F");
+        pdf.roundedRect(
+          selectedPageSize.width / 2 + 5,
+          yPos + 18,
+          (selectedPageSize.width - 50) / 2,
+          25,
+          3,
+          3,
+          "F",
+        );
         pdf.setDrawColor(59, 130, 246);
-        pdf.roundedRect(selectedPageSize.width / 2 + 5, yPos + 18, (selectedPageSize.width - 50) / 2, 25, 3, 3, "S");
+        pdf.roundedRect(
+          selectedPageSize.width / 2 + 5,
+          yPos + 18,
+          (selectedPageSize.width - 50) / 2,
+          25,
+          3,
+          3,
+          "S",
+        );
 
         pdf.setFontSize(9);
         pdf.setFont("helvetica", "bold");
@@ -265,9 +356,27 @@ function ReportsGeneration() {
           borderColor: [number, number, number];
           textColor: [number, number, number];
         }> = [
-          { label: "Fresh Produce Sales", value: `₱${reportSummary.freshProduceSales.toLocaleString()}`, color: [236, 253, 236], borderColor: [34, 197, 94], textColor: [22, 101, 52] },
-          { label: "Organic Fertilizer Sales", value: `₱${reportSummary.compostSales.toLocaleString()}`, color: [254, 249, 195], borderColor: [234, 179, 8], textColor: [133, 77, 14] },
-          { label: "Food Waste Collected", value: `${reportSummary.wasteCollected.toLocaleString()} kg`, color: [239, 246, 255], borderColor: [59, 130, 246], textColor: [30, 64, 175] },
+          {
+            label: "Fresh Produce Sales",
+            value: `₱${reportSummary.freshProduceSales.toLocaleString()}`,
+            color: [236, 253, 236],
+            borderColor: [34, 197, 94],
+            textColor: [22, 101, 52],
+          },
+          {
+            label: "Organic Fertilizer Sales",
+            value: `₱${reportSummary.compostSales.toLocaleString()}`,
+            color: [254, 249, 195],
+            borderColor: [234, 179, 8],
+            textColor: [133, 77, 14],
+          },
+          {
+            label: "Food Waste Collected",
+            value: `${reportSummary.wasteCollected.toLocaleString()} kg`,
+            color: [239, 246, 255],
+            borderColor: [59, 130, 246],
+            textColor: [30, 64, 175],
+          },
         ];
 
         yPos += 15;
@@ -296,14 +405,26 @@ function ReportsGeneration() {
         pdf.setFontSize(9);
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(255, 255, 255);
-        pdf.text("Siargao Loops - Circular Food Economy Platform", selectedPageSize.width / 2, selectedPageSize.height - 18, { align: "center" });
+        pdf.text(
+          "Farm2Food Cycle - Circular Food Economy Platform",
+          selectedPageSize.width / 2,
+          selectedPageSize.height - 18,
+          { align: "center" },
+        );
 
         pdf.setFontSize(8);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(220, 220, 220);
-        pdf.text(`Report ID: ${Date.now()} | Generated on ${new Date().toLocaleString()}`, selectedPageSize.width / 2, selectedPageSize.height - 10, { align: "center" });
+        pdf.text(
+          `Report ID: ${Date.now()} | Generated on ${new Date().toLocaleString()}`,
+          selectedPageSize.width / 2,
+          selectedPageSize.height - 10,
+          { align: "center" },
+        );
 
-        pdf.save(`Siargao_Loops_Report_${reportSummary.municipality}_${new Date().toISOString().split('T')[0]}.pdf`);
+        pdf.save(
+          `Siargao_Loops_Report_${reportSummary.municipality}_${new Date().toISOString().split("T")[0]}.pdf`,
+        );
         toast.success(`PDF report generated for ${reportSummary.municipality}`);
       } else {
         // CSV generation
@@ -316,7 +437,10 @@ function ReportsGeneration() {
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", `Siargao_Loops_Report_${reportSummary.municipality}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute(
+          "download",
+          `Siargao_Loops_Report_${reportSummary.municipality}_${new Date().toISOString().split("T")[0]}.csv`,
+        );
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
@@ -338,7 +462,7 @@ function ReportsGeneration() {
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Siargao Loops Report - ${reportSummary.municipality}</title>
+          <title>Farm2Food Cycle Report - ${reportSummary.municipality}</title>
           <style>
             @page {
               size: ${selectedPageSize.width}mm ${selectedPageSize.height}mm;
@@ -419,7 +543,7 @@ function ReportsGeneration() {
         </head>
         <body>
           <div class="header">
-            <h1>Siargao Loops</h1>
+            <h1>Farm2Food Cycle</h1>
             <p>Circular Food Economy Platform</p>
             <p>Republic of the Philippines • Province of Surigao del Norte</p>
           </div>
@@ -441,11 +565,11 @@ function ReportsGeneration() {
           <div class="section">
             <h3>Economic Activity</h3>
             <div class="detail"><span>Fresh Produce Sales:</span> ₱${reportSummary.freshProduceSales.toLocaleString()}</div>
-            <div class="detail"><span>Organic Fertilizer Sales:</span> ₱${reportSummary.compostSales.toLocaleString()}</div>
+            <div class="detail"><span>Compost Sales:</span> ₱${reportSummary.compostSales.toLocaleString()}</div>
             <div class="detail"><span>Food Waste Collected:</span> ${reportSummary.wasteCollected.toLocaleString()} kg</div>
           </div>
           <div class="footer">
-            <p>This report is generated by Siargao Loops - Circular Food Economy Platform</p>
+            <p>This report is generated by Farm2Food Cycle - Circular Food Economy Platform</p>
             <p>Report ID: ${Date.now()} | Generated on ${new Date().toLocaleString()}</p>
           </div>
         </body>
@@ -462,7 +586,9 @@ function ReportsGeneration() {
         <Card className="mx-auto max-w-xl p-8 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-primary" />
           <h2 className="mt-3 font-display text-2xl font-semibold">LGU access only</h2>
-          <p className="mt-2 text-sm text-muted-foreground">This dashboard is reserved for verified Local Government Unit accounts.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This dashboard is reserved for verified Local Government Unit accounts.
+          </p>
         </Card>
       </Container>
     );
@@ -493,321 +619,435 @@ function ReportsGeneration() {
           }
         `}</style>
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-mint-50/50 animate-gradient-shift" style={{ animationDuration: '50s' }} />
-          <div className="absolute top-20 left-20 text-6xl opacity-[0.05] animate-float-slow">🍃</div>
-          <div className="absolute top-40 right-32 text-5xl opacity-[0.05] animate-float-slow" style={{ animationDelay: '2s' }}>🍃</div>
-          <div className="absolute bottom-32 left-40 text-4xl opacity-[0.05] animate-float-slow" style={{ animationDelay: '4s' }}>♻</div>
-          <div className="absolute bottom-20 right-20 text-5xl opacity-[0.05] animate-float-slow" style={{ animationDelay: '6s' }}>🍃</div>
-          <div className="absolute top-1/2 left-1/3 text-4xl opacity-[0.05] animate-float-slow" style={{ animationDelay: '8s' }}>💧</div>
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-mint-50/50 animate-gradient-shift"
+            style={{ animationDuration: "50s" }}
+          />
+          <div className="absolute top-20 left-20 text-6xl opacity-[0.05] animate-float-slow">
+            🍃
+          </div>
+          <div
+            className="absolute top-40 right-32 text-5xl opacity-[0.05] animate-float-slow"
+            style={{ animationDelay: "2s" }}
+          >
+            🍃
+          </div>
+          <div
+            className="absolute bottom-32 left-40 text-4xl opacity-[0.05] animate-float-slow"
+            style={{ animationDelay: "4s" }}
+          >
+            ♻
+          </div>
+          <div
+            className="absolute bottom-20 right-20 text-5xl opacity-[0.05] animate-float-slow"
+            style={{ animationDelay: "6s" }}
+          >
+            🍃
+          </div>
+          <div
+            className="absolute top-1/2 left-1/3 text-4xl opacity-[0.05] animate-float-slow"
+            style={{ animationDelay: "8s" }}
+          >
+            💧
+          </div>
         </div>
 
-      {/* SECTION 1 - Report Type Selection */}
-      <Card className="p-8 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
-        <h2 className="font-display text-2xl font-bold text-slate-900 mb-6">Select Report Type</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-          {reportTypes.map((type) => {
-            const Icon = type.icon;
-            const isSelected = reportType === type.id;
-            return (
-              <button
-                key={type.id}
-                onClick={() => setReportType(type.id)}
-                className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
-                  isSelected 
-                    ? 'border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-500/20' 
-                    : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md hover:-translate-y-1'
-                }`}
-              >
-                {isSelected && (
-                  <div className="absolute top-4 right-4 h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
-                    <CheckCircle2 className="h-4 w-4 text-white" />
+        {/* SECTION 1 - Report Type Selection */}
+        <Card className="p-8 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
+          <h2 className="font-display text-2xl font-bold text-slate-900 mb-6">
+            Select Report Type
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+            {reportTypes.map((type) => {
+              const Icon = type.icon;
+              const isSelected = reportType === type.id;
+              return (
+                <button
+                  key={type.id}
+                  onClick={() => setReportType(type.id)}
+                  className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+                    isSelected
+                      ? "border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-500/20"
+                      : "border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md hover:-translate-y-1"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-4 right-4 h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
+                      <CheckCircle2 className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                  <div
+                    className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
+                      isSelected
+                        ? "bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30"
+                        : "bg-gradient-to-br from-emerald-100 to-green-200 group-hover:from-emerald-200 group-hover:to-green-300"
+                    }`}
+                  >
+                    <Icon className={`h-7 w-7 ${isSelected ? "text-white" : "text-emerald-700"}`} />
                   </div>
-                )}
-                <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${
-                  isSelected 
-                    ? 'bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30' 
-                    : 'bg-gradient-to-br from-emerald-100 to-green-200 group-hover:from-emerald-200 group-hover:to-green-300'
-                }`}>
-                  <Icon className={`h-7 w-7 ${isSelected ? 'text-white' : 'text-emerald-700'}`} />
-                </div>
-                <h3 className="font-display text-lg font-bold text-slate-900 mb-2">{type.label}</h3>
-                <p className="text-sm text-slate-600 mb-4 leading-relaxed">{type.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {type.metrics.map((metric) => (
-                    <span key={metric} className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      isSelected ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {metric}
-                    </span>
+                  <h3 className="font-display text-lg font-bold text-slate-900 mb-2">
+                    {type.label}
+                  </h3>
+                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">{type.description}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {type.metrics.map((metric) => (
+                      <span
+                        key={metric}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          isSelected
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        {metric}
+                      </span>
+                    ))}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* SECTION 2 - Report Configuration */}
+        <Card className="p-6 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex-1 min-w-[180px]">
+              <label className="text-sm font-medium text-slate-700 mb-2 block">Date Range</label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {dateRanges.map((range) => (
+                    <SelectItem key={range.id} value={range.id}>
+                      {range.label}
+                    </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 min-w-[180px]">
+              <label className="text-sm font-medium text-slate-700 mb-2 block">Output Format</label>
+              <Select value={format} onValueChange={setFormat}>
+                <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {formats.map((fmt) => (
+                    <SelectItem key={fmt.id} value={fmt.id}>
+                      {fmt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 min-w-[180px]">
+              <label className="text-sm font-medium text-slate-700 mb-2 block">Paper Size</label>
+              <Select value={pageSize} onValueChange={setPageSize}>
+                <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {pageSizes.map((size) => (
+                    <SelectItem key={size.id} value={size.id}>
+                      {size.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end gap-3">
+              <Button
+                onClick={handleGenerateReport}
+                disabled={generating}
+                className="h-11 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/30"
+              >
+                {generating ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Generate Report
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleGenerateReport}
+                variant="outline"
+                className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Print
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* SECTION 3 - Report Summary Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30">
+                <Users className="h-6 w-6" />
+              </span>
+            </div>
+            <div className="font-display text-2xl font-bold text-slate-900 mb-1">
+              {reportSummary.members}
+            </div>
+            <div className="text-sm text-slate-600 font-medium">Total Members</div>
+          </Card>
+          <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30">
+                <Trash2 className="h-6 w-6" />
+              </span>
+            </div>
+            <div className="font-display text-2xl font-bold text-slate-900 mb-1">
+              {reportSummary.wasteCollected} kg
+            </div>
+            <div className="text-sm text-slate-600 font-medium">Waste Collected</div>
+          </Card>
+          <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-green-600 text-white shadow-lg shadow-teal-500/30">
+                <ShoppingBag className="h-6 w-6" />
+              </span>
+            </div>
+            <div className="font-display text-2xl font-bold text-slate-900 mb-1">
+              ₱{reportSummary.freshProduceSales.toLocaleString()}
+            </div>
+            <div className="text-sm text-slate-600 font-medium">Produce Sold</div>
+          </Card>
+          <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-lg shadow-emerald-600/30">
+                <DollarSign className="h-6 w-6" />
+              </span>
+            </div>
+            <div className="font-display text-2xl font-bold text-slate-900 mb-1">
+              ₱{(reportSummary.freshProduceSales + reportSummary.compostSales).toLocaleString()}
+            </div>
+            <div className="text-sm text-slate-600 font-medium">Revenue Generated</div>
+          </Card>
+        </div>
+
+        {/* SECTION 3 - Live Report Preview */}
+        <Card className="rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm overflow-hidden">
+          {/* Preview Toolbar */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <div>
+              <h3 className="font-display text-lg font-bold text-slate-900">Report Preview</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Last Generated: {new Date().toLocaleString()}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* PDF-style Preview */}
+          <div className="p-8 bg-slate-100 overflow-auto max-h-[600px]">
+            <div className="bg-white rounded-lg shadow-xl mx-auto max-w-[800px] p-8 min-h-[1000px]">
+              {/* Report Header */}
+              <div className="text-center mb-8 pb-6 border-b-4 border-emerald-600">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <Leaf className="h-8 w-8 text-emerald-600" />
+                  <h3 className="text-3xl font-bold uppercase tracking-widest text-slate-900">
+                    Farm2Food Cycle
+                  </h3>
+                  <Leaf className="h-8 w-8 text-emerald-600" />
                 </div>
-              </button>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* SECTION 2 - Report Configuration */}
-      <Card className="p-6 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex-1 min-w-[180px]">
-            <label className="text-sm font-medium text-slate-700 mb-2 block">Date Range</label>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {dateRanges.map((range) => (
-                  <SelectItem key={range.id} value={range.id}>{range.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 min-w-[180px]">
-            <label className="text-sm font-medium text-slate-700 mb-2 block">Output Format</label>
-            <Select value={format} onValueChange={setFormat}>
-              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {formats.map((fmt) => (
-                  <SelectItem key={fmt.id} value={fmt.id}>{fmt.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 min-w-[180px]">
-            <label className="text-sm font-medium text-slate-700 mb-2 block">Paper Size</label>
-            <Select value={pageSize} onValueChange={setPageSize}>
-              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {pageSizes.map((size) => (
-                  <SelectItem key={size.id} value={size.id}>{size.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-end gap-3">
-            <Button 
-              onClick={handleGenerateReport} 
-              disabled={generating} 
-              className="h-11 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/30"
-            >
-              {generating ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Generate Report
-                </>
-              )}
-            </Button>
-            <Button 
-              onClick={handleGenerateReport} 
-              variant="outline" 
-              className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download
-            </Button>
-            <Button 
-              onClick={handlePrint} 
-              variant="outline" 
-              className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
-            >
-              <Printer className="mr-2 h-4 w-4" />
-              Print
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* SECTION 3 - Report Summary Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30">
-              <Users className="h-6 w-6" />
-            </span>
-          </div>
-          <div className="font-display text-2xl font-bold text-slate-900 mb-1">{reportSummary.members}</div>
-          <div className="text-sm text-slate-600 font-medium">Total Members</div>
-        </Card>
-        <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30">
-              <Trash2 className="h-6 w-6" />
-            </span>
-          </div>
-          <div className="font-display text-2xl font-bold text-slate-900 mb-1">{reportSummary.wasteCollected} kg</div>
-          <div className="text-sm text-slate-600 font-medium">Waste Collected</div>
-        </Card>
-        <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-green-600 text-white shadow-lg shadow-teal-500/30">
-              <ShoppingBag className="h-6 w-6" />
-            </span>
-          </div>
-          <div className="font-display text-2xl font-bold text-slate-900 mb-1">₱{reportSummary.freshProduceSales.toLocaleString()}</div>
-          <div className="text-sm text-slate-600 font-medium">Produce Sold</div>
-        </Card>
-        <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-lg shadow-emerald-600/30">
-              <DollarSign className="h-6 w-6" />
-            </span>
-          </div>
-          <div className="font-display text-2xl font-bold text-slate-900 mb-1">₱{(reportSummary.freshProduceSales + reportSummary.compostSales).toLocaleString()}</div>
-          <div className="text-sm text-slate-600 font-medium">Revenue Generated</div>
-        </Card>
-      </div>
-
-      {/* SECTION 3 - Live Report Preview */}
-      <Card className="rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm overflow-hidden">
-        {/* Preview Toolbar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
-          <div>
-            <h3 className="font-display text-lg font-bold text-slate-900">Report Preview</h3>
-            <p className="text-xs text-slate-500 mt-1">Last Generated: {new Date().toLocaleString()}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700">
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700">
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700">
-              <Maximize2 className="h-4 w-4" />
-            </Button>
-            <Button size="sm" variant="ghost" className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-100 text-slate-600 hover:text-emerald-700">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* PDF-style Preview */}
-        <div className="p-8 bg-slate-100 overflow-auto max-h-[600px]">
-          <div className="bg-white rounded-lg shadow-xl mx-auto max-w-[800px] p-8 min-h-[1000px]">
-            {/* Report Header */}
-            <div className="text-center mb-8 pb-6 border-b-4 border-emerald-600">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Leaf className="h-8 w-8 text-emerald-600" />
-                <h3 className="text-3xl font-bold uppercase tracking-widest text-slate-900">Siargao Loops</h3>
-                <Leaf className="h-8 w-8 text-emerald-600" />
+                <p className="text-base font-medium text-slate-600 mt-2">
+                  Circular Food Economy Platform
+                </p>
+                <div className="w-24 h-0.5 bg-emerald-600 mx-auto my-3"></div>
+                <p className="text-sm text-slate-500">
+                  Republic of the Philippines • Province of Surigao del Norte
+                </p>
               </div>
-              <p className="text-base font-medium text-slate-600 mt-2">Circular Food Economy Platform</p>
-              <div className="w-24 h-0.5 bg-emerald-600 mx-auto my-3"></div>
-              <p className="text-sm text-slate-500">Republic of the Philippines • Province of Surigao del Norte</p>
-            </div>
 
-            {/* Document Title */}
-            <div className="text-center mb-10 pb-6 border-b-2 border-slate-300">
-              <h3 className="text-2xl font-bold uppercase tracking-widest text-slate-900 mb-2">Municipality Report</h3>
-              <p className="text-slate-600 font-medium">{reportSummary.municipality} • {new Date().toLocaleDateString()}</p>
-            </div>
-
-            {/* Report Configuration */}
-            <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                Report Configuration
-              </h4>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Report Type</span>
-                  <p className="font-semibold text-slate-900 text-lg">{reportTypes.find((type) => type.id === reportType)?.label}</p>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Date Range</span>
-                  <p className="font-semibold text-slate-900 text-lg">{dateRanges.find((range) => range.id === dateRange)?.label}</p>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Page Size</span>
-                  <p className="font-semibold text-slate-900 text-lg">{pageSizes.find((size) => size.id === pageSize)?.label}</p>
-                </div>
-                <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Format</span>
-                  <p className="font-semibold text-slate-900 text-lg">{formats.find((fmt) => fmt.id === format)?.label}</p>
-                </div>
+              {/* Document Title */}
+              <div className="text-center mb-10 pb-6 border-b-2 border-slate-300">
+                <h3 className="text-2xl font-bold uppercase tracking-widest text-slate-900 mb-2">
+                  Municipality Report
+                </h3>
+                <p className="text-slate-600 font-medium">
+                  {reportSummary.municipality} • {new Date().toLocaleDateString()}
+                </p>
               </div>
-            </div>
 
-            {/* Municipality Statistics */}
-            <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                Municipality Statistics
-              </h4>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-lg border-2 border-emerald-200 shadow-sm">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Users className="h-6 w-6 text-emerald-700" />
-                    <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Total Members</span>
+              {/* Report Configuration */}
+              <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
+                <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
+                  Report Configuration
+                </h4>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Report Type
+                    </span>
+                    <p className="font-semibold text-slate-900 text-lg">
+                      {reportTypes.find((type) => type.id === reportType)?.label}
+                    </p>
                   </div>
-                  <p className="text-4xl font-bold text-emerald-900">{reportSummary.members}</p>
-                </div>
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border-2 border-blue-200 shadow-sm">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FileText className="h-6 w-6 text-blue-700" />
-                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Active Listings</span>
+                  <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Date Range
+                    </span>
+                    <p className="font-semibold text-slate-900 text-lg">
+                      {dateRanges.find((range) => range.id === dateRange)?.label}
+                    </p>
                   </div>
-                  <p className="text-4xl font-bold text-blue-900">{reportSummary.listings}</p>
+                  <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Page Size
+                    </span>
+                    <p className="font-semibold text-slate-900 text-lg">
+                      {pageSizes.find((size) => size.id === pageSize)?.label}
+                    </p>
+                  </div>
+                  <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Format
+                    </span>
+                    <p className="font-semibold text-slate-900 text-lg">
+                      {formats.find((fmt) => fmt.id === format)?.label}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Economic Activity */}
-            <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                Economic Activity
-              </h4>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-5 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg border-2 border-emerald-300 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                      <Leaf className="h-5 w-5 text-white" />
+              {/* Municipality Statistics */}
+              <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
+                <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
+                  Municipality Statistics
+                </h4>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-lg border-2 border-emerald-200 shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Users className="h-6 w-6 text-emerald-700" />
+                      <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                        Total Members
+                      </span>
                     </div>
-                    <span className="text-slate-800 font-semibold text-lg">Fresh Produce Sales</span>
+                    <p className="text-4xl font-bold text-emerald-900">{reportSummary.members}</p>
                   </div>
-                  <span className="text-2xl font-bold text-emerald-900">₱{reportSummary.freshProduceSales.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border-2 border-yellow-300 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
-                      <Recycle className="h-5 w-5 text-white" />
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border-2 border-blue-200 shadow-sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      <FileText className="h-6 w-6 text-blue-700" />
+                      <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                        Active Listings
+                      </span>
                     </div>
-                    <span className="text-slate-800 font-semibold text-lg">Organic Fertilizer Sales</span>
+                    <p className="text-4xl font-bold text-blue-900">{reportSummary.listings}</p>
                   </div>
-                  <span className="text-2xl font-bold text-yellow-900">₱{reportSummary.compostSales.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center p-5 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border-2 border-blue-300 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                      <Trash2 className="h-5 w-5 text-white" />
-                    </div>
-                    <span className="text-slate-800 font-semibold text-lg">Food Waste Collected</span>
-                  </div>
-                  <span className="text-2xl font-bold text-blue-900">{reportSummary.wasteCollected.toLocaleString()} kg</span>
                 </div>
               </div>
-            </div>
 
-            {/* Footer */}
-            <div className="mt-8 pt-6 border-t-2 border-slate-300 text-center">
-              <p className="text-sm text-slate-600">This report is generated by Siargao Loops - Circular Food Economy Platform</p>
-              <p className="text-xs text-slate-500 mt-2">Report ID: {Date.now()} | Generated on {new Date().toLocaleString()}</p>
+              {/* Economic Activity */}
+              <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
+                <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
+                  Economic Activity
+                </h4>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg border-2 border-emerald-300 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
+                        <Leaf className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-slate-800 font-semibold text-lg">
+                        Fresh Produce Sales
+                      </span>
+                    </div>
+                    <span className="text-2xl font-bold text-emerald-900">
+                      ₱{reportSummary.freshProduceSales.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border-2 border-yellow-300 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
+                        <Recycle className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-slate-800 font-semibold text-lg">
+                        Organic Fertilizer Sales
+                      </span>
+                    </div>
+                    <span className="text-2xl font-bold text-yellow-900">
+                      ₱{reportSummary.compostSales.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-5 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border-2 border-blue-300 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <Trash2 className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="text-slate-800 font-semibold text-lg">
+                        Food Waste Collected
+                      </span>
+                    </div>
+                    <span className="text-2xl font-bold text-blue-900">
+                      {reportSummary.wasteCollected.toLocaleString()} kg
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 pt-6 border-t-2 border-slate-300 text-center">
+                <p className="text-sm text-slate-600">
+                  This report is generated by Farm2Food Cycle - Circular Food Economy Platform
+                </p>
+                <p className="text-xs text-slate-500 mt-2">
+                  Report ID: {Date.now()} | Generated on {new Date().toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
     </>
   );
 }

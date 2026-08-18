@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { Container } from "@/components/layout/Section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, Calendar, Trash2, CheckCircle, Clock, Truck } from "lucide-react";
@@ -58,8 +65,9 @@ export function LGUWasteCollectionView() {
         return;
       }
 
-      const { data: collectionData, error: collectionError } = await (supabase
-        .from("waste_collections") as any)
+      const { data: collectionData, error: collectionError } = await (
+        supabase.from("waste_collections") as any
+      )
         .select("*")
         .in("waste_report_id", reportIds);
 
@@ -114,7 +122,7 @@ export function LGUWasteCollectionView() {
 
     setCollections((prev) => ({ ...prev, [selectedReport.id]: data }));
     setReports((prev) =>
-      prev.map((r) => (r.id === selectedReport.id ? { ...r, status: "scheduled" } : r))
+      prev.map((r) => (r.id === selectedReport.id ? { ...r, status: "scheduled" } : r)),
     );
     setShowScheduleDialog(false);
     setSelectedReport(null);
@@ -143,10 +151,14 @@ export function LGUWasteCollectionView() {
 
     setCollections((prev) => ({
       ...prev,
-      [collection.waste_report_id]: { ...collection, status: "completed", completed_date: new Date().toISOString() },
+      [collection.waste_report_id]: {
+        ...collection,
+        status: "completed",
+        completed_date: new Date().toISOString(),
+      },
     }));
     setReports((prev) =>
-      prev.map((r) => (r.id === collection.waste_report_id ? { ...r, status: "collected" } : r))
+      prev.map((r) => (r.id === collection.waste_report_id ? { ...r, status: "collected" } : r)),
     );
     toast.success("Collection marked as completed.");
   };
@@ -173,7 +185,9 @@ export function LGUWasteCollectionView() {
         <Card className="mx-auto max-w-xl p-8 text-center">
           <Truck className="mx-auto h-12 w-12 text-primary mb-4" />
           <h2 className="text-2xl font-semibold text-primary">Waste Collection Management</h2>
-          <p className="text-slate-600 mt-2">This page is for LGU administrators to manage waste collection schedules.</p>
+          <p className="text-slate-600 mt-2">
+            This page is for LGU administrators to manage waste collection schedules.
+          </p>
         </Card>
       </Container>
     );
@@ -182,8 +196,12 @@ export function LGUWasteCollectionView() {
   return (
     <Container className="py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Waste Collection Management</h1>
-        <p className="text-slate-600">Schedule and track food waste collection from hotels and restaurants.</p>
+        <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">
+          Waste Collection Management
+        </h1>
+        <p className="text-slate-600">
+          Schedule and track food waste collection from hotels and restaurants.
+        </p>
       </div>
 
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
@@ -237,7 +255,10 @@ export function LGUWasteCollectionView() {
           {reports.map((report) => {
             const collection = collections[report.id];
             return (
-              <Card key={report.id} className="p-6 border-2 border-primary/20 hover:border-primary/40 transition-all">
+              <Card
+                key={report.id}
+                className="p-6 border-2 border-primary/20 hover:border-primary/40 transition-all"
+              >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -257,7 +278,9 @@ export function LGUWasteCollectionView() {
                         Preferred: {new Date(report.collection_date).toLocaleDateString()}
                       </span>
                       <span>{report.quantity_kg} kg</span>
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(report.status)}`}
+                      >
                         {report.status}
                       </span>
                     </div>
@@ -267,7 +290,9 @@ export function LGUWasteCollectionView() {
                           <Clock className="h-4 w-4" />
                           Scheduled: {new Date(collection.scheduled_date).toLocaleDateString()}
                         </span>
-                        <span className={`ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(collection.status)}`}>
+                        <span
+                          className={`ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(collection.status)}`}
+                        >
                           {collection.status}
                         </span>
                       </div>

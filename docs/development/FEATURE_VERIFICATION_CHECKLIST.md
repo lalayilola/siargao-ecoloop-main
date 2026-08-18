@@ -9,6 +9,7 @@ Use this checklist to verify all features are working correctly.
 ## ✅ Core Features
 
 ### Authentication & User Management
+
 - [ ] User can register with email/password
 - [ ] User can select role during signup (Farmer, Restaurant, Resident, LGU Admin)
 - [ ] User can login
@@ -20,6 +21,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Protected routes redirect unauthenticated users to login
 
 ### User Roles
+
 - [ ] Farmer role shows farmer-specific features
 - [ ] Restaurant role shows restaurant-specific features
 - [ ] LGU Admin role shows admin-specific features
@@ -31,6 +33,7 @@ Use this checklist to verify all features are working correctly.
 ## 🌾 Farmer Portal (`/dashboard/farmer`)
 
 ### Dashboard
+
 - [ ] Dashboard displays farmer welcome message
 - [ ] Stats cards show: Active Listings, Pending Orders, Completed Sales, Compost Requests
 - [ ] Stats cards are clickable and navigate to relevant pages
@@ -38,6 +41,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Recent activity feed shows trades/orders
 
 ### Produce Inventory (`/inventory`)
+
 - [ ] Can create new produce listings
 - [ ] Can upload images for listings
 - [ ] Can set transaction type (Sell Only, Barter Only, Sell & Barter)
@@ -49,6 +53,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Listings display in marketplace
 
 ### Orders Management (`/orders`)
+
 - [ ] Can view incoming purchase requests
 - [ ] Can accept/reject purchase requests
 - [ ] Can message request senders
@@ -56,6 +61,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can see buyer information
 
 ### Compost (`/compost-marketplace`)
+
 - [ ] Can browse available compost
 - [ ] Can request compost
 - [ ] Can purchase compost
@@ -63,6 +69,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can see LGU compost listings
 
 ### Compost History (`/compost-history`)
+
 - [ ] Can view all compost purchases
 - [ ] Can see purchase dates and quantities
 - [ ] Can see supplier information
@@ -73,6 +80,7 @@ Use this checklist to verify all features are working correctly.
 ## 🏨 Restaurant Portal (`/dashboard/restaurant`)
 
 ### Dashboard
+
 - [ ] Dashboard displays restaurant welcome message
 - [ ] Stats cards show: Active Orders, Completed Orders, Waste Reports, Collection Requests
 - [ ] Stats cards navigate to relevant pages
@@ -80,6 +88,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Recent orders display
 
 ### Browse Produce (`/marketplace`)
+
 - [ ] Can see all available produce listings
 - [ ] Can filter by transaction type
 - [ ] Can filter by category
@@ -89,6 +98,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can place purchase requests
 
 ### Purchase Orders (`/orders`)
+
 - [ ] Can see all placed purchase requests
 - [ ] Can see status of requests (pending, accepted, completed)
 - [ ] Can message farmers
@@ -96,12 +106,14 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can schedule deliveries
 
 ### Order Tracking (`/order-history`)
+
 - [ ] Can view completed orders
 - [ ] Can see order history
 - [ ] Can view transaction details
 - [ ] Can see dates and quantities
 
 ### Waste Reports (`/waste-reports`)
+
 - [ ] Can submit new waste reports
 - [ ] Can specify waste type and quantity
 - [ ] Can see report history
@@ -109,6 +121,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can see when waste will be collected
 
 ### Collection Requests (`/waste-collection`)
+
 - [ ] Can request waste collection
 - [ ] Can specify collection location
 - [ ] Can select collection date/time
@@ -121,6 +134,7 @@ Use this checklist to verify all features are working correctly.
 ## 🏛️ LGU Admin Portal (`/dashboard`)
 
 ### Dashboard Analytics
+
 - [ ] Can see total food waste collected (metric)
 - [ ] Can see total compost produced (metric)
 - [ ] Can see total farmers participating (metric)
@@ -131,6 +145,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Dashboard data updates in real-time
 
 ### User Management (`/dashboard-users`)
+
 - [ ] Can view all registered farmers
 - [ ] Can view all registered restaurants
 - [ ] Can view all registered residents
@@ -140,6 +155,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can manage user accounts
 
 ### Waste Monitoring (`/dashboard-diversion`)
+
 - [ ] Can see all waste submissions
 - [ ] Can view waste collection status
 - [ ] Can see collection schedules
@@ -149,6 +165,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can generate waste reports
 
 ### Compost Management
+
 - [ ] Can create compost listings
 - [ ] Can set quantities and prices
 - [ ] Can specify pickup locations
@@ -158,6 +175,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can track compost distribution
 
 ### Reports (`/dashboard-reports`)
+
 - [ ] Can generate waste diversion reports
 - [ ] Can see environmental impact metrics
 - [ ] Can export reports
@@ -167,6 +185,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can see trend analysis
 
 ### GIS Map (`/gis-map`)
+
 - [ ] Map placeholder visible
 - [ ] Ready for Leaflet integration
 - [ ] Can show collection points (when implemented)
@@ -174,6 +193,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can show recycling centers (when implemented)
 
 ### Announcements (`/dashboard-announcements`)
+
 - [ ] Can create announcements
 - [ ] Can add announcement title and content
 - [ ] Can specify announcement type
@@ -187,6 +207,7 @@ Use this checklist to verify all features are working correctly.
 ## 📱 Community Features (All Users)
 
 ### EcoFeed (`/feed`)
+
 - [ ] Can create posts
 - [ ] Can add text content
 - [ ] Can upload images
@@ -199,6 +220,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can delete own posts
 
 ### Marketplace (`/marketplace`)
+
 - [ ] Can browse all listings
 - [ ] Can filter by transaction type
 - [ ] Can filter by user type
@@ -212,6 +234,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can see reviews/ratings
 
 ### Transaction History (`/trades`)
+
 - [ ] Can see all trades and purchases
 - [ ] Can see transaction status
 - [ ] Can see transaction dates
@@ -221,6 +244,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can export transaction history
 
 ### Messages (`/messages`)
+
 - [ ] Can view conversations
 - [ ] Can send messages
 - [ ] Can upload images in messages
@@ -231,6 +255,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can search conversations
 
 ### Notifications (`/notifications`)
+
 - [ ] Notification bell shows unread count
 - [ ] Can open notification dropdown
 - [ ] Can view all notifications
@@ -240,6 +265,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Can filter notifications by type
 
 ### Announcements (`/announcements`)
+
 - [ ] Can view all system announcements
 - [ ] Can see announcement dates
 - [ ] Can see announcement sources (LGU)
@@ -247,6 +273,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Announcements update in real-time
 
 ### Profile (`/profile`)
+
 - [ ] Can view profile information
 - [ ] Can edit profile
 - [ ] Can change password
@@ -261,12 +288,14 @@ Use this checklist to verify all features are working correctly.
 ## 🎮 Gamification System
 
 ### Eco Points (`/eco-points`)
+
 - [ ] Total eco points displayed
 - [ ] Points breakdown shown by category
 - [ ] Can see how many points earned from each activity
 - [ ] Points update when activities complete
 
 ### Badges
+
 - [ ] Waste Warrior badge available
 - [ ] Compost Champion badge available
 - [ ] Eco Enthusiast badge available
@@ -281,6 +310,7 @@ Use this checklist to verify all features are working correctly.
 ## 🔔 Real-Time Features
 
 ### Notifications
+
 - [ ] Notification arrives when trade request received
 - [ ] Notification arrives when purchase request received
 - [ ] Notification arrives when request accepted/rejected
@@ -290,6 +320,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Badge count updates
 
 ### Chat/Messenger
+
 - [ ] Can send message to user
 - [ ] Message appears in conversation
 - [ ] Can see message read status
@@ -299,6 +330,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Chat is only available after request submitted
 
 ### Feed
+
 - [ ] New posts appear in real-time
 - [ ] Likes update in real-time
 - [ ] Comments appear immediately
@@ -309,6 +341,7 @@ Use this checklist to verify all features are working correctly.
 ## 📊 Data Verification
 
 ### Database Tables
+
 - [ ] `profiles` table has user data
 - [ ] `marketplace_listings` table has produce listings
 - [ ] `purchase_requests` table has purchase requests
@@ -321,6 +354,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] All tables have proper relationships
 
 ### Data Integrity
+
 - [ ] User data is validated
 - [ ] Images are stored in Supabase Storage
 - [ ] Listings reference correct farmers
@@ -333,6 +367,7 @@ Use this checklist to verify all features are working correctly.
 ## 🎨 UI/UX Verification
 
 ### Design System
+
 - [ ] Green color scheme applied consistently
 - [ ] Responsive design works on mobile
 - [ ] Responsive design works on tablet
@@ -342,6 +377,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Gradients and shadows apply correctly
 
 ### Navigation
+
 - [ ] Sidebar navigation works
 - [ ] All menu items functional
 - [ ] Active route highlighted
@@ -350,6 +386,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Breadcrumbs display (if implemented)
 
 ### Forms
+
 - [ ] All input fields work
 - [ ] Form validation shows errors
 - [ ] Required fields marked
@@ -359,6 +396,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Error messages display
 
 ### Performance
+
 - [ ] Pages load quickly
 - [ ] Images load smoothly
 - [ ] Animations are smooth
@@ -371,6 +409,7 @@ Use this checklist to verify all features are working correctly.
 ## 🔐 Security Verification
 
 ### Authentication
+
 - [ ] Passwords required to login
 - [ ] Passwords must meet requirements
 - [ ] Sessions timeout after inactivity
@@ -378,6 +417,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] CSRF protection in place
 
 ### Authorization
+
 - [ ] Farmers can only see farmer features
 - [ ] Restaurants can only see restaurant features
 - [ ] LGU Admins can only see admin features
@@ -385,6 +425,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] Users cannot view other users' private data
 
 ### Data Protection
+
 - [ ] Images encrypted in storage
 - [ ] Passwords hashed in database
 - [ ] HTTPS enforced
@@ -396,6 +437,7 @@ Use this checklist to verify all features are working correctly.
 ## 📈 Workflow Testing
 
 ### Complete Produce Purchase Workflow
+
 - [ ] 1. Farmer logs in and creates produce listing
 - [ ] 2. Restaurant logs in and searches marketplace
 - [ ] 3. Restaurant finds farmer's produce
@@ -408,6 +450,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] 10. Both users can see completed transaction
 
 ### Complete Waste Management Workflow
+
 - [ ] 1. Restaurant submits waste report
 - [ ] 2. LGU Admin receives notification
 - [ ] 3. LGU Admin views waste dashboard
@@ -420,6 +463,7 @@ Use this checklist to verify all features are working correctly.
 - [ ] 10. Farmer purchases compost
 
 ### Complete Compost Cycle
+
 - [ ] 1. LGU Admin lists compost
 - [ ] 2. Farmer searches compost marketplace
 - [ ] 3. Farmer requests compost
@@ -462,6 +506,7 @@ Use this checklist to verify all features are working correctly.
 ## 📋 Final Checklist
 
 ### Before Launch
+
 - [ ] All tests pass
 - [ ] All features verified working
 - [ ] Documentation complete
@@ -477,19 +522,23 @@ Use this checklist to verify all features are working correctly.
 
 ## 🎉 Sign-Off
 
-**Verification Date**: _______________
+**Verification Date**: **\*\***\_\_\_**\*\***
 
-**Verified By**: _______________
+**Verified By**: **\*\***\_\_\_**\*\***
 
-**Status**: 
+**Status**:
+
 - [ ] Ready for Production
 - [ ] Minor Issues (Document Below)
 - [ ] Major Issues (Do Not Deploy)
 
 **Notes**:
-_______________________________________________
-_______________________________________________
-_______________________________________________
+
+---
+
+---
+
+---
 
 ---
 

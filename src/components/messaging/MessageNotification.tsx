@@ -24,7 +24,7 @@ export function MessageNotification() {
         },
         async (payload) => {
           const newMessage = payload.new as any;
-          
+
           // Check if this message is for the current user
           const { data: conversation } = await supabase
             .from("conversations")
@@ -34,7 +34,8 @@ export function MessageNotification() {
 
           if (!conversation) return;
 
-          const isForUser = conversation.participant_1_id === user.id || conversation.participant_2_id === user.id;
+          const isForUser =
+            conversation.participant_1_id === user.id || conversation.participant_2_id === user.id;
           const isFromOtherUser = newMessage.sender_id !== user.id;
 
           if (isForUser && isFromOtherUser) {
@@ -55,19 +56,23 @@ export function MessageNotification() {
                   <MessageCircle className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-slate-900">New message from {senderProfile?.full_name || "Someone"}</p>
-                  <p className="text-xs text-slate-600 truncate">{newMessage.content || "Sent a message"}</p>
+                  <p className="font-semibold text-sm text-slate-900">
+                    New message from {senderProfile?.full_name || "Someone"}
+                  </p>
+                  <p className="text-xs text-slate-600 truncate">
+                    {newMessage.content || "Sent a message"}
+                  </p>
                 </div>
               </div>,
               {
                 duration: 6000,
                 position: "top-right",
                 style: {
-                  background: 'white',
-                  border: '2px solid #10b981',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                  background: "white",
+                  border: "2px solid #10b981",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                 },
                 action: {
                   label: "View Messages",
@@ -75,10 +80,10 @@ export function MessageNotification() {
                     window.location.href = "/messages";
                   },
                 },
-              }
+              },
             );
           }
-        }
+        },
       )
       .subscribe();
 

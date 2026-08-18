@@ -13,18 +13,21 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 1. Core Workflow System
 
 #### Produce Cycle
+
 - ✅ Farmers list and sell agricultural produce via Marketplace
 - ✅ Hotels/Restaurants browse and purchase produce from farmers
 - ✅ Purchase requests with messaging system
 - ✅ Order tracking and history
 
 #### Waste Cycle
+
 - ✅ Restaurants/Hotels submit food waste reports
 - ✅ Schedule waste collection requests
 - ✅ Waste history tracking
 - ✅ LGU waste monitoring dashboard
 
 #### Compost Cycle
+
 - ✅ LGU lists available compost/fertilizer
 - ✅ Farmers request, purchase, or reserve compost
 - ✅ Compost purchase history
@@ -35,7 +38,9 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 2. User Roles & Portals
 
 #### Farmer Portal
+
 **URL**: `/dashboard/farmer`
+
 - Dashboard with statistics (active listings, pending orders, completed sales, compost requests)
 - Produce Inventory management (`/inventory`)
 - Receive and manage orders (`/orders`)
@@ -45,7 +50,9 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - Quick actions for common tasks
 
 #### Restaurant/Hotel Portal
+
 **URL**: `/dashboard/restaurant`
+
 - Dashboard with statistics (active orders, completed orders, waste reports, collection requests)
 - Browse produce marketplace (`/marketplace`)
 - Purchase produce with order requests
@@ -55,7 +62,9 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - Quick access to key features
 
 #### LGU Admin Portal
+
 **URL**: `/dashboard`
+
 - **Dashboard Analytics** showing:
   - Total food waste collected
   - Total compost produced
@@ -85,6 +94,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
   - Create and manage LGU announcements
 
 #### Community Features (All Users)
+
 - EcoFeed (`/feed`):
   - Facebook-style community feed
   - Post creation with image uploads
@@ -118,6 +128,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 3. Marketplace Features
 
 #### Listing Management
+
 - ✅ Create marketplace listings with:
   - Title, description, quantity, price
   - Transaction type (Sell Only, Barter Only, Sell & Barter)
@@ -129,6 +140,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - ✅ Track listing performance
 
 #### Request System
+
 - ✅ **Trade Requests**: Barter requests between users
   - Select items to offer
   - Add message to seller
@@ -142,6 +154,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
   - Real-time notifications
 
 #### Marketplace Filters
+
 - ✅ Transaction Type: Sell Only, Barter Only, Sell & Barter
 - ✅ User Type: Farmer, Restaurant, Resident
 - ✅ Category: Item categories
@@ -152,6 +165,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 4. Real-Time Communication
 
 #### Notification System
+
 - ✅ Notification Bell with:
   - Unread count badge
   - Notification dropdown
@@ -165,6 +179,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
   - System announcements
 
 #### Chat/Messenger
+
 - ✅ Chat messenger component with:
   - Full-featured messaging interface
   - Automatic conversation creation
@@ -179,6 +194,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 5. Gamification System
 
 #### Eco Points (`/eco-points`)
+
 - ✅ Point tracking system with points awarded for:
   - Submitting waste reports: +25 points
   - Scheduling waste collection: +10 points
@@ -191,6 +207,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
   - Commenting on posts: +5 points
 
 #### Badge System
+
 - ✅ **Waste Warrior**: Submit 10 food waste reports
 - ✅ **Compost Champion**: Purchase compost 5 times
 - ✅ **Eco Enthusiast**: Earn 500 eco points
@@ -203,6 +220,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 6. Community & Social Features
 
 #### Siargao Loops Hub (Feed)
+
 - ✅ Facebook-style community feed (`/feed`)
 - ✅ Post creation with:
   - Text content
@@ -227,6 +245,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 7. Database Backend
 
 #### Tables Implemented
+
 - ✅ `profiles` - User profiles with roles and information
 - ✅ `marketplace_listings` - Produce listings with transaction types
 - ✅ `purchase_requests` - Buy requests between users
@@ -242,6 +261,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - ✅ (Additional tables as per schema)
 
 #### Database Features
+
 - ✅ Authentication via Supabase Auth
 - ✅ Real-time subscriptions
 - ✅ Automatic triggers for notifications
@@ -280,6 +300,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 10. UI/UX Design
 
 #### Design System
+
 - ✅ Green-themed, sustainable aesthetic
 - ✅ Modern component library
 - ✅ Tailwind CSS styling
@@ -287,6 +308,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - ✅ Mobile-first approach
 
 #### Key Pages Implemented
+
 - ✅ Landing Page (`/`)
 - ✅ Login (`/auth`)
 - ✅ Registration (role selector)
@@ -309,6 +331,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### 11. Tech Stack
 
 #### Frontend
+
 - ✅ React 18+ with TypeScript
 - ✅ TanStack Router for routing
 - ✅ TanStack Query for data management
@@ -318,6 +341,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - ✅ Sonner for toast notifications
 
 #### Backend
+
 - ✅ Supabase (PostgreSQL)
 - ✅ Supabase Auth
 - ✅ Supabase Storage
@@ -325,6 +349,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 - ✅ Database triggers for automation
 
 #### Development
+
 - ✅ Vite for build tooling
 - ✅ TypeScript for type safety
 - ✅ ESLint for code quality
@@ -337,7 +362,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 ### Data Flow
 
 1. **Produce Listing**: Farmer creates listing → Marketplace displays → Restaurant/Hotel browses
-2. **Purchase Transaction**: 
+2. **Purchase Transaction**:
    - Restaurant creates purchase request → Farmer receives notification
    - Farmer accepts/rejects → Restaurant notified
    - Messages exchanged via chat
@@ -358,6 +383,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
    - Badges unlocked
 
 ### Real-Time Updates
+
 - Supabase subscriptions for:
   - New messages
   - Notifications
@@ -365,6 +391,7 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
   - Inventory changes
 
 ### Notifications
+
 - Automatic triggers for:
   - New requests
   - Status changes
@@ -375,28 +402,29 @@ Siargao Loops is a full-stack circular food waste management ecosystem connectin
 
 ## 🎯 Key Features Summary
 
-| Feature | Status | Details |
-|---------|--------|---------|
-| User Authentication | ✅ Complete | Email/password, role-based |
-| Farmer Portal | ✅ Complete | Dashboard, inventory, orders |
-| Restaurant Portal | ✅ Complete | Dashboard, purchases, waste mgmt |
-| LGU Admin Portal | ✅ Complete | Analytics, monitoring, management |
-| Marketplace | ✅ Complete | Listing, filtering, transactions |
-| Trading System | ✅ Complete | Purchase requests, trade requests |
-| Chat/Messenger | ✅ Complete | Real-time messaging |
-| Notifications | ✅ Complete | Real-time notifications |
-| Community Feed | ✅ Complete | Posts, likes, comments, shares |
-| Eco Points | ✅ Complete | Gamification with badges |
-| Waste Management | ✅ Complete | Reports, collection, tracking |
-| Compost Management | ✅ Complete | Inventory, requests, tracking |
-| Analytics/Reports | ✅ Complete | Dashboards, charts, statistics |
-| GIS Map | 🔄 Partial | Placeholder (ready for Leaflet) |
+| Feature             | Status      | Details                           |
+| ------------------- | ----------- | --------------------------------- |
+| User Authentication | ✅ Complete | Email/password, role-based        |
+| Farmer Portal       | ✅ Complete | Dashboard, inventory, orders      |
+| Restaurant Portal   | ✅ Complete | Dashboard, purchases, waste mgmt  |
+| LGU Admin Portal    | ✅ Complete | Analytics, monitoring, management |
+| Marketplace         | ✅ Complete | Listing, filtering, transactions  |
+| Trading System      | ✅ Complete | Purchase requests, trade requests |
+| Chat/Messenger      | ✅ Complete | Real-time messaging               |
+| Notifications       | ✅ Complete | Real-time notifications           |
+| Community Feed      | ✅ Complete | Posts, likes, comments, shares    |
+| Eco Points          | ✅ Complete | Gamification with badges          |
+| Waste Management    | ✅ Complete | Reports, collection, tracking     |
+| Compost Management  | ✅ Complete | Inventory, requests, tracking     |
+| Analytics/Reports   | ✅ Complete | Dashboards, charts, statistics    |
+| GIS Map             | 🔄 Partial  | Placeholder (ready for Leaflet)   |
 
 ---
 
 ## 🚀 Deployment & Configuration
 
 ### Environment Setup
+
 ```bash
 # Install dependencies
 bun install
@@ -409,10 +437,12 @@ bun build
 ```
 
 ### Database Migrations
+
 - Run all migrations via Supabase CLI or dashboard
 - Tables and triggers automatically set up
 
 ### Storage Setup
+
 - Create Supabase Storage bucket for uploads
 - Configure bucket policies for authenticated access
 
@@ -421,18 +451,19 @@ bun build
 ## 📝 Next Steps & Enhancements
 
 ### Optional Enhancements
+
 1. **GIS Map Integration**: Implement full Leaflet map with:
    - Collection point markers
    - Compost site locations
    - Real-time collection status
    - Route optimization
 
-2. **Advanced Analytics**: 
+2. **Advanced Analytics**:
    - Environmental impact calculations (CO2 saved, waste diverted)
    - Trend analysis
    - Export reports to PDF/Excel
 
-3. **Mobile App**: 
+3. **Mobile App**:
    - React Native version
    - Offline support
    - Push notifications
@@ -469,6 +500,7 @@ bun build
 ## 📞 Support & Documentation
 
 ### Key Files
+
 - Database schema: Migration files in `supabase/migrations/`
 - Components: `src/components/`
 - Routes: `src/routes/_authenticated/`
@@ -476,6 +508,7 @@ bun build
 - Type definitions: `src/integrations/supabase/types.ts`
 
 ### Database Documentation
+
 - See `MARKETPLACE_FEATURES_IMPLEMENTATION.md` for marketplace details
 - See migration files for schema details
 

@@ -38,7 +38,10 @@ function NotFoundComponent() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-6">
-          <Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
             Go home
           </Link>
         </div>
@@ -57,16 +60,26 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Something went wrong on our end. You can try refreshing or head back home.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Something went wrong on our end. You can try refreshing or head back home.
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Try again
           </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          >
             Go home
           </a>
         </div>
@@ -80,15 +93,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Siargao Loops — Food Waste Exchange & Sustainable Farming" },
-      { name: "description", content: "A circular economy platform connecting Siargao farmers, restaurants, residents, and LGUs to turn food waste into local harvest." },
-      { name: "author", content: "Siargao Loops" },
+      { name: "title", content: "Farm2Food Cycle — Food Waste Exchange & Sustainable Farming" },
+      {
+        name: "description",
+        content:
+          "A circular economy platform connecting farmers, restaurants, residents, and LGUs to turn food waste into local harvest.",
+      },
+      { name: "author", content: "Farm2Food Cycle" },
       { name: "theme-color", content: "#2E7D32" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "Siargao Loops" },
-      { property: "og:title", content: "Siargao Loops" },
-      { property: "og:description", content: "Turn food waste into harvest. A community platform for sustainable farming in Siargao." },
+      { name: "apple-mobile-web-app-title", content: "Farm2Food Cycle" },
+      { property: "og:title", content: "Farm2Food Cycle" },
+      {
+        property: "og:description",
+        content: "Turn food waste into harvest. A community platform for sustainable farming.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -96,7 +116,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap",
+      },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "apple-touch-icon", type: "image/png", href: "/Socorro_Logo.png" },
       { rel: "icon", type: "image/png", href: "/Socorro_Logo.png" },
@@ -111,9 +134,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+      </head>
       <body>
-        <a className="skip-link" href="#main-content">Skip to main content</a>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
         {children}
         <Scripts />
       </body>
@@ -130,7 +157,9 @@ function RootComponent() {
     // Register service worker for PWA
     registerServiceWorker();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
@@ -140,14 +169,20 @@ function RootComponent() {
       try {
         const controller = new AbortController();
         const timeout = window.setTimeout(() => controller.abort(), 4000);
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL}/auth/v1/settings`, {
-          method: "GET",
-          headers: {
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || ""}`,
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL}/auth/v1/settings`,
+          {
+            method: "GET",
+            headers: {
+              apikey:
+                import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+                process.env.SUPABASE_PUBLISHABLE_KEY ||
+                "",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || ""}`,
+            },
+            signal: controller.signal,
           },
-          signal: controller.signal,
-        });
+        );
         window.clearTimeout(timeout);
         setSupabaseUnavailable(!response.ok);
       } catch {
@@ -167,8 +202,11 @@ function RootComponent() {
       <LanguageProvider>
         <AuthProvider>
           {supabaseUnavailable && (
-            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-900" role="status">
-              Siargao Loops is temporarily unavailable. Please try again in a few moments.
+            <div
+              className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-900"
+              role="status"
+            >
+              Farm2Food Cycle is temporarily unavailable. Please try again in a few moments.
             </div>
           )}
           <Shell />
@@ -202,7 +240,9 @@ function Shell() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main id="main-content" className="flex-1"><Outlet /></main>
+      <main id="main-content" className="flex-1">
+        <Outlet />
+      </main>
       <SiteFooter />
     </div>
   );
@@ -218,7 +258,9 @@ function PublicInsideAppShell() {
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
           </header>
-          <main id="main-content" className="flex-1 overflow-hidden"><Outlet /></main>
+          <main id="main-content" className="flex-1 overflow-hidden">
+            <Outlet />
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>

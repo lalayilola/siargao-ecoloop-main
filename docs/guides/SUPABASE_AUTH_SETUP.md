@@ -53,11 +53,13 @@ This guide explains how to configure Supabase for the Siargao Loops authenticati
 3. Customize the email template with your branding:
 
 **Subject:**
+
 ```
 Verify your Siargao Loops account
 ```
 
 **Body (HTML):**
+
 ```html
 <h2>Welcome to Siargao Loops!</h2>
 <p>Thank you for registering. Please verify your email address to activate your account.</p>
@@ -72,11 +74,13 @@ Verify your Siargao Loops account
 2. Customize the email template:
 
 **Subject:**
+
 ```
 Reset your Siargao Loops password
 ```
 
 **Body (HTML):**
+
 ```html
 <h2>Password Reset Request</h2>
 <p>You requested to reset your password. Click the link below to set a new password:</p>
@@ -99,6 +103,7 @@ Reset your Siargao Loops password
 Add the following URLs to **Allowed Redirect URLs**:
 
 **Development:**
+
 ```
 http://localhost:5173/*
 http://localhost:5173/auth/callback
@@ -107,6 +112,7 @@ http://localhost:5173/reset-password
 ```
 
 **Production:**
+
 ```
 https://your-domain.com/*
 https://your-domain.com/auth/callback
@@ -117,6 +123,7 @@ https://your-domain.com/reset-password
 ### Email Confirmation Redirect URL
 
 Set **Email Confirmation Redirect URL** to:
+
 - Development: `http://localhost:5173/verify-email`
 - Production: `https://your-domain.com/verify-email`
 

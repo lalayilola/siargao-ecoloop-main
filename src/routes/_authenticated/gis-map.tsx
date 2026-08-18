@@ -4,7 +4,7 @@ import { GISMapView } from "@/components/planning/GISMapView";
 export const Route = createFileRoute("/_authenticated/gis-map")({
   head: () => ({
     meta: [
-      { title: "GIS Map — Siargao Loops" },
+      { title: "GIS Map — Farm2Food Cycle" },
       { name: "description", content: "GIS map monitoring for waste management." },
       { property: "og:title", content: "GIS Map" },
       { property: "og:description", content: "Monitor waste collection and compost sites." },

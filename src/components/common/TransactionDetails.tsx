@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 interface TransactionDetailsProps {
   transaction: {
     id: string;
-    type: 'trade' | 'purchase';
+    type: "trade" | "purchase";
     status: string;
     created_at: string;
     item_name: string;
@@ -52,24 +52,24 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
   // Ensure required fields have safe defaults
   const safeTransaction = {
     ...transaction,
-    item_name: transaction.item_name || 'Unknown Item',
-    status: transaction.status || 'unknown',
+    item_name: transaction.item_name || "Unknown Item",
+    status: transaction.status || "unknown",
     created_at: transaction.created_at || new Date().toISOString(),
-    type: transaction.type || 'purchase',
+    type: transaction.type || "purchase",
   };
 
   useEffect(() => {
     // Check if user has already rated this transaction
     const checkExistingRating = async () => {
       if (!user) return;
-      
+
       try {
-        const { data, error } = await supabase
+        const { data, error } = (await supabase
           .from("transaction_ratings" as any)
           .select("*")
           .eq("transaction_id", safeTransaction.id)
           .eq("rater_id", user.id)
-          .single() as any;
+          .single()) as any;
 
         if (data && !error) {
           setHasRated(true);
@@ -112,16 +112,14 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("transaction_ratings")
-        .insert({
-          transaction_id: safeTransaction.id,
-          transaction_type: safeTransaction.type,
-          rater_id: user.id,
-          rated_user_id: ratedUserId,
-          rating: rating,
-          review: review || null,
-        });
+      const { error } = await supabase.from("transaction_ratings").insert({
+        transaction_id: safeTransaction.id,
+        transaction_type: safeTransaction.type,
+        rater_id: user.id,
+        rated_user_id: ratedUserId,
+        rating: rating,
+        review: review || null,
+      });
 
       if (error) throw error;
 
@@ -143,21 +141,22 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
 
     setMarkingComplete(true);
     try {
-      const tableName = safeTransaction.type === 'trade' ? 'trade_requests' : 'purchase_requests';
+      const tableName = safeTransaction.type === "trade" ? "trade_requests" : "purchase_requests";
       console.log(`Updating ${tableName} with id ${safeTransaction.id} to status 'completed'`);
 
       // First, fetch the transaction data to get listing_id and quantity
-      const transactionResult = safeTransaction.type === "trade"
-        ? await supabase
-            .from("trade_requests")
-            .select("listing_id, quantity_kg")
-            .eq("id", safeTransaction.id)
-            .single()
-        : await supabase
-            .from("purchase_requests")
-            .select("listing_id, quantity_kg")
-            .eq("id", safeTransaction.id)
-            .single();
+      const transactionResult =
+        safeTransaction.type === "trade"
+          ? await supabase
+              .from("trade_requests")
+              .select("listing_id, quantity_kg")
+              .eq("id", safeTransaction.id)
+              .single()
+          : await supabase
+              .from("purchase_requests")
+              .select("listing_id, quantity_kg")
+              .eq("id", safeTransaction.id)
+              .single();
 
       const { data: transactionData, error: fetchError } = transactionResult;
 
@@ -169,15 +168,16 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
       console.log("Transaction data:", transactionData);
 
       // Update transaction status to completed
-      const updateResult = safeTransaction.type === "trade"
-        ? await supabase
-            .from("trade_requests")
-            .update({ status: "completed" })
-            .eq("id", safeTransaction.id)
-        : await supabase
-            .from("purchase_requests")
-            .update({ status: "completed" })
-            .eq("id", safeTransaction.id);
+      const updateResult =
+        safeTransaction.type === "trade"
+          ? await supabase
+              .from("trade_requests")
+              .update({ status: "completed" })
+              .eq("id", safeTransaction.id)
+          : await supabase
+              .from("purchase_requests")
+              .update({ status: "completed" })
+              .eq("id", safeTransaction.id);
 
       const { error: updateError } = updateResult;
 
@@ -195,9 +195,9 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
 
         // Get current listing data
         const { data: listingData, error: listingFetchError } = await supabase
-          .from('marketplace_listings')
-          .select('kg, kind')
-          .eq('id', listingId)
+          .from("marketplace_listings")
+          .select("kg, kind")
+          .eq("id", listingId)
           .single();
 
         if (listingFetchError) {
@@ -207,18 +207,18 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
 
         const currentKg = listingData?.kg || 0;
         const newKg = Math.max(0, currentKg - quantityKg);
-        const listingStatus = newKg <= 0 ? 'sold_out' : 'available';
+        const listingStatus = newKg <= 0 ? "sold_out" : "available";
         console.log(`Current kg: ${currentKg}, New kg: ${newKg}, Status: ${listingStatus}`);
 
         // Update listing
         const { error: listingUpdateError } = await supabase
-          .from('marketplace_listings')
+          .from("marketplace_listings")
           .update({
             kg: newKg,
             listing_status: listingStatus,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', listingId);
+          .eq("id", listingId);
 
         if (listingUpdateError) {
           console.error("Error updating listing inventory:", listingUpdateError);
@@ -227,7 +227,6 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
         } else {
           console.log("Listing inventory updated successfully");
         }
-
       } else {
         console.log("No listing_id or quantity_kg found, skipping inventory update");
       }
@@ -244,8 +243,15 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
     }
   };
 
-  const canRate = (safeTransaction.status === "completed" || safeTransaction.status === "rejected" || safeTransaction.status === "accepted") && !hasRated;
-  const canMarkComplete = safeTransaction.status !== "completed" && safeTransaction.status !== "cancelled" && safeTransaction.status !== "rejected";
+  const canRate =
+    (safeTransaction.status === "completed" ||
+      safeTransaction.status === "rejected" ||
+      safeTransaction.status === "accepted") &&
+    !hasRated;
+  const canMarkComplete =
+    safeTransaction.status !== "completed" &&
+    safeTransaction.status !== "cancelled" &&
+    safeTransaction.status !== "rejected";
 
   // Debug logging
   console.log("TransactionDetails debug:", {
@@ -270,175 +276,180 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
             </div>
           </DialogHeader>
 
-        <div className="space-y-6 mt-4">
-          {/* Transaction Header */}
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className={statusColor[safeTransaction.status]}>
-              {safeTransaction.status}
-            </Badge>
-            <Badge variant="outline" className="bg-slate-100 text-slate-700 border-slate-300">
-              {safeTransaction.type === 'trade' ? 'Trade' : 'Purchase'}
-            </Badge>
-          </div>
-
-          {/* Item Information */}
-          <Card className="p-6">
-            <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              Item Information
-            </h3>
-            <div className="grid gap-4">
-              {safeTransaction.item_image && (
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-slate-100">
-                  <img 
-                    src={safeTransaction.item_image} 
-                    alt={safeTransaction.item_name} 
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Item Name</label>
-                <p className="font-semibold text-lg">{safeTransaction.item_name}</p>
-              </div>
-              {safeTransaction.item_category && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Category</label>
-                  <p>{safeTransaction.item_category}</p>
-                </div>
-              )}
-              {safeTransaction.quantity && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Quantity</label>
-                  <p>{safeTransaction.quantity} kg</p>
-                </div>
-              )}
-              {safeTransaction.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{safeTransaction.location}</span>
-                </div>
-              )}
+          <div className="space-y-6 mt-4">
+            {/* Transaction Header */}
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className={statusColor[safeTransaction.status]}>
+                {safeTransaction.status}
+              </Badge>
+              <Badge variant="outline" className="bg-slate-100 text-slate-700 border-slate-300">
+                {safeTransaction.type === "trade" ? "Trade" : "Purchase"}
+              </Badge>
             </div>
-          </Card>
 
-          {/* User Information */}
-          <Card className="p-6">
-            <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
-              User Information
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  {safeTransaction.type === 'trade' ? 'Trade Partner' : 'Seller'}
-                </label>
-                <p className="font-semibold">{safeTransaction.seller_name || safeTransaction.from_name}</p>
-              </div>
-              {safeTransaction.buyer_name && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Buyer</label>
-                  <p className="font-semibold">{safeTransaction.buyer_name}</p>
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Transaction Information */}
-          <Card className="p-6">
-            <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Transaction Information
-            </h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Transaction ID</label>
-                <p className="font-mono text-sm">{safeTransaction.id}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Date & Time</label>
-                <p>{new Date(safeTransaction.created_at).toLocaleString()}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Status</label>
-                <p className="capitalize">{safeTransaction.status.replace('_', ' ')}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Transaction Type</label>
-                <p className="capitalize">{safeTransaction.type}</p>
-              </div>
-              {safeTransaction.notes && (
-                <div className="sm:col-span-2">
-                  <label className="text-sm font-medium text-muted-foreground">Notes</label>
-                  <p className="text-sm">{safeTransaction.notes}</p>
-                </div>
-              )}
-            </div>
-            {canMarkComplete && (
-              <div className="mt-4 pt-4 border-t">
-                <Button 
-                  onClick={handleMarkComplete}
-                  disabled={markingComplete}
-                  className="w-full"
-                >
-                  {markingComplete ? "Marking as complete..." : "Mark as Completed"}
-                </Button>
-              </div>
-            )}
-          </Card>
-
-          {/* Rating Section */}
-          {canRate && (
+            {/* Item Information */}
             <Card className="p-6">
               <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                <Star className="h-5 w-5 text-primary" />
-                Rate This Transaction
+                <Package className="h-5 w-5 text-primary" />
+                Item Information
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Rate your experience with this transaction. You can only rate completed, accepted, or rejected transactions once.
-              </p>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      onClick={() => setRating(star)}
-                      className="focus:outline-none"
-                    >
-                      <Star
-                        className={`h-8 w-8 ${
-                          star <= rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    </button>
-                  ))}
+              <div className="grid gap-4">
+                {safeTransaction.item_image && (
+                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-slate-100">
+                    <img
+                      src={safeTransaction.item_image}
+                      alt={safeTransaction.item_name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Item Name</label>
+                  <p className="font-semibold text-lg">{safeTransaction.item_name}</p>
                 </div>
-                <textarea
-                  value={review}
-                  onChange={(e) => setReview(e.target.value)}
-                  placeholder="Leave a review (optional)"
-                  className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-                />
-                <Button onClick={handleRatingSubmit} className="w-full" disabled={loading}>
-                  {loading ? "Submitting..." : "Submit Rating"}
-                </Button>
+                {safeTransaction.item_category && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Category</label>
+                    <p>{safeTransaction.item_category}</p>
+                  </div>
+                )}
+                {safeTransaction.quantity && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Quantity</label>
+                    <p>{safeTransaction.quantity} kg</p>
+                  </div>
+                )}
+                {safeTransaction.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span>{safeTransaction.location}</span>
+                  </div>
+                )}
               </div>
             </Card>
-          )}
 
-          {hasRated && (
-            <Card className="p-6 bg-green-50 border-green-200">
-              <div className="flex items-center gap-2 text-green-700">
-                <Star className="h-5 w-5 fill-green-500" />
-                <span className="font-medium">You have rated this transaction</span>
+            {/* User Information */}
+            <Card className="p-6">
+              <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                User Information
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {safeTransaction.type === "trade" ? "Trade Partner" : "Seller"}
+                  </label>
+                  <p className="font-semibold">
+                    {safeTransaction.seller_name || safeTransaction.from_name}
+                  </p>
+                </div>
+                {safeTransaction.buyer_name && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Buyer</label>
+                    <p className="font-semibold">{safeTransaction.buyer_name}</p>
+                  </div>
+                )}
               </div>
             </Card>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+
+            {/* Transaction Information */}
+            <Card className="p-6">
+              <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Transaction Information
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Transaction ID
+                  </label>
+                  <p className="font-mono text-sm">{safeTransaction.id}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Date & Time</label>
+                  <p>{new Date(safeTransaction.created_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Status</label>
+                  <p className="capitalize">{safeTransaction.status.replace("_", " ")}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Transaction Type
+                  </label>
+                  <p className="capitalize">{safeTransaction.type}</p>
+                </div>
+                {safeTransaction.notes && (
+                  <div className="sm:col-span-2">
+                    <label className="text-sm font-medium text-muted-foreground">Notes</label>
+                    <p className="text-sm">{safeTransaction.notes}</p>
+                  </div>
+                )}
+              </div>
+              {canMarkComplete && (
+                <div className="mt-4 pt-4 border-t">
+                  <Button
+                    onClick={handleMarkComplete}
+                    disabled={markingComplete}
+                    className="w-full"
+                  >
+                    {markingComplete ? "Marking as complete..." : "Mark as Completed"}
+                  </Button>
+                </div>
+              )}
+            </Card>
+
+            {/* Rating Section */}
+            {canRate && (
+              <Card className="p-6">
+                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-primary" />
+                  Rate This Transaction
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Rate your experience with this transaction. You can only rate completed, accepted,
+                  or rejected transactions once.
+                </p>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`h-8 w-8 ${
+                            star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={review}
+                    onChange={(e) => setReview(e.target.value)}
+                    placeholder="Leave a review (optional)"
+                    className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  <Button onClick={handleRatingSubmit} className="w-full" disabled={loading}>
+                    {loading ? "Submitting..." : "Submit Rating"}
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {hasRated && (
+              <Card className="p-6 bg-green-50 border-green-200">
+                <div className="flex items-center gap-2 text-green-700">
+                  <Star className="h-5 w-5 fill-green-500" />
+                  <span className="font-medium">You have rated this transaction</span>
+                </div>
+              </Card>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   } catch (error) {
     console.error("TransactionDetails render error:", error);

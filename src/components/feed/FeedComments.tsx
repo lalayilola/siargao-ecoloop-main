@@ -44,7 +44,7 @@ export function FeedComments({ postId }: FeedCommentsProps) {
 
       // Fetch profile data for all users
       const userIds = [...new Set(commentsData?.map((c: any) => c.user_id) || [])];
-      
+
       let profileMap = new Map();
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
@@ -100,7 +100,7 @@ export function FeedComments({ postId }: FeedCommentsProps) {
 
       const newCommentWithProfile = {
         ...(data as unknown as Comment),
-        profiles: profileData || { full_name: user.email?.split('@')[0] || 'User' },
+        profiles: profileData || { full_name: user.email?.split("@")[0] || "User" },
       };
 
       setComments([newCommentWithProfile as unknown as Comment, ...comments]);
@@ -125,8 +125,8 @@ export function FeedComments({ postId }: FeedCommentsProps) {
 
       setComments(
         comments.map((c) =>
-          c.id === commentId ? { ...c, content: editContent.trim() } : c
-        ) as any
+          c.id === commentId ? { ...c, content: editContent.trim() } : c,
+        ) as any,
       );
       setEditingComment(null);
       setEditContent("");
@@ -190,7 +190,11 @@ export function FeedComments({ postId }: FeedCommentsProps) {
                 <div className="flex items-start gap-3 flex-1">
                   <div className="h-8 w-8 rounded-full overflow-hidden bg-secondary/10 flex-shrink-0 shadow-md border border-primary/40 mt-1">
                     {comment.profiles?.profile_picture_url ? (
-                      <img src={comment.profiles.profile_picture_url} alt={comment.profiles.full_name} className="h-full w-full object-cover" />
+                      <img
+                        src={comment.profiles.profile_picture_url}
+                        alt={comment.profiles.full_name}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center font-semibold text-primary text-xs">
                         {comment.profiles?.full_name?.[0]?.toUpperCase() || "?"}

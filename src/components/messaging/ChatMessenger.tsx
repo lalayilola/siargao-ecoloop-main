@@ -1,10 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, X, Paperclip, Image as ImageIcon, Edit3, Trash2, Check, CheckCheck } from "lucide-react";
+import {
+  Send,
+  X,
+  Paperclip,
+  Image as ImageIcon,
+  Edit3,
+  Trash2,
+  Check,
+  CheckCheck,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,7 +86,9 @@ export function ChatMessenger({
         .single();
 
       if (!error && data) {
-        setOtherUserPictureUrl((data as { profile_picture_url: string | null }).profile_picture_url);
+        setOtherUserPictureUrl(
+          (data as { profile_picture_url: string | null }).profile_picture_url,
+        );
       }
     };
 
@@ -93,27 +110,35 @@ export function ChatMessenger({
     }
   }, []);
 
-  const markMessagesAsRead = useCallback(async (items: Message[]) => {
-    const unreadMessages = items.filter((message) => message.sender_id !== user?.id && !message.read_at);
-    await Promise.all(unreadMessages.map((message) => markMessageAsRead(message.id)));
-  }, [markMessageAsRead, user?.id]);
+  const markMessagesAsRead = useCallback(
+    async (items: Message[]) => {
+      const unreadMessages = items.filter(
+        (message) => message.sender_id !== user?.id && !message.read_at,
+      );
+      await Promise.all(unreadMessages.map((message) => markMessageAsRead(message.id)));
+    },
+    [markMessageAsRead, user?.id],
+  );
 
-  const loadMessages = useCallback(async (convId: string) => {
-    const { data, error } = await supabase
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", convId)
-      .order("created_at", { ascending: true });
+  const loadMessages = useCallback(
+    async (convId: string) => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", convId)
+        .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Error loading messages:", error);
-      return;
-    }
+      if (error) {
+        console.error("Error loading messages:", error);
+        return;
+      }
 
-    setMessages(data ?? []);
-    scrollToBottom();
-    void markMessagesAsRead(data ?? []);
-  }, [markMessagesAsRead, scrollToBottom]);
+      setMessages(data ?? []);
+      scrollToBottom();
+      void markMessagesAsRead(data ?? []);
+    },
+    [markMessagesAsRead, scrollToBottom],
+  );
 
   useEffect(() => {
     if (!open || !user) return;
@@ -129,7 +154,9 @@ export function ChatMessenger({
         const { data: existingConv } = await supabase
           .from("conversations")
           .select("*")
-          .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`)
+          .or(
+            `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`,
+          )
           .single<Conversation>();
 
         if (existingConv) {
@@ -139,7 +166,7 @@ export function ChatMessenger({
         }
 
         // Create new conversation
-        const { data: newConv, error: convError } = await supabase
+        const { data: newConv, error: convError } = (await supabase
           .from("conversations")
           .insert({
             trade_request_id: tradeRequestId || null,
@@ -149,7 +176,7 @@ export function ChatMessenger({
             participant_2_id: otherUserId,
           } as any)
           .select()
-          .single() as { data: Conversation | null; error: any };
+          .single()) as { data: Conversation | null; error: any };
 
         if (convError || !newConv) {
           toast.error("Failed to create conversation");
@@ -162,7 +189,16 @@ export function ChatMessenger({
     };
 
     loadOrCreateConversation();
-  }, [open, conversationId, user, otherUserId, tradeRequestId, purchaseRequestId, listingId, loadMessages]);
+  }, [
+    open,
+    conversationId,
+    user,
+    otherUserId,
+    tradeRequestId,
+    purchaseRequestId,
+    listingId,
+    loadMessages,
+  ]);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -199,7 +235,7 @@ export function ChatMessenger({
           if (payload.new.sender_id !== user?.id) {
             markMessageAsRead(payload.new.id);
           }
-        }
+        },
       )
       .subscribe();
 
@@ -218,18 +254,25 @@ export function ChatMessenger({
       let imageUrl: string | null = null;
       if (file) {
         const filePath = `chat/${conversationId}/${Date.now()}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(filePath, file);
         if (uploadError) throw uploadError;
-        const { data: publicData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path ?? filePath);
+        const { data: publicData } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(uploadData.path ?? filePath);
         imageUrl = publicData.publicUrl;
       }
 
-      const { data: insertedMessage, error } = await (supabase.from("messages") as any).insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content: newMessage.trim() || "",
-        image_url: imageUrl,
-      }).select().single() as { data: Message | null; error: any };
+      const { data: insertedMessage, error } = (await (supabase.from("messages") as any)
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: newMessage.trim() || "",
+          image_url: imageUrl,
+        })
+        .select()
+        .single()) as { data: Message | null; error: any };
 
       if (error) throw error;
 
@@ -239,8 +282,11 @@ export function ChatMessenger({
         scrollToBottom();
       }
 
-      const recipientId = otherUserId ??
-        (conversation?.participant_1_id === user.id ? conversation.participant_2_id : conversation?.participant_1_id);
+      const recipientId =
+        otherUserId ??
+        (conversation?.participant_1_id === user.id
+          ? conversation.participant_2_id
+          : conversation?.participant_1_id);
 
       if (recipientId && recipientId !== user.id) {
         const title = `${profile?.full_name ?? "Someone"} sent you a message`;
@@ -272,7 +318,7 @@ export function ChatMessenger({
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   const handleEditMessage = (messageId: string, content: string) => {
@@ -298,8 +344,8 @@ export function ChatMessenger({
 
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.id === editingMessageId ? { ...msg, content: editContent.trim() } : msg
-      )
+        msg.id === editingMessageId ? { ...msg, content: editContent.trim() } : msg,
+      ),
     );
     setIsEditModalOpen(false);
     setEditingMessageId(null);
@@ -334,9 +380,17 @@ export function ChatMessenger({
               )}
             </Avatar>
             <div>
-              <DialogTitle className="text-sm font-medium">{otherUserName || "Conversation"}</DialogTitle>
+              <DialogTitle className="text-sm font-medium">
+                {otherUserName || "Conversation"}
+              </DialogTitle>
               <DialogDescription className="text-xs">
-                {tradeRequestId ? "Trade Request" : purchaseRequestId ? "Purchase Request" : listingId ? "Marketplace Listing" : "Direct Message"}
+                {tradeRequestId
+                  ? "Trade Request"
+                  : purchaseRequestId
+                    ? "Purchase Request"
+                    : listingId
+                      ? "Marketplace Listing"
+                      : "Direct Message"}
               </DialogDescription>
             </div>
           </div>
@@ -361,7 +415,11 @@ export function ChatMessenger({
                     }`}
                   >
                     {message.image_url && (
-                      <img src={message.image_url} alt="Attachment" className="rounded mb-2 max-w-full h-auto" />
+                      <img
+                        src={message.image_url}
+                        alt="Attachment"
+                        className="rounded mb-2 max-w-full h-auto"
+                      />
                     )}
                     {message.content && <p className="text-sm">{message.content}</p>}
                     <div className="flex items-center justify-between gap-1 mt-1">

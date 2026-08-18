@@ -25,13 +25,13 @@ const SheetOverlay = React.forwardRef<
       className,
     )}
     style={{
-      position: 'fixed',
+      position: "fixed",
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      width: '100vw',
-      height: '100vh',
+      width: "100vw",
+      height: "100vh",
     }}
     {...props}
     ref={ref}
@@ -69,13 +69,13 @@ const SheetContent = React.forwardRef<
 >(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
-    <SheetPrimitive.Content 
-      ref={ref} 
-      className={cn(sheetVariants({ side }), className)} 
+    <SheetPrimitive.Content
+      ref={ref}
+      className={cn(sheetVariants({ side }), className)}
       style={{
-        position: 'fixed',
-        maxHeight: '100dvh',
-        maxWidth: '100vw',
+        position: "fixed",
+        maxHeight: "100dvh",
+        maxWidth: "100vw",
       }}
       {...props}
     >
