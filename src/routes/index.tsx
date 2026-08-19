@@ -47,8 +47,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { t } = useLanguage();
   const [stats, setStats] = useState({
-    wasteCollected: 0,
-    divertedPercentage: 0,
+    wasteCollected: 70,
+    produceSales: 0,
     activeMembers: 0,
     municipalities: 0,
   });
@@ -199,12 +199,17 @@ function Index() {
           .filter((report) => ["collected", "processed"].includes(report.status))
           .reduce((sum, report) => sum + (Number(report.quantity_kg) || 0), 0);
 
-        const totalWaste = wasteReports.reduce(
-          (sum, report) => sum + (Number(report.quantity_kg) || 0),
-          0,
+        // Use 70 kg as default if no waste collected
+        const finalWasteCollected = wasteCollected > 0 ? wasteCollected : 70;
+
+        // Calculate produce sales from marketplace listings
+        const produceListings = (listingsResult || []).filter(
+          (listing: any) => listing.kind === "produce" && listing.price
         );
-        const divertedPercentage =
-          totalWaste > 0 ? Math.round((wasteCollected / totalWaste) * 100) : 0;
+        const produceSales = produceListings.reduce(
+          (sum: number, listing: any) => sum + (Number(listing.kg) || 0),
+          0
+        );
 
         // Get unique municipalities from profiles
         const { data: municipalityData } = await supabase
@@ -216,8 +221,8 @@ function Index() {
         );
 
         setStats({
-          wasteCollected,
-          divertedPercentage,
+          wasteCollected: finalWasteCollected,
+          produceSales,
           activeMembers: profiles.length,
           municipalities: uniqueMunicipalities.size,
         });
@@ -230,8 +235,8 @@ function Index() {
         console.error("Error loading stats:", error);
         // Set default stats on error so page still renders
         setStats({
-          wasteCollected: 0,
-          divertedPercentage: 0,
+          wasteCollected: 70,
+          produceSales: 0,
           activeMembers: 0,
           municipalities: 0,
         });
@@ -289,13 +294,13 @@ function Index() {
             </span>
             <h1 className="mt-8 font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight uppercase text-white drop-shadow-2xl">
               <div className="bg-gradient-to-r from-emerald-600 via-white to-emerald-600 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]">
-                Turn food waste into
+                TURN FOOD WASTE INTO
               </div>
               <div
                 className="bg-gradient-to-r from-emerald-700 via-white to-emerald-700 bg-clip-text text-transparent animate-gradient-text bg-[length:200%_auto]"
                 style={{ animationDelay: "0.5s" }}
               >
-                Island harvest
+                HARVEST
               </div>
             </h1>
             <p className="mt-6 max-w-2xl text-lg sm:text-xl text-white/90 font-light leading-relaxed mx-auto text-center">
@@ -327,7 +332,7 @@ function Index() {
                   v: t("home.hero.wasteCollected"),
                 },
                 {
-                  k: loading ? "..." : `${stats.divertedPercentage}%`,
+                  k: loading ? "..." : `${stats.produceSales.toLocaleString()} kg`,
                   v: t("home.hero.divertedFromLandfill"),
                 },
                 {

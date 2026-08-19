@@ -63,11 +63,11 @@ const resources = {
           badge: "A circular food system",
           title: "Turn food waste into harvest.",
           subtitle:
-            "Farm2Food Cycle connects farmers, restaurants, residents and LGUs so kitchen scraps become compost, feed and fresh produce — keeping the community green and the loop closed.",
+            "Farm2Food Cycle connects farmers, restaurants, residents, and LGUs to transform kitchen food waste into valuable compost and fertilizers that support the production of fresh, local produce—reducing food waste, supporting local agriculture, and keeping the community green through a closed-loop food system.",
           joinLoop: "Join the loop",
           seeHowItWorks: "See how it works",
           wasteCollected: "Waste collected",
-          divertedFromLandfill: "Diverted from landfill",
+          divertedFromLandfill: "Fresh Produce Sales",
           activeMembers: "Active members",
         },
         problem: {
@@ -76,7 +76,7 @@ const resources = {
           description:
             "Tons of edible scraps and organic matter leave restaurants, resorts and homes every week. Meanwhile, local farmers spend on inputs they could grow themselves through composting. Farm2Food Cycle bridges the two ends — and rewards everyone in between.",
           point1: "Reduce environmental pollution and methane from landfills",
-          point2: "Support local food production with low-cost compost",
+          point2: "Support local food production with low-cost farm goods",
           point3: "Strengthen barangay-level cooperation and barter culture",
           point4: "Plan ahead with future-supply and future-need announcements",
         },
@@ -101,7 +101,7 @@ const resources = {
           ecoFeedDesc: "A social feed of available crops, waste and trades from your barangay.",
           marketplaces: "Marketplaces",
           marketplacesDesc:
-            "Three markets — fresh produce, compost/fertilizer, and food waste — with photos, weight, price and location.",
+            "Three markets — fresh produce, farm goods, and food waste — with photos, weight, price and location.",
           barter: "Barter & Trades",
           barterDesc: "Swap waste, produce and meals without cash. Track every trade end-to-end.",
           smartSearch: "Smart Search",
@@ -305,7 +305,7 @@ const resources = {
       howItWorks: {
         hero: {
           eyebrow: "How it works",
-          title: "A four-step loop the whole island can use.",
+          title: "A four-step loop the community can use.",
           subtitle:
             "Farm2Food Cycle is designed to feel as natural as a barangay tiangge — easy to join, quick to use, fair for everyone.",
         },
@@ -395,11 +395,11 @@ const resources = {
           badge: "Isang circular food system para sa komunidad",
           title: "Ibalik ang pagkain sa ani ng komunidad.",
           subtitle:
-            "Ang Farm2Food Cycle ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging compost, feed at sariwang produkto — pinapanatili ang komunidad na berde at ang loop na sarado.",
+            "Ang Farm2Food Cycle ay nagkokonekta sa mga magsasaka, restawran, residente at LGU kaya ang mga laba sa kusina ay nagiging farm goods, feed at sariwang produkto — pinapanatili ang komunidad na berde at ang loop na sarado.",
           joinLoop: "Sumali sa loop",
           seeHowItWorks: "Tingnan kung paano ito gumagana",
           wasteCollected: "Nakolektang basura",
-          divertedFromLandfill: "Ibinaba mula sa landfill",
+          divertedFromLandfill: "Benta ng Sariwang Produkto",
           activeMembers: "Aktibong miyembro",
         },
         problem: {
@@ -408,7 +408,7 @@ const resources = {
           description:
             "Tonelada ng nakakain na scraps at organic matter ang umaalis sa mga restawran, resort at bahay tuwing linggo. Samantala, ang mga lokal na magsasaka ay gumagastos sa mga input na maaari nilang magtalo mismo sa pamamagitan ng composting. Ang Farm2Food Cycle ay nagtulay sa dalawang dulo — at nagpapala sa lahat sa gitna.",
           point1: "Bawasan ang polusyon sa kapaligiran at methane mula sa mga landfill",
-          point2: "Suportahan ang lokal na produksyon ng pagkain mula sa mababang compost",
+          point2: "Suportahan ang lokal na produksyon ng pagkain mula sa mababang farm goods",
           point3: "Palakasin ang kooperasyon sa barangay at kultura ng barter",
           point4: "Magplano nang maaga sa mga anunsyo ng future-supply at future-need",
         },
@@ -438,7 +438,7 @@ const resources = {
             "Isang social feed ng available na crops, waste at trades mula sa iyong barangay.",
           marketplaces: "Marketplaces",
           marketplacesDesc:
-            "Tatlong market — sariwang produkto, compost/fertilizer, at pagkain — na may mga litrato, timbang, presyo at lokasyon.",
+            "Tatlong market — sariwang produkto, farm goods, at pagkain — na may mga litrato, timbang, presyo at lokasyon.",
           barter: "Barter & Trades",
           barterDesc:
             "I-swap ang waste, produce at mga meal nang walang cash. I-track ang bawat trade end-to-end.",
@@ -741,11 +741,11 @@ const resources = {
           badge: "Usa ka circular food system alang sa komunidad",
           title: "Ibalik ang pagkaon sa ani sa komunidad.",
           subtitle:
-            "Ang Farm2Food Cycle nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong compost, feed ug bag-ong produkto — nagpabilin sa komunidad nga berde ug ang loop nga sarado.",
+            "Ang Farm2Food Cycle nagkonekta sa mga mag-uuma, restawran, residente ug LGU busa ang mga laba sa kusina mahimong farm goods, feed ug bag-ong produkto — nagpabilin sa komunidad nga berde ug ang loop nga sarado.",
           joinLoop: "Sali sa loop",
           seeHowItWorks: "Tan-awa kung unsa managsa kini",
           wasteCollected: "Nakolekta nga basura",
-          divertedFromLandfill: "Ibaba gikan sa landfill",
+          divertedFromLandfill: "Benta sa Sariwang Produkto",
           activeMembers: "Aktibong miyembro",
         },
         problem: {
@@ -754,7 +754,7 @@ const resources = {
           description:
             "Tonelada sa makakaon nga scraps ug organic matter ang mobalik sa mga restawran, resort ug balay matag semana. Samtanan, ang mga lokal nga mag-uuma naggastos sa mga input nga mahimo nilang magtalo mismo pinaagi sa composting. Ang Farm2Food Cycle nagtulay sa duha nga tumoy — ug nagpahalag sa tanan sa tunga-tunga.",
           point1: "Bawasan ang polusyon sa kapalibutan ug methane gikan sa mga landfill",
-          point2: "Suportahan ang lokal nga produksyon sa pagkaon gikan sa mubong compost",
+          point2: "Suportahan ang lokal nga produksyon sa pagkaon gikan sa mubong farm goods",
           point3: "Palig-on ang kooperasyon sa barangay ug kultura sa barter",
           point4: "Magplano nang sayo sa mga anunsyo sa future-supply ug future-need",
         },
@@ -784,7 +784,7 @@ const resources = {
             "Usa ka social feed sa available nga crops, waste ug trades gikan sa imong barangay.",
           marketplaces: "Marketplaces",
           marketplacesDesc:
-            "Tulo ka market — bag-ong produkto, compost/fertilizer, ug pagkaon — nga may mga litrato, timbang, presyo ug lokasyon.",
+            "Tulo ka market — bag-ong produkto, farm goods, ug pagkaon — nga may mga litrato, timbang, presyo ug lokasyon.",
           barter: "Barter & Trades",
           barterDesc:
             "I-swap ang waste, produce ug mga meal nga walay cash. I-track ang matag trade end-to-end.",
