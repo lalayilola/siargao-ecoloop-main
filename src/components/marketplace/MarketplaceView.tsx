@@ -1290,7 +1290,7 @@ export function MarketplaceView() {
                     }
                     onClick={() => setKind("waste")}
                   >
-                    ♻️ Waste
+                    ♻️ WASTE
                   </Button>
                 ) : profile?.primary_role === "lgu_admin" ? (
                   <Button
@@ -1302,7 +1302,7 @@ export function MarketplaceView() {
                     }
                     onClick={() => setKind("compost")}
                   >
-                    🌱 Compost
+                    🧪 FARM GOODS
                   </Button>
                 ) : (
                   <Button
@@ -1314,7 +1314,7 @@ export function MarketplaceView() {
                     }
                     onClick={() => setKind("produce")}
                   >
-                    🌾 Produce
+                    🌾 PRODUCE
                   </Button>
                 )}
               </div>
