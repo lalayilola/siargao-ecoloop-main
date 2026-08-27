@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Trash2, CalendarDays, MapPin } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -23,6 +24,7 @@ type WasteReport = Database["public"]["Tables"]["food_waste_reports"]["Row"];
 type WasteReportInsert = Database["public"]["Tables"]["food_waste_reports"]["Insert"];
 
 export function WasteReportsView() {
+  const { t } = useLanguage();
   const { user, profile } = useAuth();
   const [reports, setReports] = useState<WasteReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,51 +144,51 @@ export function WasteReportsView() {
     <Container className="py-12">
       <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Waste Reports</h1>
-          <p className="text-slate-600">Submit and track food waste for composting collection.</p>
+          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">{t("wasteReports.title")}</h1>
+          <p className="text-slate-600">{t("wasteReports.subtitle")}</p>
         </div>
         <Button
           className="bg-accent hover:bg-accent/90 text-white gap-2"
           onClick={() => setShowForm(true)}
         >
-          <Plus className="h-4 w-4" /> Submit Report
+          <Plus className="h-4 w-4" /> {t("wasteReports.submitReport")}
         </Button>
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Submit a Waste Report</DialogTitle>
+            <DialogTitle>{t("wasteReports.submitWasteReport")}</DialogTitle>
             <DialogDescription>
-              Share the waste details so LGU collection teams can schedule a pickup.
+              {t("wasteReports.wasteReportDescription")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="waste-type">Waste type</Label>
+                <Label htmlFor="waste-type">{t("wasteReports.wasteType")}</Label>
                 <Input
                   id="waste-type"
                   value={wasteType}
                   onChange={(event) => setWasteType(event.target.value)}
-                  placeholder="e.g. Vegetable scraps, food trimmings"
+                  placeholder={t("wasteReports.wasteTypePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="quantity-kg">Quantity (kg)</Label>
+                <Label htmlFor="quantity-kg">{t("wasteReports.quantity")}</Label>
                 <Input
                   id="quantity-kg"
                   type="number"
                   min={1}
                   value={quantityKg || ""}
                   onChange={(event) => setQuantityKg(Number(event.target.value) || 0)}
-                  placeholder="25"
+                  placeholder={t("wasteReports.quantityPlaceholder")}
                 />
               </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="collection-date">Preferred collection date</Label>
+                <Label htmlFor="collection-date">{t("wasteReports.preferredCollectionDate")}</Label>
                 <Input
                   id="collection-date"
                   type="date"
@@ -195,32 +197,32 @@ export function WasteReportsView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="collection-address">Collection address</Label>
+                <Label htmlFor="collection-address">{t("wasteReports.collectionAddress")}</Label>
                 <Input
                   id="collection-address"
                   value={collectionAddress}
                   onChange={(event) => setCollectionAddress(event.target.value)}
-                  placeholder="Barangay, street or landmark"
+                  placeholder={t("wasteReports.collectionAddressPlaceholder")}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="notes">Additional details</Label>
+              <Label htmlFor="notes">{t("wasteReports.additionalDetails")}</Label>
               <Textarea
                 id="notes"
                 rows={4}
                 value={""}
-                placeholder="Optional note for the collector"
+                placeholder={t("wasteReports.notesPlaceholder")}
                 disabled
                 className="opacity-60"
               />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                Cancel
+                {t("wasteReports.cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit Report"}
+                {isSubmitting ? t("wasteReports.submitting") : t("wasteReports.submitReport")}
               </Button>
             </DialogFooter>
           </form>
@@ -229,20 +231,20 @@ export function WasteReportsView() {
 
       {isLoading ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-600">Loading waste reports...</p>
+          <p className="text-slate-600">{t("wasteReports.loading")}</p>
         </Card>
       ) : reports.length === 0 ? (
         <Card className="p-12 text-center border-2 border-accent/20">
           <Trash2 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">No reports yet</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">{t("wasteReports.noReports")}</h2>
           <p className="text-slate-600 mb-6">
-            Submit your first food waste report and get collection scheduled.
+            {t("wasteReports.noReportsDescription")}
           </p>
           <Button
             className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto"
             onClick={() => setShowForm(true)}
           >
-            <Plus className="h-4 w-4" /> Submit First Report
+            <Plus className="h-4 w-4" /> {t("wasteReports.submitFirstReport")}
           </Button>
         </Card>
       ) : (
@@ -279,7 +281,7 @@ export function WasteReportsView() {
                     {report.status}
                   </span>
                   <p className="text-xs text-slate-500">
-                    Submitted: {new Date(report.created_at).toLocaleDateString()}
+                    {t("wasteReports.submitted")}: {new Date(report.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>

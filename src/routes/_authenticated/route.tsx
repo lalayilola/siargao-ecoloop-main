@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import { LanguageSelector } from "@/components/common/LanguageSelector";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -33,6 +34,9 @@ function AuthenticatedLayout() {
           <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border/60 bg-background/85 px-3 backdrop-blur">
             <SidebarTrigger />
             <span className="text-sm font-medium text-muted-foreground">Members area</span>
+            <div className="ml-auto">
+              <LanguageSelector />
+            </div>
           </header>
           <main id="main-content" className="flex-1 overflow-hidden">
             <Outlet />

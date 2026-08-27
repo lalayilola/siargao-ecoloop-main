@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 
 type Listing = Database["public"]["Tables"]["marketplace_listings"]["Row"] & {
   profiles?: {
@@ -62,6 +63,7 @@ export function ListingCard({
   onDelete?: () => void;
   onViewDetails?: () => void;
 }) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -238,7 +240,7 @@ export function ListingCard({
 
         {/* Availability badge */}
         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100">
-          Available: {item.kg} kg
+          {t("marketplace.available")}: {item.kg} kg
         </Badge>
 
         {/* Seller name - clickable to view profile */}
@@ -274,7 +276,7 @@ export function ListingCard({
             onViewDetails?.();
           }}
         >
-          View Details
+          {t("marketplace.viewDetails")}
         </Button>
 
         {/* Owner actions */}
@@ -290,7 +292,7 @@ export function ListingCard({
                   onEdit();
                 }}
               >
-                <Edit3 className="h-3 w-3 mr-1" /> Edit
+                <Edit3 className="h-3 w-3 mr-1" /> {t("marketplace.edit")}
               </Button>
             )}
             {onDelete && (
@@ -302,19 +304,18 @@ export function ListingCard({
                     className="flex-1 h-9 border-red-200 text-red-600 hover:bg-red-50"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    <Trash2 className="h-3 w-3 mr-1" /> Delete
+                    <Trash2 className="h-3 w-3 mr-1" /> {t("marketplace.delete")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete listing?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("marketplace.deleteListing")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. The listing will be removed from the
-                      marketplace.
+                      {t("marketplace.deleteListingDescription")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{t("marketplace.cancel")}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={async () => {
                         setIsDeleting(true);
@@ -322,7 +323,7 @@ export function ListingCard({
                         setIsDeleting(false);
                       }}
                     >
-                      {isDeleting ? "Deleting..." : "Delete"}
+                      {isDeleting ? t("marketplace.deleting") : t("marketplace.delete")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

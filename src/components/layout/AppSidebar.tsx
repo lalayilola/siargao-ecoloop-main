@@ -35,6 +35,7 @@ import {
   History,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -43,11 +44,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const memberItems = [
-  { to: "/marketplace", label: "Marketplace", icon: Store },
-  { to: "/planning", label: "Planning & Forecast", icon: Calendar },
-  { to: "/requests", label: "Transactions", icon: ArrowLeftRight },
-  { to: "/messages", label: "Messages", icon: MessageCircle },
-  { to: "/announcements", label: "Announcements", icon: Megaphone },
+  { to: "/marketplace", labelKey: "sidebar.marketplace", icon: Store },
+  { to: "/planning", labelKey: "sidebar.planning", icon: Calendar },
+  { to: "/requests", labelKey: "sidebar.transactions", icon: ArrowLeftRight },
+  { to: "/messages", labelKey: "sidebar.messages", icon: MessageCircle },
+  { to: "/announcements", labelKey: "sidebar.announcements", icon: Megaphone },
 ];
 
 const farmerItems: Array<{ to: string; label: string; icon: LucideIcon }> = [];
@@ -55,6 +56,7 @@ const farmerItems: Array<{ to: string; label: string; icon: LucideIcon }> = [];
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { profile, isLguAdmin, signOut, user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isMobile, setOpenMobile } = useSidebar();
@@ -228,7 +230,7 @@ export function AppSidebar() {
               Farm2Food <span className="text-primary">Cycle</span>
             </span>
           </Link>
-          <div className="relative z-10 shrink-0 group-data-[collapsible=icon]:[&_button]:h-8 group-data-[collapsible=icon]:[&_button]:w-8 group-data-[collapsible=icon]:[&_button]:p-0">
+          <div className="relative z-10 flex items-center gap-2 shrink-0 group-data-[collapsible=icon]:[&_button]:h-8 group-data-[collapsible=icon]:[&_button]:w-8 group-data-[collapsible=icon]:[&_button]:p-0">
             <NotificationBell />
           </div>
         </div>
@@ -237,7 +239,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
-            Community
+            {t("sidebar.community")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -257,7 +259,7 @@ export function AppSidebar() {
                         className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                       >
                         <it.icon className="h-4 w-4" />
-                        <span>{it.label}</span>
+                        <span>{t(it.labelKey)}</span>
                         {unreadCount > 0 && (
                           <Badge className="ml-auto bg-slate-500 text-white hover:bg-slate-600 text-xs h-5 min-w-[20px] flex items-center justify-center px-1.5">
                             {unreadCount > 99 ? "99+" : unreadCount}
@@ -275,7 +277,7 @@ export function AppSidebar() {
         {isLguAdmin && (
           <SidebarGroup>
             <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
-              LGU Admin
+              {t("dashboard.lguAdmin")}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -287,7 +289,7 @@ export function AppSidebar() {
                       className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                     >
                       <LayoutDashboard />
-                      <span>Dashboard</span>
+                      <span>{t("dashboard.title")}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -300,7 +302,7 @@ export function AppSidebar() {
                       className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                     >
                       <UserIcon />
-                      <span>Member's Dashboard</span>
+                      <span>{t("dashboard.membersDashboard")}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -312,7 +314,7 @@ export function AppSidebar() {
                       className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                     >
                       <FileText />
-                      <span>Reports</span>
+                      <span>{t("dashboard.reports")}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -323,7 +325,7 @@ export function AppSidebar() {
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-green-700 font-bold uppercase tracking-wider text-sm">
-            Account
+            {t("sidebar.account")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -335,7 +337,7 @@ export function AppSidebar() {
                     className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                   >
                     <UserIcon />
-                    <span>Profile</span>
+                    <span>{t("sidebar.profile")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -346,7 +348,7 @@ export function AppSidebar() {
                     className="flex items-center gap-3 rounded-full px-3 py-2 text-slate-800 transition hover:bg-green-100 hover:text-green-700"
                   >
                     <Home />
-                    <span>Back to site</span>
+                    <span>{t("sidebar.backToSite")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -399,7 +401,7 @@ export function AppSidebar() {
           }}
         >
           <LogOut className="h-4 w-4" />
-          <span className="group-data-[collapsible=icon]:hidden">Sign out</span>
+          <span className="group-data-[collapsible=icon]:hidden">{t("sidebar.signOut")}</span>
         </Button>
       </SidebarFooter>
     </Sidebar>

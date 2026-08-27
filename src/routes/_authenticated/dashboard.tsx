@@ -47,7 +47,7 @@ import {
 } from "recharts";
 
 import { useAuth } from "@/hooks/use-auth";
-
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 
 import type { Database } from "@/integrations/supabase/types";
@@ -226,6 +226,7 @@ function Stat({
 
 function DashboardPage() {
   const { isLguAdmin, profile, user } = useAuth();
+  const { t } = useLanguage();
 
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -528,8 +529,8 @@ function DashboardPage() {
   return (
     <>
       <PremiumHero
-        title="LGU Monitoring Dashboard"
-        sub={`Track produce sales, compost activity, food waste collection and member activity across ${monitoringStats.municipalityLabel}.`}
+        title={t("dashboard.title")}
+        sub={t("dashboard.subtitle").replace("{municipality}", monitoringStats.municipalityLabel)}
         action={
           <Button
             onClick={refreshData}
@@ -537,7 +538,7 @@ function DashboardPage() {
             className="bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/30"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-            {isRefreshing ? "Refreshing..." : "Refresh Data"}
+            {isRefreshing ? t("dashboard.refreshing") : t("dashboard.refreshData")}
           </Button>
         }
       />
@@ -610,10 +611,10 @@ function DashboardPage() {
                 <ArrowRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
               <div className="font-display text-lg font-bold text-slate-900 mb-1">
-                Monitoring Dashboard
+                {t("dashboard.monitoringDashboard")}
               </div>
               <div className="text-sm text-slate-600 flex-1">
-                Live municipality activity and circular economy metrics
+                {t("dashboard.monitoringDashboardDesc")}
               </div>
             </Card>
           </button>
@@ -627,10 +628,10 @@ function DashboardPage() {
                 <ArrowRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
               <div className="font-display text-lg font-bold text-slate-900 mb-1">
-                Members Dashboard
+                {t("dashboard.membersDashboard")}
               </div>
               <div className="text-sm text-slate-600 flex-1">
-                View and manage farmers, restaurant owners and buyers
+                {t("dashboard.membersDashboardDesc")}
               </div>
             </Card>
           </Link>
@@ -644,10 +645,10 @@ function DashboardPage() {
                 <ArrowRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
               <div className="font-display text-lg font-bold text-slate-900 mb-1">
-                Transactions Dashboard
+                {t("dashboard.transactionsDashboard")}
               </div>
               <div className="text-sm text-slate-600 flex-1">
-                Review marketplace purchases, sales and exchanges
+                {t("dashboard.transactionsDashboardDesc")}
               </div>
             </Card>
           </Link>
@@ -660,9 +661,9 @@ function DashboardPage() {
                 </span>
                 <ArrowRight className="h-5 w-5 text-emerald-600 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
-              <div className="font-display text-lg font-bold text-slate-900 mb-1">Reports</div>
+              <div className="font-display text-lg font-bold text-slate-900 mb-1">{t("dashboard.reports")}</div>
               <div className="text-sm text-slate-600 flex-1">
-                Generate municipality reports and export data
+                {t("dashboard.reportsDesc")}
               </div>
             </Card>
           </Link>
@@ -671,7 +672,7 @@ function DashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat
             icon={Users}
-            label="Registered members"
+            label={t("dashboard.registeredMembers")}
             value={monitoringStats.totalMembers.toLocaleString()}
             trend="+3 today"
             sub="Updated 2m ago"
@@ -679,7 +680,7 @@ function DashboardPage() {
 
           <Stat
             icon={Leaf}
-            label="Fresh produce sales"
+            label={t("dashboard.freshProduceSales")}
             value={`₱${monitoringStats.freshProduceSales.toLocaleString()}`}
             trend="+12% this week"
             sub="Monthly total"
@@ -687,7 +688,7 @@ function DashboardPage() {
 
           <Stat
             icon={Recycle}
-            label="Organic fertilizer sales"
+            label={t("dashboard.organicFertilizerSales")}
             value={`₱${monitoringStats.compostSales.toLocaleString()}`}
             trend="+8% this week"
             sub="Monthly total"
@@ -695,7 +696,7 @@ function DashboardPage() {
 
           <Stat
             icon={Truck}
-            label="Food waste collected"
+            label={t("dashboard.foodWasteCollected")}
             value={`${monitoringStats.foodWasteCollected.toLocaleString()} kg`}
             trend="+5% this week"
             sub="Monthly total"
@@ -707,10 +708,10 @@ function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-display text-lg font-bold text-slate-900">
-                  Municipality circular economy overview
+                  {t("dashboard.municipalityCircularEconomyOverview")}
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Key metrics for {monitoringStats.municipalityLabel}
+                  {t("dashboard.keyMetricsFor").replace("{municipality}", monitoringStats.municipalityLabel)}
                 </p>
               </div>
             </div>
@@ -718,10 +719,10 @@ function DashboardPage() {
               <ResponsiveContainer>
                 <BarChart
                   data={[
-                    { name: "Produce sales", value: monitoringStats.freshProduceSales },
-                    { name: "Compost sales", value: monitoringStats.compostSales },
-                    { name: "Waste collected", value: monitoringStats.foodWasteCollected },
-                    { name: "Listings", value: monitoringStats.activeListings },
+                    { name: t("dashboard.produceSales"), value: monitoringStats.freshProduceSales },
+                    { name: t("dashboard.compostSales"), value: monitoringStats.compostSales },
+                    { name: t("dashboard.wasteCollected"), value: monitoringStats.foodWasteCollected },
+                    { name: t("dashboard.listings"), value: monitoringStats.activeListings },
                   ]}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -744,8 +745,8 @@ function DashboardPage() {
           <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-display text-lg font-bold text-slate-900">Member mix</h3>
-                <p className="text-sm text-slate-500">Distribution by role</p>
+                <h3 className="font-display text-lg font-bold text-slate-900">{t("dashboard.memberMix")}</h3>
+                <p className="text-sm text-slate-500">{t("dashboard.distributionByRole")}</p>
               </div>
             </div>
             <div className="mt-4 h-56">
@@ -753,9 +754,9 @@ function DashboardPage() {
                 <PieChart>
                   <Pie
                     data={[
-                      { name: "Farmers", value: monitoringStats.farmers },
-                      { name: "Restaurants", value: monitoringStats.restaurants },
-                      { name: "Buyers", value: monitoringStats.buyers },
+                      { name: t("dashboard.farmers"), value: monitoringStats.farmers },
+                      { name: t("dashboard.restaurants"), value: monitoringStats.restaurants },
+                      { name: t("dashboard.buyers"), value: monitoringStats.buyers },
                     ]}
                     dataKey="value"
                     nameKey="name"
@@ -785,11 +786,9 @@ function DashboardPage() {
         <Card className="mt-8 p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-display text-lg font-bold text-slate-900">
-                Vegetable Sales by Type
-              </h3>
+              <h3 className="font-display text-lg font-bold text-slate-900">{t("dashboard.vegetableSalesByType")}</h3>
               <p className="text-sm text-slate-500">
-                Top 10 vegetables sold in {monitoringStats.municipalityLabel}
+                {t("dashboard.topVegetablesSold").replace("{municipality}", monitoringStats.municipalityLabel)}
               </p>
             </div>
             <div className="flex gap-2">
@@ -799,7 +798,7 @@ function DashboardPage() {
                 onClick={() => setTimePeriod("daily")}
                 className="bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 rounded-full"
               >
-                Daily
+                {t("dashboard.daily")}
               </Button>
               <Button
                 size="sm"
@@ -807,14 +806,14 @@ function DashboardPage() {
                 onClick={() => setTimePeriod("monthly")}
                 className="bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 rounded-full"
               >
-                Monthly
+                {t("dashboard.monthly")}
               </Button>
             </div>
           </div>
           <div className="mt-4 h-56">
             {vegetableSalesData.length === 0 ? (
               <div className="flex items-center justify-center h-full text-slate-500">
-                No vegetable sales data available
+                {t("dashboard.noVegetableSalesData")}
               </div>
             ) : (
               <ResponsiveContainer>
@@ -850,10 +849,10 @@ function DashboardPage() {
                 disabled={currentPage === 0}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Previous
+                {t("dashboard.previous")}
               </Button>
               <span className="text-sm text-slate-600">
-                Page {currentPage + 1} of {Math.ceil(vegetableSalesData.length / itemsPerPage)}
+                {t("dashboard.pageOf").replace("{current}", (currentPage + 1).toString()).replace("{total}", Math.ceil(vegetableSalesData.length / itemsPerPage).toString())}
               </span>
               <Button
                 size="sm"
@@ -869,7 +868,7 @@ function DashboardPage() {
                 disabled={currentPage >= Math.ceil(vegetableSalesData.length / itemsPerPage) - 1}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Next
+                {t("dashboard.next")}
               </Button>
             </div>
           )}
@@ -925,10 +924,10 @@ function DashboardPage() {
                 disabled={currentPage === 0}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Previous
+                {t("dashboard.previous")}
               </Button>
               <span className="text-sm text-slate-600">
-                Page {currentPage + 1} of {Math.ceil(foodWasteData.length / itemsPerPage)}
+                {t("dashboard.pageOf").replace("{current}", (currentPage + 1).toString()).replace("{total}", Math.ceil(foodWasteData.length / itemsPerPage).toString())}
               </span>
               <Button
                 size="sm"
@@ -941,7 +940,7 @@ function DashboardPage() {
                 disabled={currentPage >= Math.ceil(foodWasteData.length / itemsPerPage) - 1}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Next
+                {t("dashboard.next")}
               </Button>
             </div>
           )}
@@ -997,26 +996,23 @@ function DashboardPage() {
                 disabled={currentPage === 0}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Previous
+                {t("dashboard.previous")}
               </Button>
               <span className="text-sm text-slate-600">
-                Page {currentPage + 1} of {Math.ceil(compostSalesData.length / itemsPerPage)}
+                {t("dashboard.pageOf").replace("{current}", (currentPage + 1).toString()).replace("{total}", Math.ceil(compostSalesData.length / itemsPerPage).toString())}
               </span>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() =>
                   setCurrentPage(
-                    Math.min(
-                      Math.ceil(compostSalesData.length / itemsPerPage) - 1,
-                      currentPage + 1,
-                    ),
+                    Math.min(Math.ceil(compostSalesData.length / itemsPerPage) - 1, currentPage + 1),
                   )
                 }
                 disabled={currentPage >= Math.ceil(compostSalesData.length / itemsPerPage) - 1}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-full"
               >
-                Next
+                {t("dashboard.next")}
               </Button>
             </div>
           )}

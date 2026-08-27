@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { roleMeta } from "@/data/mock";
@@ -83,6 +84,7 @@ interface Transaction {
 
 export function TransactionHistoryPage() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -323,8 +325,8 @@ export function TransactionHistoryPage() {
   return (
     <>
       <PremiumHero
-        title="Transaction History"
-        sub="View your complete transaction history including purchases, trades, and exchanges with detailed status tracking."
+        title={t('transactions.title')}
+        sub={t('transactions.subtitle')}
       />
       <Container className="py-12">
         {/* Analytics Cards */}
@@ -339,7 +341,7 @@ export function TransactionHistoryPage() {
             <div className="mt-5 font-display text-4xl font-bold text-slate-900">
               {analytics.totalTransactions}
             </div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Total Transactions</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">{t('transactions.totalTransactions')}</div>
           </Card>
           <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-green-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -353,7 +355,7 @@ export function TransactionHistoryPage() {
             <div className="mt-5 font-display text-4xl font-bold text-slate-900">
               {analytics.completedTransactions}
             </div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Completed</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">{t('transactions.completed')}</div>
           </Card>
           <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -364,7 +366,7 @@ export function TransactionHistoryPage() {
             <div className="mt-5 font-display text-4xl font-bold text-slate-900">
               {analytics.totalTrades}
             </div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Trades</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">{t('transactions.trades')}</div>
           </Card>
           <Card className="p-6 bg-gradient-to-br from-purple-50 to-violet-50 border-purple-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -375,7 +377,7 @@ export function TransactionHistoryPage() {
             <div className="mt-5 font-display text-4xl font-bold text-slate-900">
               {analytics.totalPurchases}
             </div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Purchases</div>
+            <div className="text-sm font-medium text-slate-600 mt-1">{t('transactions.purchases')}</div>
           </Card>
         </div>
 
@@ -387,7 +389,7 @@ export function TransactionHistoryPage() {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search transactions by product, seller, or buyer..."
+                placeholder={t('transactions.searchPlaceholder')}
                 className="h-14 pl-12 pr-4 text-base rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
               />
             </div>
@@ -395,12 +397,12 @@ export function TransactionHistoryPage() {
             {/* Filter Chips */}
             <div className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-600">Sort:</span>
+                <span className="text-sm font-medium text-slate-600">{t('transactions.sort')}:</span>
                 <div className="flex gap-2">
                   {[
-                    { id: "date_desc", label: "Newest" },
-                    { id: "date_asc", label: "Oldest" },
-                    { id: "status", label: "Status" },
+                    { id: "date_desc", label: t('transactions.newest') },
+                    { id: "date_asc", label: t('transactions.oldest') },
+                    { id: "status", label: t('transactions.status') },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -418,12 +420,12 @@ export function TransactionHistoryPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-600">Type:</span>
+                <span className="text-sm font-medium text-slate-600">{t('transactions.type')}:</span>
                 <div className="flex gap-2">
                   {[
-                    { id: "all", label: "All" },
-                    { id: "trade", label: "Trades" },
-                    { id: "purchase", label: "Purchases" },
+                    { id: "all", label: t('transactions.all') },
+                    { id: "trade", label: t('transactions.trades') },
+                    { id: "purchase", label: t('transactions.purchases') },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -441,16 +443,16 @@ export function TransactionHistoryPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-600">Status:</span>
+                <span className="text-sm font-medium text-slate-600">{t('transactions.status')}:</span>
                 <div className="flex gap-2">
                   {[
-                    { id: "all", label: "All" },
-                    { id: "pending", label: "Pending" },
-                    { id: "approved", label: "Approved" },
-                    { id: "in_progress", label: "In Progress" },
-                    { id: "completed", label: "Completed" },
-                    { id: "cancelled", label: "Cancelled" },
-                    { id: "rejected", label: "Rejected" },
+                    { id: "all", label: t('transactions.all') },
+                    { id: "pending", label: t('transactions.pending') },
+                    { id: "approved", label: t('transactions.approved') },
+                    { id: "in_progress", label: t('transactions.inProgress') },
+                    { id: "completed", label: t('transactions.completed') },
+                    { id: "cancelled", label: t('transactions.cancelled') },
+                    { id: "rejected", label: t('transactions.rejected') },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -475,15 +477,15 @@ export function TransactionHistoryPage() {
           <Card className="p-12 text-center">
             <div className="flex flex-col items-center gap-4">
               <div className="h-8 w-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-              <p className="text-slate-600 font-medium">Loading transactions...</p>
+              <p className="text-slate-600 font-medium">{t('transactions.loading')}</p>
             </div>
           </Card>
         ) : filteredTransactions.length === 0 ? (
           <Card className="p-12 text-center">
             <Package className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-            <p className="text-slate-600 font-medium">No transactions found</p>
+            <p className="text-slate-600 font-medium">{t('transactions.noTransactions')}</p>
             <p className="text-sm text-slate-400 mt-1">
-              Try adjusting your filters or search terms
+              {t('transactions.tryAdjustingFilters')}
             </p>
           </Card>
         ) : (
@@ -576,13 +578,13 @@ export function TransactionHistoryPage() {
                         {/* Seller/Buyer Info */}
                         <div className="text-sm">
                           <span className="text-slate-500">
-                            {transaction.type === "trade" ? "Trade between" : "Purchase from"}{" "}
+                            {transaction.type === "trade" ? t('transactions.tradeBetween') : t('transactions.purchaseFrom')}{" "}
                             <span className="font-semibold text-slate-900">
                               {transaction.seller_name || transaction.from_name}
                             </span>
                             {transaction.buyer_name && (
                               <span className="text-slate-500">
-                                {" and "}
+                                {" " + t('transactions.and') + " "}
                                 <span className="font-semibold text-slate-900">
                                   {transaction.buyer_name}
                                 </span>
@@ -600,7 +602,7 @@ export function TransactionHistoryPage() {
                           className="rounded-full px-5 py-2.5 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 transition-all duration-200 group"
                           onClick={() => setSelectedTransaction(transaction)}
                         >
-                          View Details
+                          {t('transactions.viewDetails')}
                           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </Button>
                       </div>
@@ -617,17 +619,17 @@ export function TransactionHistoryPage() {
           <Card className="p-6 mt-8 bg-white/80 backdrop-blur-sm border-slate-200">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-slate-600 font-medium">
-                Showing{" "}
+                {t('transactions.showing')}{" "}
                 <span className="text-slate-900 font-semibold">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>{" "}
-                to{" "}
+                {t('transactions.to')}{" "}
                 <span className="text-slate-900 font-semibold">
                   {Math.min(currentPage * itemsPerPage, filteredTransactions.length)}
                 </span>{" "}
-                of{" "}
+                {t('transactions.of')}{" "}
                 <span className="text-slate-900 font-semibold">{filteredTransactions.length}</span>{" "}
-                transactions
+                {t('transactions.transactions')}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -637,7 +639,7 @@ export function TransactionHistoryPage() {
                   disabled={currentPage === 1}
                   className="rounded-full px-4 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:border-slate-300 disabled:hover:text-slate-700 transition-all"
                 >
-                  Previous
+                  {t('transactions.previous')}
                 </Button>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -663,7 +665,7 @@ export function TransactionHistoryPage() {
                   disabled={currentPage === totalPages}
                   className="rounded-full px-4 border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:border-slate-300 disabled:hover:text-slate-700 transition-all"
                 >
-                  Next
+                  {t('transactions.next')}
                 </Button>
               </div>
             </div>

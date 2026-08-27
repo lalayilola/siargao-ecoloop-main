@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -161,6 +162,7 @@ const canBuyListing = (
 };
 
 export function MarketplaceView() {
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
 
   const [listings, setListings] = useState<Listing[]>([]);
@@ -1081,8 +1083,8 @@ export function MarketplaceView() {
   return (
     <>
       <PremiumHero
-        title="Marketplace"
-        sub="Find fresh produce, food waste, and compost from verified sellers across Siargao."
+        title={t("marketplace.title")}
+        sub={t("marketplace.subtitle")}
         action={
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl">
             <div className="relative flex-1 group">
@@ -1090,7 +1092,7 @@ export function MarketplaceView() {
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search products, sellers, or municipalities..."
+                placeholder={t("marketplace.searchPlaceholder")}
                 className="h-14 pl-12 pr-4 rounded-2xl border-2 border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 bg-white shadow-md hover:shadow-lg transition-all duration-200"
               />
             </div>
@@ -1109,7 +1111,7 @@ export function MarketplaceView() {
                   }
                 }}
               >
-                <Plus className="mr-2 h-5 w-5" /> New Listing
+                <Plus className="mr-2 h-5 w-5" /> {t("marketplace.newListing")}
               </Button>
             )}
           </div>
@@ -1149,7 +1151,7 @@ export function MarketplaceView() {
             className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
             onClick={() => setShowFilters(!showFilters)}
           >
-            <Filter className="mr-1 h-4 w-4" /> Filters
+            <Filter className="mr-1 h-4 w-4" /> {t("marketplace.filterBy")}
           </Button>
         </div>
 
@@ -1157,7 +1159,7 @@ export function MarketplaceView() {
           <Card className="mb-6 p-4 border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10 shadow-sm shadow-primary/10">
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
-                <Label className="mb-2 block text-sm font-medium text-primary">User Type</Label>
+                <Label className="mb-2 block text-sm font-medium text-primary">{t("marketplace.userRole")}</Label>
 
                 <Select
                   value={filterUserRole}
@@ -1166,17 +1168,19 @@ export function MarketplaceView() {
                   ) => setFilterUserRole(value)}
                 >
                   <SelectTrigger className="border-primary/30 focus:border-primary focus:ring-primary/50">
-                    <SelectValue placeholder="All users" />
+                    <SelectValue placeholder={t("marketplace.allRoles")} />
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="all">All Users</SelectItem>
+                    <SelectItem value="all">{t("marketplace.allRoles")}</SelectItem>
 
-                    <SelectItem value="farmer">Farmers</SelectItem>
+                    <SelectItem value="farmer">{t("marketplace.farmers")}</SelectItem>
 
-                    <SelectItem value="restaurant">Restaurants</SelectItem>
+                    <SelectItem value="restaurant">{t("marketplace.restaurants")}</SelectItem>
 
-                    <SelectItem value="resident">Residents</SelectItem>
+                    <SelectItem value="resident">{t("marketplace.residents")}</SelectItem>
+
+                    <SelectItem value="lgu">{t("marketplace.lgu")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1495,7 +1499,7 @@ export function MarketplaceView() {
               value="produce"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white text-slate-700"
             >
-              🌾 Fresh Produce
+              🌾 {t("marketplace.freshProduce")}
             </TabsTrigger>
 
             {(profile?.primary_role === "restaurant" || profile?.primary_role === "lgu_admin") && (
@@ -1503,7 +1507,7 @@ export function MarketplaceView() {
                 value="waste"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700"
               >
-                🍽️ Food Waste
+                🍽️ {t("marketplace.foodWaste")}
               </TabsTrigger>
             )}
 
@@ -1512,7 +1516,7 @@ export function MarketplaceView() {
                 value="compost"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-secondary data-[state=active]:to-primary data-[state=active]:text-white text-slate-700"
               >
-                🧪 Compost
+                🧪 {t("marketplace.compost")}
               </TabsTrigger>
             )}
           </TabsList>

@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import {
   AlertCircle,
@@ -127,6 +128,7 @@ const titleCase = (value: string) => value.charAt(0).toUpperCase() + value.slice
 
 function UserAnnouncements() {
   const { user, isLguAdmin } = useAuth();
+  const { t } = useLanguage();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -240,11 +242,11 @@ function UserAnnouncements() {
       } as any);
 
       if (error) throw error;
-      toast.success("Comment added successfully");
+      toast.success(t("announcements.commentAdded"));
       setNewComment("");
       loadComments();
     } catch (error: any) {
-      toast.error(`Failed to add comment: ${error.message}`);
+      toast.error(`${t("announcements.failedToAddComment")}: ${error.message}`);
     }
   };
 
@@ -293,14 +295,14 @@ function UserAnnouncements() {
       } as any);
 
       if (error) throw error;
-      toast.success("Announcement published successfully");
+      toast.success(t("announcements.announcementPublished"));
       setIsCreateDialogOpen(false);
       setFormData({ title: "", content: "", category: "general", importance: "normal" });
       setSelectedImages([]);
       setImagePreviews([]);
       loadAnnouncements();
     } catch (error: any) {
-      toast.error(`Failed to publish announcement: ${error.message}`);
+      toast.error(`${t("announcements.failedToPublish")}: ${error.message}`);
     }
   };
 
@@ -361,14 +363,14 @@ function UserAnnouncements() {
         .eq("id", editingAnnouncement.id);
 
       if (error) throw error;
-      toast.success("Announcement updated successfully");
+      toast.success(t("announcements.announcementUpdated"));
       setEditingAnnouncement(null);
       setFormData({ title: "", content: "", category: "general", importance: "normal" });
       setSelectedImages([]);
       setImagePreviews([]);
       loadAnnouncements();
     } catch (error: any) {
-      toast.error(`Failed to update announcement: ${error.message}`);
+      toast.error(`${t("announcements.failedToUpdate")}: ${error.message}`);
     }
   };
 
@@ -379,10 +381,10 @@ function UserAnnouncements() {
       const { error } = await supabase.from("announcements").delete().eq("id", id);
 
       if (error) throw error;
-      toast.success("Announcement deleted successfully");
+      toast.success(t("announcements.announcementDeleted"));
       loadAnnouncements();
     } catch (error: any) {
-      toast.error(`Failed to delete announcement: ${error.message}`);
+      toast.error(`${t("announcements.failedToDelete")}: ${error.message}`);
     }
   };
 
@@ -407,13 +409,13 @@ function UserAnnouncements() {
     Array.from(files).forEach((file) => {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        toast.error("Please select only image files");
+        toast.error(t("announcements.selectOnlyImages"));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size must be less than 5MB");
+        toast.error(t("announcements.imageSizeLimit"));
         return;
       }
 
@@ -481,9 +483,9 @@ function UserAnnouncements() {
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-primary" />
-          <h2 className="mt-3 font-display text-2xl font-semibold">Authentication required</h2>
+          <h2 className="mt-3 font-display text-2xl font-semibold">{t("announcements.authenticationRequired")}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Please sign in to view announcements.
+            {t("announcements.pleaseSignIn")}
           </p>
         </Card>
       </Container>
@@ -493,11 +495,11 @@ function UserAnnouncements() {
   return (
     <>
       <PremiumHero
-        title="Community Announcements"
+        title={t("announcements.title")}
         sub={
           isLguAdmin
-            ? "Keep Siargao informed with timely community news, advisories, and events."
-            : "Stay informed with the latest news, advisories, and events from your Local Government Unit."
+            ? t("announcements.subtitleAdmin")
+            : t("announcements.subtitleUser")
         }
       />
       <Container className="py-8 sm:py-10">
@@ -507,13 +509,13 @@ function UserAnnouncements() {
               <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-100">
                 <BellRing className="h-4 w-4" />
               </span>
-              Community bulletin
+              {t("announcements.bulletin")}
             </div>
             <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              What’s happening in Siargao
+              {t("announcements.heading")}
             </h2>
             <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-              Browse official updates, share a reaction, or join the conversation.
+              {t("announcements.description")}
             </p>
           </div>
 
@@ -523,7 +525,7 @@ function UserAnnouncements() {
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="h-11 rounded-xl bg-emerald-600 px-5 text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700">
-                    <Plus className="mr-2 h-4 w-4" /> New announcement
+                    <Plus className="mr-2 h-4 w-4" /> {t("announcements.newAnnouncement")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-2xl">
@@ -532,10 +534,10 @@ function UserAnnouncements() {
                       <Megaphone className="h-5 w-5" />
                     </div>
                     <DialogTitle className="font-display text-2xl">
-                      Create a new announcement
+                      {t("announcements.createAnnouncement")}
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">
-                      Share a clear, timely update with the community.
+                      {t("announcements.createDescription")}
                     </p>
                   </DialogHeader>
                   <form onSubmit={handleCreateAnnouncement} className="space-y-5">
@@ -544,13 +546,13 @@ function UserAnnouncements() {
                         htmlFor="announcement-title"
                         className="mb-1.5 block text-sm font-semibold text-slate-700"
                       >
-                        Title
+                        {t("announcements.titleLabel")}
                       </label>
                       <Input
                         id="announcement-title"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="e.g. Coastal clean-up this Saturday"
+                        placeholder={t("announcements.titlePlaceholder")}
                         className="h-11 rounded-xl"
                         required
                       />
@@ -560,13 +562,13 @@ function UserAnnouncements() {
                         htmlFor="announcement-content"
                         className="mb-1.5 block text-sm font-semibold text-slate-700"
                       >
-                        Message
+                        {t("announcements.message")}
                       </label>
                       <Textarea
                         id="announcement-content"
                         value={formData.content}
                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                        placeholder="Include the important details your community needs to know…"
+                        placeholder={t("announcements.messagePlaceholder")}
                         rows={6}
                         className="resize-none rounded-xl"
                         required
@@ -574,7 +576,7 @@ function UserAnnouncements() {
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-slate-700">
-                        Images <span className="font-normal text-slate-400">(optional)</span>
+                        {t("announcements.images")} <span className="font-normal text-slate-400">{t("announcements.imagesOptional")}</span>
                       </label>
                       <div className="mt-2">
                         {imagePreviews.length > 0 && (
@@ -620,14 +622,14 @@ function UserAnnouncements() {
                           className="h-11 w-full rounded-xl border-dashed"
                         >
                           <ImageIcon className="h-4 w-4 mr-2" />
-                          {imagePreviews.length > 0 ? "Add more images" : "Upload images"}
+                          {imagePreviews.length > 0 ? t("announcements.addMoreImages") : t("announcements.uploadImages")}
                         </Button>
                       </div>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-slate-700">
-                          Category
+                          {t("announcements.category")}
                         </label>
                         <Select
                           value={formData.category}
@@ -637,16 +639,16 @@ function UserAnnouncements() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="general">General</SelectItem>
-                            <SelectItem value="emergency">Emergency</SelectItem>
-                            <SelectItem value="event">Event</SelectItem>
-                            <SelectItem value="policy">Policy</SelectItem>
+                            <SelectItem value="general">{t("announcements.general")}</SelectItem>
+                            <SelectItem value="emergency">{t("announcements.emergency")}</SelectItem>
+                            <SelectItem value="event">{t("announcements.event")}</SelectItem>
+                            <SelectItem value="policy">{t("announcements.policy")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-slate-700">
-                          Priority
+                          {t("announcements.priority")}
                         </label>
                         <Select
                           value={formData.importance}
@@ -656,9 +658,9 @@ function UserAnnouncements() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="normal">Normal</SelectItem>
-                            <SelectItem value="important">Important</SelectItem>
-                            <SelectItem value="urgent">Urgent</SelectItem>
+                            <SelectItem value="normal">{t("announcements.normal")}</SelectItem>
+                            <SelectItem value="important">{t("announcements.important")}</SelectItem>
+                            <SelectItem value="urgent">{t("announcements.urgent")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -673,14 +675,14 @@ function UserAnnouncements() {
                           clearAllImages();
                         }}
                       >
-                        Cancel
+                        {t("announcements.cancel")}
                       </Button>
                       <Button
                         type="submit"
                         className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
                       >
                         <Megaphone className="mr-2 h-4 w-4" />
-                        Publish announcement
+                        {t("announcements.publishAnnouncement")}
                       </Button>
                     </div>
                   </form>
@@ -700,30 +702,30 @@ function UserAnnouncements() {
           >
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Edit Announcement</DialogTitle>
+                <DialogTitle>{t("announcements.editAnnouncement")}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleEditAnnouncement} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">Title</label>
+                  <label className="text-sm font-medium">{t("announcements.title")}</label>
                   <Input
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Announcement title"
+                    placeholder={t("announcements.titlePlaceholder")}
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Content</label>
+                  <label className="text-sm font-medium">{t("announcements.message")}</label>
                   <Textarea
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Announcement content"
+                    placeholder={t("announcements.messagePlaceholder")}
                     rows={6}
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Images (optional)</label>
+                  <label className="text-sm font-medium">{t("announcements.images")} {t("announcements.imagesOptional")}</label>
                   <div className="mt-2">
                     {imagePreviews.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-2">
@@ -767,13 +769,13 @@ function UserAnnouncements() {
                       className="w-full"
                     >
                       <ImageIcon className="h-4 w-4 mr-2" />
-                      {imagePreviews.length > 0 ? "Add more images" : "Upload images"}
+                      {imagePreviews.length > 0 ? t("announcements.addMoreImages") : t("announcements.uploadImages")}
                     </Button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Category</label>
+                    <label className="text-sm font-medium">{t("announcements.category")}</label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -782,15 +784,15 @@ function UserAnnouncements() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="emergency">Emergency</SelectItem>
-                        <SelectItem value="event">Event</SelectItem>
-                        <SelectItem value="policy">Policy</SelectItem>
+                        <SelectItem value="general">{t("announcements.general")}</SelectItem>
+                        <SelectItem value="emergency">{t("announcements.emergency")}</SelectItem>
+                        <SelectItem value="event">{t("announcements.event")}</SelectItem>
+                        <SelectItem value="policy">{t("announcements.policy")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Importance</label>
+                    <label className="text-sm font-medium">{t("announcements.priority")}</label>
                     <Select
                       value={formData.importance}
                       onValueChange={(value) => setFormData({ ...formData, importance: value })}
@@ -799,9 +801,9 @@ function UserAnnouncements() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="normal">Normal</SelectItem>
-                        <SelectItem value="important">Important</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
+                        <SelectItem value="normal">{t("announcements.normal")}</SelectItem>
+                        <SelectItem value="important">{t("announcements.important")}</SelectItem>
+                        <SelectItem value="urgent">{t("announcements.urgent")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -815,9 +817,9 @@ function UserAnnouncements() {
                       clearAllImages();
                     }}
                   >
-                    Cancel
+                    {t("announcements.cancel")}
                   </Button>
-                  <Button type="submit">Update</Button>
+                  <Button type="submit">{t("announcements.update")}</Button>
                 </div>
               </form>
             </DialogContent>
@@ -835,12 +837,12 @@ function UserAnnouncements() {
                 <div>
                   <p className="font-semibold text-slate-900">
                     {announcements.length}{" "}
-                    {announcements.length === 1 ? "published update" : "published updates"}
+                    {announcements.length === 1 ? t("announcements.publishedUpdate") : t("announcements.publishedUpdates")}
                   </p>
                   <p className="text-xs text-slate-500">
                     {urgentCount > 0
-                      ? `${urgentCount} marked urgent`
-                      : "You’re all caught up on urgent notices"}
+                      ? `${urgentCount} ${t("announcements.markedUrgent")}`
+                      : t("announcements.allCaughtUp")}
                   </p>
                 </div>
               </div>
@@ -853,7 +855,7 @@ function UserAnnouncements() {
                   className="rounded-lg text-slate-600 hover:bg-white hover:text-emerald-700"
                 >
                   <RotateCcw className="mr-2 h-3.5 w-3.5" />
-                  Clear {activeFilterCount} {activeFilterCount === 1 ? "filter" : "filters"}
+                  {t("announcements.clearFilters").replace("{count}", activeFilterCount.toString()).replace("{filter}", activeFilterCount === 1 ? t("announcements.filter") : t("announcements.filters"))}
                 </Button>
               )}
             </div>
@@ -863,7 +865,7 @@ function UserAnnouncements() {
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 aria-label="Search announcements"
-                placeholder="Search by title or keyword"
+                placeholder={t("announcements.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 transition-colors focus:bg-white"
@@ -881,25 +883,25 @@ function UserAnnouncements() {
             </div>
             <Select value={filterCategory} onValueChange={setFilterCategory}>
               <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder={t("announcements.category")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="emergency">Emergency</SelectItem>
-                <SelectItem value="event">Event</SelectItem>
-                <SelectItem value="policy">Policy</SelectItem>
+                <SelectItem value="all">{t("announcements.allCategories")}</SelectItem>
+                <SelectItem value="general">{t("announcements.general")}</SelectItem>
+                <SelectItem value="emergency">{t("announcements.emergency")}</SelectItem>
+                <SelectItem value="event">{t("announcements.event")}</SelectItem>
+                <SelectItem value="policy">{t("announcements.policy")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterImportance} onValueChange={setFilterImportance}>
               <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white">
-                <SelectValue placeholder="Priority" />
+                <SelectValue placeholder={t("announcements.priority")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All priorities</SelectItem>
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="important">Important</SelectItem>
-                <SelectItem value="urgent">Urgent</SelectItem>
+                <SelectItem value="all">{t("announcements.allPriorities")}</SelectItem>
+                <SelectItem value="normal">{t("announcements.normal")}</SelectItem>
+                <SelectItem value="important">{t("announcements.important")}</SelectItem>
+                <SelectItem value="urgent">{t("announcements.urgent")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -908,11 +910,11 @@ function UserAnnouncements() {
         {!loading && filteredAnnouncements.length > 0 && (
           <div className="mb-4 flex items-center justify-between">
             <p className="text-sm font-medium text-slate-600">
-              Showing{" "}
+              {t("announcements.showing")}{" "}
               <span className="font-bold text-slate-900">{filteredAnnouncements.length}</span>{" "}
-              {filteredAnnouncements.length === 1 ? "announcement" : "announcements"}
+              {filteredAnnouncements.length === 1 ? t("announcements.announcement") : t("announcements.announcements")}
             </p>
-            <p className="hidden text-xs text-slate-400 sm:block">Newest updates appear first</p>
+            <p className="hidden text-xs text-slate-400 sm:block">{t("announcements.newestFirst")}</p>
           </div>
         )}
 
@@ -945,12 +947,12 @@ function UserAnnouncements() {
               <Megaphone className="h-8 w-8" />
             </span>
             <h3 className="mt-5 font-display text-xl font-bold text-slate-900">
-              {activeFilterCount > 0 ? "No matching announcements" : "No announcements yet"}
+              {activeFilterCount > 0 ? t("announcements.noMatchingAnnouncements") : t("announcements.noAnnouncementsYet")}
             </h3>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
               {activeFilterCount > 0
-                ? "Try a different keyword or clear your filters to see all community updates."
-                : "Official community updates will appear here as soon as they are published."}
+                ? t("announcements.noMatchingDescription")
+                : t("announcements.noAnnouncementsDescription")}
             </p>
             {activeFilterCount > 0 && (
               <Button
@@ -960,7 +962,7 @@ function UserAnnouncements() {
                 className="mt-5 rounded-xl bg-white"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Clear all filters
+                {t("announcements.clearAllFilters")}
               </Button>
             )}
           </Card>
@@ -1004,7 +1006,7 @@ function UserAnnouncements() {
                             <Megaphone className="h-8 w-8" />
                           </span>
                           <span className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700/70">
-                            Official update
+                            {t("announcements.officialUpdate")}
                           </span>
                         </div>
                       )}
@@ -1018,7 +1020,7 @@ function UserAnnouncements() {
                       {isUrgent && (
                         <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-rose-950/20">
                           <AlertCircle className="h-3.5 w-3.5" />
-                          Urgent notice
+                          {t("announcements.urgentNotice")}
                         </span>
                       )}
                     </button>
@@ -1054,21 +1056,21 @@ function UserAnnouncements() {
                               className="h-8 rounded-lg px-2.5 text-slate-500 hover:bg-emerald-50 hover:text-emerald-700"
                             >
                               <Edit className="mr-1 h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">Edit</span>
+                              <span className="hidden sm:inline">{t("announcements.edit")}</span>
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (confirm("Are you sure you want to delete this announcement?")) {
+                                if (confirm(t("announcements.deleteConfirmation"))) {
                                   handleDeleteAnnouncement(announcement.id);
                                 }
                               }}
                               className="h-8 rounded-lg px-2.5 text-slate-500 hover:bg-rose-50 hover:text-rose-700"
                             >
                               <Trash2 className="mr-1 h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">Delete</span>
+                              <span className="hidden sm:inline">{t("announcements.delete")}</span>
                             </Button>
                           </div>
                         )}
@@ -1153,7 +1155,7 @@ function UserAnnouncements() {
                           className="h-9 rounded-full px-3 font-semibold text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
                           onClick={() => setSelectedAnnouncement(announcement)}
                         >
-                          Read full update
+                          {t("announcements.readFullUpdate")}
                           <ChevronRight className="ml-1 h-4 w-4" />
                         </Button>
                       </div>

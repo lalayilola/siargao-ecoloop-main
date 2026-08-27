@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Trash2, FolderOpen, Clock, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -13,6 +14,7 @@ type WasteReport = Database["public"]["Tables"]["food_waste_reports"]["Row"];
 type WasteCollection = Database["public"]["Tables"]["waste_collections"]["Row"];
 
 export function WasteCollectionView() {
+  const { t } = useLanguage();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [reports, setReports] = useState<WasteReport[]>([]);
@@ -95,9 +97,9 @@ export function WasteCollectionView() {
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <FolderOpen className="mx-auto h-12 w-12 text-accent mb-4" />
-          <h2 className="text-2xl font-semibold text-accent">Collection Requests</h2>
+          <h2 className="text-2xl font-semibold text-accent">{t("wasteCollection.title")}</h2>
           <p className="text-slate-600 mt-2">
-            This page is for restaurants to track waste pickup requests.
+            {t("wasteCollection.onlyForRestaurants")}
           </p>
         </Card>
       </Container>
@@ -109,36 +111,36 @@ export function WasteCollectionView() {
       <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">
-            Collection Requests
+            {t("wasteCollection.title")}
           </h1>
           <p className="text-slate-600">
-            Track your food waste reports and scheduled pickup details.
+            {t("wasteCollection.subtitle")}
           </p>
         </div>
         <Button
           className="bg-accent hover:bg-accent/90 text-white gap-2"
           onClick={() => navigate({ to: "/waste-reports" })}
         >
-          <Plus className="h-4 w-4" /> Request Collection
+          <Plus className="h-4 w-4" /> {t("wasteCollection.requestCollection")}
         </Button>
       </div>
 
       {isLoading ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-600">Loading collection requests...</p>
+          <p className="text-slate-600">{t("wasteCollection.loading")}</p>
         </Card>
       ) : reports.length === 0 ? (
         <Card className="p-12 text-center border-2 border-accent/20">
           <MapPin className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">No collection requests yet</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">{t("wasteCollection.noRequests")}</h2>
           <p className="text-slate-600 mb-6">
-            Submit a waste report so the LGU can schedule a pickup.
+            {t("wasteCollection.noRequestsDescription")}
           </p>
           <Button
             className="bg-accent hover:bg-accent/90 text-white gap-2 mx-auto"
             onClick={() => navigate({ to: "/waste-reports" })}
           >
-            <Plus className="h-4 w-4" /> Submit a Waste Report
+            <Plus className="h-4 w-4" /> {t("wasteCollection.submitWasteReport")}
           </Button>
         </Card>
       ) : (
@@ -173,17 +175,17 @@ export function WasteCollectionView() {
                     </div>
                     {collection && (
                       <p className="text-sm text-slate-600">
-                        Collection scheduled:{" "}
-                        {new Date(collection.scheduled_date).toLocaleDateString()} • Status:{" "}
+                        {t("wasteCollection.collectionScheduled")}:{" "}
+                        {new Date(collection.scheduled_date).toLocaleDateString()} • {t("wasteCollection.status")}:{" "}
                         {collection.status}
                       </p>
                     )}
                   </div>
                   <div className="rounded-3xl bg-secondary/10 px-4 py-3 text-slate-700 text-sm">
-                    <p className="font-semibold">Submitted</p>
+                    <p className="font-semibold">{t("wasteCollection.submitted")}</p>
                     <p>{new Date(report.created_at).toLocaleDateString()}</p>
                     <p className="mt-1 flex items-center gap-2 text-slate-500">
-                      <Clock className="h-4 w-4" /> Awaiting LGU collection
+                      <Clock className="h-4 w-4" /> {t("wasteCollection.awaitingCollection")}
                     </p>
                   </div>
                 </div>

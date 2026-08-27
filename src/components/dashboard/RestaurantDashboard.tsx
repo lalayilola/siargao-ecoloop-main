@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { UtensilsCrossed, TrendingUp, Package, Leaf } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -14,6 +15,7 @@ type WasteCollection = Database["public"]["Tables"]["waste_collections"]["Row"];
 
 export function RestaurantDashboard() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     wasteReports: 0,
     collectionRequests: 0,
@@ -59,7 +61,7 @@ export function RestaurantDashboard() {
 
   const statCards = [
     {
-      title: "Waste Reports",
+      title: t("restaurantDashboard.wasteReports"),
       value: stats.wasteReports,
       icon: Leaf,
       color: "text-green-600",
@@ -67,7 +69,7 @@ export function RestaurantDashboard() {
       link: "/waste-reports",
     },
     {
-      title: "Collection Requests",
+      title: t("restaurantDashboard.collectionRequests"),
       value: stats.collectionRequests,
       icon: Package,
       color: "text-blue-600",
@@ -78,14 +80,14 @@ export function RestaurantDashboard() {
 
   const quickActions = [
     {
-      title: "Browse Produce",
-      description: "Find fresh produce from local farmers",
+      title: t("restaurantDashboard.browseProduce"),
+      description: t("restaurantDashboard.findFreshProduce"),
       icon: Leaf,
       link: "/marketplace",
     },
     {
-      title: "View Activity",
-      description: "Review recent trades and requests",
+      title: t("restaurantDashboard.viewActivity"),
+      description: t("restaurantDashboard.reviewRecentTrades"),
       icon: Package,
       link: "/trades",
     },
@@ -96,9 +98,9 @@ export function RestaurantDashboard() {
       <Container className="py-12">
         <Card className="p-8 text-center border-2 border-accent/30 bg-gradient-to-br from-white to-accent/10">
           <UtensilsCrossed className="h-16 w-16 text-accent mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-accent mb-2">Restaurant Dashboard</h2>
+          <h2 className="text-2xl font-semibold text-accent mb-2">{t("restaurantDashboard.title")}</h2>
           <p className="text-slate-600">
-            This dashboard is only available for restaurants and hotels.
+            {t("restaurantDashboard.onlyForRestaurants")}
           </p>
         </Card>
       </Container>
@@ -109,9 +111,9 @@ export function RestaurantDashboard() {
     <Container className="py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-accent mb-2">
-          Welcome, {profile.full_name}
+          {t("restaurantDashboard.welcome")}, {profile.full_name}
         </h1>
-        <p className="text-slate-600">Manage your produce sourcing and recent activity.</p>
+        <p className="text-slate-600">{t("restaurantDashboard.manageSourcing")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -133,7 +135,7 @@ export function RestaurantDashboard() {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-accent mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-semibold text-accent mb-4">{t("restaurantDashboard.quickActions")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => (
             <Link key={action.title} to={action.link}>
@@ -149,12 +151,12 @@ export function RestaurantDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-xl font-semibold text-accent mb-4">Recent Orders</h2>
+          <h2 className="text-xl font-semibold text-accent mb-4">{t("restaurantDashboard.recentOrders")}</h2>
           <Card className="border-2 border-accent/20 bg-gradient-to-br from-white to-accent/10">
             {recentActivity.length === 0 ? (
               <div className="p-8 text-center">
                 <Package className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-600">No recent orders</p>
+                <p className="text-slate-600">{t("restaurantDashboard.noRecentOrders")}</p>
               </div>
             ) : (
               <div className="divide-y divide-accent/10">
@@ -188,7 +190,7 @@ export function RestaurantDashboard() {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold text-accent mb-4">Quick Links</h2>
+          <h2 className="text-xl font-semibold text-accent mb-4">{t("restaurantDashboard.quickLinks")}</h2>
           <div className="space-y-4">
             <Link to="/messages">
               <Card className="p-6 border-2 border-accent/20 bg-gradient-to-br from-white to-accent/10 hover:border-accent/40 transition-all cursor-pointer">
@@ -197,9 +199,9 @@ export function RestaurantDashboard() {
                     <Leaf className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900">Messages</h3>
+                    <h3 className="font-semibold text-slate-900">{t("restaurantDashboard.messages")}</h3>
                     <p className="text-sm text-slate-600">
-                      Stay connected with farmers and suppliers
+                      {t("restaurantDashboard.stayConnected")}
                     </p>
                   </div>
                 </div>

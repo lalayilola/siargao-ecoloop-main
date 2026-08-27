@@ -13,6 +13,7 @@ import {
   ShoppingCart as OrdersIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -24,6 +25,7 @@ type PurchaseRequest = Database["public"]["Tables"]["purchase_requests"]["Row"];
 
 export function FarmerDashboard() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     totalListings: 0,
     activeListings: 0,
@@ -90,7 +92,7 @@ export function FarmerDashboard() {
 
   const statCards = [
     {
-      title: "Active Listings",
+      title: t("farmerDashboard.activeListings"),
       value: stats.activeListings,
       icon: Sprout,
       color: "text-green-600",
@@ -98,7 +100,7 @@ export function FarmerDashboard() {
       link: "/marketplace",
     },
     {
-      title: "Total Sales",
+      title: t("farmerDashboard.totalSales"),
       value: `₱${stats.totalSales.toLocaleString()}`,
       icon: TrendingUp,
       color: "text-blue-600",
@@ -109,8 +111,8 @@ export function FarmerDashboard() {
 
   const quickActions = [
     {
-      title: "List Produce",
-      description: "Add new produce to the marketplace",
+      title: t("farmerDashboard.listProduce"),
+      description: t("farmerDashboard.addNewProduce"),
       icon: Leaf,
       link: "/marketplace",
     },
@@ -121,8 +123,8 @@ export function FarmerDashboard() {
       <Container className="py-12">
         <Card className="p-8 text-center border-2 border-primary/30 bg-gradient-to-br from-white to-secondary/10">
           <Sprout className="h-16 w-16 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-primary mb-2">Farmer Dashboard</h2>
-          <p className="text-slate-600">This dashboard is only available for farmers.</p>
+          <h2 className="text-2xl font-semibold text-primary mb-2">{t("farmerDashboard.title")}</h2>
+          <p className="text-slate-600">{t("farmerDashboard.onlyForFarmers")}</p>
         </Card>
       </Container>
     );
@@ -132,10 +134,10 @@ export function FarmerDashboard() {
     <Container className="py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-primary mb-2">
-          Welcome, {profile.full_name}
+          {t("farmerDashboard.welcome")}, {profile.full_name}
         </h1>
         <p className="text-slate-600">
-          Manage your produce listings and recent community activity.
+          {t("farmerDashboard.manageListings")}
         </p>
       </div>
 
@@ -165,7 +167,7 @@ export function FarmerDashboard() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-primary mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-semibold text-primary mb-4">{t("farmerDashboard.quickActions")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => (
             <Link key={action.title} to={action.link}>
@@ -182,12 +184,12 @@ export function FarmerDashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-xl font-semibold text-primary mb-4">Recent Activity</h2>
+          <h2 className="text-xl font-semibold text-primary mb-4">{t("farmerDashboard.recentActivity")}</h2>
           <Card className="border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10">
             {recentActivity.length === 0 ? (
               <div className="p-8 text-center">
                 <Package className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-600">No recent activity</p>
+                <p className="text-slate-600">{t("farmerDashboard.noRecentActivity")}</p>
               </div>
             ) : (
               <div className="divide-y divide-primary/10">
@@ -225,7 +227,7 @@ export function FarmerDashboard() {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold text-primary mb-4">Notifications & Feed</h2>
+          <h2 className="text-xl font-semibold text-primary mb-4">{t("farmerDashboard.notificationsFeed")}</h2>
           <div className="space-y-4">
             <Link to="/notifications">
               <Card className="p-6 border-2 border-primary/20 bg-gradient-to-br from-white to-secondary/10 hover:border-primary/40 transition-all cursor-pointer">
@@ -234,8 +236,8 @@ export function FarmerDashboard() {
                     <Bell className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900">Notifications</h3>
-                    <p className="text-sm text-slate-600">View your recent notifications</p>
+                    <h3 className="font-semibold text-slate-900">{t("farmerDashboard.notifications")}</h3>
+                    <p className="text-sm text-slate-600">{t("farmerDashboard.viewNotifications")}</p>
                   </div>
                 </div>
               </Card>
@@ -247,8 +249,8 @@ export function FarmerDashboard() {
                     <Bell className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900">Messages</h3>
-                    <p className="text-sm text-slate-600">Stay in touch with buyers and partners</p>
+                    <h3 className="font-semibold text-slate-900">{t("farmerDashboard.messages")}</h3>
+                    <p className="text-sm text-slate-600">{t("farmerDashboard.stayInTouch")}</p>
                   </div>
                 </div>
               </Card>

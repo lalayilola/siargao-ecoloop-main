@@ -7,6 +7,7 @@ import { Package, Calendar, MapPin, User, Star, MessageSquare, X } from "lucide-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 
 interface TransactionDetailsProps {
   transaction: {
@@ -43,6 +44,7 @@ const statusColor: Record<string, string> = {
 
 export function TransactionDetails({ transaction, open, onClose }: TransactionDetailsProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [hasRated, setHasRated] = useState(false);
@@ -269,7 +271,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl">Transaction Details</DialogTitle>
+              <DialogTitle className="text-2xl">{t('transactions.detailsTitle')}</DialogTitle>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X className="h-4 w-4" />
               </Button>
@@ -304,18 +306,18 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                   </div>
                 )}
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Item Name</label>
+                  <label className="text-sm font-medium text-muted-foreground">{t('transactions.itemName')}</label>
                   <p className="font-semibold text-lg">{safeTransaction.item_name}</p>
                 </div>
                 {safeTransaction.item_category && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Category</label>
+                    <label className="text-sm font-medium text-muted-foreground">{t('transactions.category')}</label>
                     <p>{safeTransaction.item_category}</p>
                   </div>
                 )}
                 {safeTransaction.quantity && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Quantity</label>
+                    <label className="text-sm font-medium text-muted-foreground">{t('transactions.quantity')}</label>
                     <p>{safeTransaction.quantity} kg</p>
                   </div>
                 )}
@@ -337,7 +339,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    {safeTransaction.type === "trade" ? "Trade Partner" : "Seller"}
+                    {safeTransaction.type === "trade" ? t('transactions.tradePartner') : t('transactions.seller')}
                   </label>
                   <p className="font-semibold">
                     {safeTransaction.seller_name || safeTransaction.from_name}
@@ -345,7 +347,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                 </div>
                 {safeTransaction.buyer_name && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Buyer</label>
+                    <label className="text-sm font-medium text-muted-foreground">{t('transactions.buyer')}</label>
                     <p className="font-semibold">{safeTransaction.buyer_name}</p>
                   </div>
                 )}
@@ -361,12 +363,12 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Transaction ID
+                    {t('transactions.transactionId')}
                   </label>
                   <p className="font-mono text-sm">{safeTransaction.id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Date & Time</label>
+                  <label className="text-sm font-medium text-muted-foreground">{t('transactions.dateTime')}</label>
                   <p>{new Date(safeTransaction.created_at).toLocaleString()}</p>
                 </div>
                 <div>
@@ -375,7 +377,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Transaction Type
+                    {t('transactions.transactionType')}
                   </label>
                   <p className="capitalize">{safeTransaction.type}</p>
                 </div>
@@ -393,7 +395,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                     disabled={markingComplete}
                     className="w-full"
                   >
-                    {markingComplete ? "Marking as complete..." : "Mark as Completed"}
+                    {markingComplete ? t('transactions.markingAsComplete') : t('transactions.markAsCompleted')}
                   </Button>
                 </div>
               )}
@@ -407,8 +409,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                   Rate This Transaction
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Rate your experience with this transaction. You can only rate completed, accepted,
-                  or rejected transactions once.
+                  {t('transactions.rateDescription')}
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-2">
@@ -429,11 +430,11 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
                   <textarea
                     value={review}
                     onChange={(e) => setReview(e.target.value)}
-                    placeholder="Leave a review (optional)"
+                    placeholder={t('transactions.leaveReview')}
                     className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
                   />
                   <Button onClick={handleRatingSubmit} className="w-full" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit Rating"}
+                    {loading ? t('transactions.submitting') : t('transactions.submitRating')}
                   </Button>
                 </div>
               </Card>
@@ -443,7 +444,7 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
               <Card className="p-6 bg-green-50 border-green-200">
                 <div className="flex items-center gap-2 text-green-700">
                   <Star className="h-5 w-5 fill-green-500" />
-                  <span className="font-medium">You have rated this transaction</span>
+                  <span className="font-medium">{t('transactions.youHaveRated')}</span>
                 </div>
               </Card>
             )}
@@ -457,11 +458,11 @@ export function TransactionDetails({ transaction, open, onClose }: TransactionDe
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Error Loading Transaction Details</DialogTitle>
+            <DialogTitle className="text-2xl">{t('transactions.errorLoadingDetails')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-sm text-muted-foreground">
-              There was an error loading the transaction details. Please try again.
+              {t('transactions.errorMessage')}
             </p>
           </div>
         </DialogContent>

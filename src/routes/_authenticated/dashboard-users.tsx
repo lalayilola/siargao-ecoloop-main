@@ -15,6 +15,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import {
   UserCheck,
@@ -134,6 +135,7 @@ function Stat({
 
 function UserManagement() {
   const { isLguAdmin, profile } = useAuth();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterRole, setFilterRole] = useState<string>("all");
@@ -184,11 +186,11 @@ function UserManagement() {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
-      farmer: "Farmer",
-      restaurant: "Restaurant Owner",
-      resident: "Buyer",
-      local_user: "Buyer",
-      lgu_admin: "LGU Admin",
+      farmer: t("membersDashboard.farmers"),
+      restaurant: t("membersDashboard.restaurantOwners"),
+      resident: t("membersDashboard.buyers"),
+      local_user: t("membersDashboard.buyers"),
+      lgu_admin: t("membersDashboard.lguAdmins"),
     };
     return labels[role] || role;
   };
@@ -211,9 +213,9 @@ function UserManagement() {
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-primary" />
-          <h2 className="mt-3 font-display text-2xl font-semibold">LGU access only</h2>
+          <h2 className="mt-3 font-display text-2xl font-semibold">{t("membersDashboard.lguAccessOnly")}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            This dashboard is reserved for verified Local Government Unit accounts.
+            {t("membersDashboard.lguAccessDescription")}
           </p>
         </Card>
       </Container>
@@ -223,8 +225,8 @@ function UserManagement() {
   return (
     <>
       <PremiumHero
-        title="Members Dashboard"
-        sub="View and manage farmers, restaurant owners, and buyers registered in your municipality."
+        title={t("membersDashboard.title")}
+        sub={t("membersDashboard.subtitle")}
       />
       <Container className="py-12 relative">
         <style>{`
@@ -284,7 +286,7 @@ function UserManagement() {
               <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <Input
-                  placeholder="Search members..."
+                  placeholder={t("membersDashboard.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
@@ -293,24 +295,24 @@ function UserManagement() {
             </div>
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger className="w-[180px] h-12 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
-                <SelectValue placeholder="Filter by role" />
+                <SelectValue placeholder={t("membersDashboard.filterByRole")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="farmer">Farmers</SelectItem>
-                <SelectItem value="restaurant">Restaurant Owners</SelectItem>
-                <SelectItem value="resident">Buyers</SelectItem>
-                <SelectItem value="lgu_admin">LGU Admins</SelectItem>
+                <SelectItem value="all">{t("membersDashboard.allRoles")}</SelectItem>
+                <SelectItem value="farmer">{t("membersDashboard.farmers")}</SelectItem>
+                <SelectItem value="restaurant">{t("membersDashboard.restaurantOwners")}</SelectItem>
+                <SelectItem value="resident">{t("membersDashboard.buyers")}</SelectItem>
+                <SelectItem value="lgu_admin">{t("membersDashboard.lguAdmins")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-[180px] h-12 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t("membersDashboard.filterByStatus")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="verified">Verified</SelectItem>
-                <SelectItem value="unverified">Not Verified</SelectItem>
+                <SelectItem value="all">{t("membersDashboard.allStatus")}</SelectItem>
+                <SelectItem value="verified">{t("membersDashboard.verified")}</SelectItem>
+                <SelectItem value="unverified">{t("membersDashboard.notVerified")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -319,31 +321,31 @@ function UserManagement() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <Stat
             icon={Users}
-            label="Total Members"
+            label={t("membersDashboard.totalMembers")}
             value={users.length}
             trend="+2 this week"
             sub="Updated 3m ago"
           />
           <Stat
             icon={Leaf}
-            label="Farmers"
+            label={t("membersDashboard.farmers")}
             value={farmers}
             trend="+1 this week"
-            sub="Active producers"
+            sub={t("membersDashboard.activeProducers")}
           />
           <Stat
             icon={Store}
-            label="Restaurant Owners"
+            label={t("membersDashboard.restaurantOwners")}
             value={restaurants}
             trend="+0 this week"
-            sub="Food waste partners"
+            sub={t("membersDashboard.foodWastePartners")}
           />
           <Stat
             icon={UserCheck}
-            label="Buyers"
+            label={t("membersDashboard.buyers")}
             value={buyers}
             trend="+1 this week"
-            sub="Local residents"
+            sub={t("membersDashboard.localResidents")}
           />
         </div>
 
@@ -365,7 +367,7 @@ function UserManagement() {
             </div>
           ) : filteredUsers.length === 0 ? (
             <p className="text-slate-500 text-center py-8">
-              No members found for this municipality.
+              {t("membersDashboard.noMembersFound")}
             </p>
           ) : (
             <div className="space-y-4">
@@ -417,17 +419,17 @@ function UserManagement() {
                             : "bg-yellow-100 text-yellow-700 border-yellow-200"
                         }`}
                       >
-                        {user.lgu_approved ? "Verified" : "Pending Verification"}
+                        {user.lgu_approved ? t("membersDashboard.verified") : t("membersDashboard.pendingVerification")}
                       </Badge>
                     </div>
                     <div className="flex flex-wrap gap-4 text-sm text-slate-500">
                       <div className="flex items-center gap-1">
                         <Phone className="h-4 w-4" />
-                        <span>{user.phone || "No phone"}</span>
+                        <span>{user.phone || t("membersDashboard.noPhone")}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        <span>{user.barangay || "No barangay"}</span>
+                        <span>{user.barangay || t("membersDashboard.noBarangay")}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
@@ -521,17 +523,17 @@ function UserManagement() {
                           >
                             {selectedUser.lgu_approved ? (
                               <>
-                                <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
+                                <CheckCircle2 className="h-3 w-3 mr-1" /> {t("membersDashboard.verified")}
                               </>
                             ) : (
                               <>
-                                <Clock className="h-3 w-3 mr-1" /> Pending Verification
+                                <Clock className="h-3 w-3 mr-1" /> {t("membersDashboard.pendingVerification")}
                               </>
                             )}
                           </Badge>
                           <span className="text-sm text-slate-500 flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            Registered: {new Date(selectedUser.created_at).toLocaleDateString()}
+                            {t("membersDashboard.registered")} {new Date(selectedUser.created_at).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -548,13 +550,13 @@ function UserManagement() {
                       <Card className="p-6 rounded-xl border border-slate-200 bg-slate-50">
                         <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                           <User className="h-5 w-5 text-emerald-600" />
-                          Personal Information
+                          {t("membersDashboard.personalInformation")}
                         </h4>
                         <div className="space-y-4">
                           <div className="flex items-start gap-3">
                             <User className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Full Name</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.fullName")}</p>
                               <p className="text-sm font-medium text-slate-900">
                                 {selectedUser.full_name}
                               </p>
@@ -563,34 +565,34 @@ function UserManagement() {
                           <div className="flex items-start gap-3">
                             <Phone className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Phone Number</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.phoneNumber")}</p>
                               <p className="text-sm font-medium text-slate-900">
-                                {selectedUser.phone || "Not provided"}
+                                {selectedUser.phone || t("membersDashboard.notProvided")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
                             <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Municipality</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.municipality")}</p>
                               <p className="text-sm font-medium text-slate-900">
-                                {selectedUser.municipality || "Not provided"}
+                                {selectedUser.municipality || t("membersDashboard.notProvided")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
                             <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Barangay / Purok</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.barangayPurok")}</p>
                               <p className="text-sm font-medium text-slate-900">
-                                {selectedUser.barangay || "Not provided"}
+                                {selectedUser.barangay || t("membersDashboard.notProvided")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
                             <Calendar className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Registration Date</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.registrationDate")}</p>
                               <p className="text-sm font-medium text-slate-900">
                                 {new Date(selectedUser.created_at).toLocaleString()}
                               </p>
@@ -603,13 +605,13 @@ function UserManagement() {
                       <Card className="p-6 rounded-xl border border-slate-200 bg-slate-50">
                         <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                           <Shield className="h-5 w-5 text-emerald-600" />
-                          Account Information
+                          {t("membersDashboard.accountInformation")}
                         </h4>
                         <div className="space-y-4">
                           <div className="flex items-start gap-3">
                             <UserCheck className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">User Role</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.userRole")}</p>
                               <Badge
                                 className={`px-2 py-1 rounded-md text-xs font-semibold ${
                                   selectedUser.primary_role === "farmer"
@@ -631,7 +633,7 @@ function UserManagement() {
                           <div className="flex items-start gap-3">
                             <ShieldCheck className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Verification Status</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.verificationStatus")}</p>
                               <Badge
                                 className={`px-2 py-1 rounded-md text-xs font-semibold ${
                                   selectedUser.lgu_approved
@@ -639,16 +641,16 @@ function UserManagement() {
                                     : "bg-yellow-100 text-yellow-700 border-yellow-200"
                                 }`}
                               >
-                                {selectedUser.lgu_approved ? "Verified" : "Pending Verification"}
+                                {selectedUser.lgu_approved ? t("membersDashboard.verified") : t("membersDashboard.pendingVerification")}
                               </Badge>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-slate-400 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-xs text-slate-500 mb-1">Account Status</p>
+                              <p className="text-xs text-slate-500 mb-1">{t("membersDashboard.accountStatus")}</p>
                               <Badge className="px-2 py-1 rounded-md text-xs font-semibold bg-green-100 text-green-700 border-green-200">
-                                Active
+                                {t("membersDashboard.active")}
                               </Badge>
                             </div>
                           </div>
@@ -661,7 +663,7 @@ function UserManagement() {
                       <Card className="p-6 rounded-xl border border-slate-200 bg-slate-50">
                         <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                           <FileText className="h-5 w-5 text-emerald-600" />
-                          Verification Documents
+                          {t("membersDashboard.verificationDocuments")}
                         </h4>
                         {selectedUser.government_id_url ? (
                           <div className="space-y-4">
@@ -669,7 +671,7 @@ function UserManagement() {
                               <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200">
                                 <img
                                   src={selectedUser.government_id_url}
-                                  alt="Government ID"
+                                  alt={t("membersDashboard.governmentId")}
                                   className="w-full h-auto max-h-64 object-contain cursor-pointer"
                                   onClick={() =>
                                     window.open(
@@ -693,7 +695,7 @@ function UserManagement() {
                                   }
                                 >
                                   <ExternalLink className="h-4 w-4 mr-2" />
-                                  Open in New Tab
+                                  {t("membersDashboard.openInNewTab")}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -714,7 +716,7 @@ function UserManagement() {
                         ) : (
                           <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
                             <FileText className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                            <p className="text-sm text-slate-500">No government ID uploaded</p>
+                            <p className="text-sm text-slate-500">{t("membersDashboard.noGovernmentId")}</p>
                           </div>
                         )}
                       </Card>
@@ -723,10 +725,10 @@ function UserManagement() {
                       <Card className="p-6 rounded-xl border border-slate-200 bg-slate-50">
                         <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                           <FileText className="h-5 w-5 text-emerald-600" />
-                          Internal Notes
+                          {t("membersDashboard.internalNotes")}
                         </h4>
                         <Textarea
-                          placeholder="Add internal notes for LGU administrators..."
+                          placeholder={t("membersDashboard.internalNotesPlaceholder")}
                           className="min-h-[100px] rounded-lg border-slate-200 bg-white focus:border-emerald-500 focus:ring-emerald-500/20"
                         />
                       </Card>
@@ -755,19 +757,19 @@ function UserManagement() {
                             }
 
                             console.log("Unverify successful");
-                            toast.success("User verification revoked");
+                            toast.success(t("membersDashboard.verificationRevoked"));
                             await loadUsers();
                             setSelectedUser(null);
                           } catch (error: any) {
                             console.error("Unverification failed:", error);
                             toast.error(
-                              `Failed to revoke verification: ${error.message || "Unknown error"}`,
+                              `${t("membersDashboard.failedToRevoke")}: ${error.message || "Unknown error"}`,
                             );
                           }
                         }}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
-                        Revoke Verification
+                        {t("membersDashboard.revokeVerification")}
                       </Button>
                     ) : (
                       <Button
@@ -786,17 +788,17 @@ function UserManagement() {
                             }
 
                             console.log("Update successful");
-                            toast.success("User verified successfully");
+                            toast.success(t("membersDashboard.userVerified"));
                             await loadUsers();
                             setSelectedUser(null);
                           } catch (error: any) {
                             console.error("Verification failed:", error);
-                            toast.error(`Failed to verify: ${error.message || "Unknown error"}`);
+                            toast.error(`${t("membersDashboard.failedToVerify")}: ${error.message || "Unknown error"}`);
                           }
                         }}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Approve Verification
+                        {t("membersDashboard.approveVerification")}
                       </Button>
                     )}
                     <Button
@@ -804,7 +806,7 @@ function UserManagement() {
                       className="h-11 rounded-lg border-slate-200 hover:bg-slate-50"
                       onClick={() => setSelectedUser(null)}
                     >
-                      Close
+                      {t("membersDashboard.close")}
                     </Button>
                   </div>
                 </div>

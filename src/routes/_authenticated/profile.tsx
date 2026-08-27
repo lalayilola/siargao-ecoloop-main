@@ -868,13 +868,13 @@ function ProfilePage() {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <span className="text-4xl">🛍️</span>
-              {isOwnProfile ? "My Listings" : `${displayProfile?.full_name}'s Listings`}
+              {isOwnProfile ? t("profile.myListings") : t("profile.userListings", { name: displayProfile?.full_name })}
             </h2>
             {isOwnProfile && (
               <Link to="/marketplace">
                 <Button className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                   <span className="text-xl mr-2">+</span>
-                  Create New Listing
+                  {t("profile.createNewListing")}
                 </Button>
               </Link>
             )}
@@ -911,18 +911,18 @@ function ProfilePage() {
               <div className="p-16 text-center">
                 <div className="text-7xl mb-6">📦</div>
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                  {isOwnProfile ? "No Listings Yet" : "No Listings Available"}
+                  {isOwnProfile ? t("profile.noListingsYet") : t("profile.noListingsAvailable")}
                 </h3>
                 <p className="text-gray-600 mb-8 text-lg">
                   {isOwnProfile
-                    ? "Start by creating your first listing to showcase your products."
-                    : `${displayProfile?.full_name} hasn't posted any listings yet.`}
+                    ? t("profile.startByCreatingFirstListing")
+                    : t("profile.userHasntPostedListings", { name: displayProfile?.full_name })}
                 </p>
                 {isOwnProfile && (
                   <Link to="/marketplace">
                     <Button className="bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 h-12 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                       <span className="text-xl mr-2">+</span>
-                      Create Your First Listing
+                      {t("profile.createFirstListing")}
                     </Button>
                   </Link>
                 )}

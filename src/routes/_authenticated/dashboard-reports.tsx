@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import {
   FileText,
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/dashboard-reports")({
 
 function ReportsGeneration() {
   const { isLguAdmin, profile } = useAuth();
+  const { t } = useLanguage();
   const [reportType, setReportType] = useState<string>("diversion");
   const [dateRange, setDateRange] = useState<string>("30");
   const [format, setFormat] = useState<string>("pdf");
@@ -60,50 +62,50 @@ function ReportsGeneration() {
   const reportTypes = [
     {
       id: "diversion",
-      label: "Municipality Circular Economy",
+      label: t("reports.municipalityCircularEconomy"),
       icon: Recycle,
-      description: "Track produce sales, fertilizer, and waste collection by municipality",
-      metrics: ["Sales", "Waste", "Compost"],
+      description: t("reports.municipalityCircularEconomyDesc"),
+      metrics: [t("reports.sales"), t("reports.waste"), t("reports.compost")],
     },
     {
       id: "users",
-      label: "Member Statistics",
+      label: t("reports.memberStatistics"),
       icon: Users,
-      description: "Farmers, restaurant owners and buyers registered in the municipality",
-      metrics: ["Members", "Roles", "Growth"],
+      description: t("reports.memberStatisticsDesc"),
+      metrics: [t("reports.members"), t("reports.roles"), t("reports.growth")],
     },
     {
       id: "transactions",
-      label: "Marketplace Activity",
+      label: t("reports.marketplaceActivity"),
       icon: TrendingUp,
-      description: "Purchases, sales and exchanges recorded within the municipality",
-      metrics: ["Volume", "Revenue", "Rate"],
+      description: t("reports.marketplaceActivityDesc"),
+      metrics: [t("reports.volume"), t("reports.revenue"), t("reports.rate")],
     },
     {
       id: "impact",
-      label: "Impact Summary",
+      label: t("reports.impactSummary"),
       icon: Leaf,
-      description: "Circular economy outcomes and environmental impact",
-      metrics: ["CO2", "Waste", "Impact"],
+      description: t("reports.impactSummaryDesc"),
+      metrics: [t("reports.co2"), t("reports.waste"), t("reports.impact")],
     },
   ];
 
   const dateRanges = [
-    { id: "7", label: "Last 7 days" },
-    { id: "30", label: "Last 30 days" },
-    { id: "90", label: "Last 90 days" },
-    { id: "all", label: "All time" },
+    { id: "7", label: t("reports.last7Days") },
+    { id: "30", label: t("reports.last30Days") },
+    { id: "90", label: t("reports.last90Days") },
+    { id: "all", label: t("reports.allTime") },
   ];
 
   const formats = [
-    { id: "pdf", label: "PDF Document" },
-    { id: "csv", label: "CSV File" },
+    { id: "pdf", label: t("reports.pdfDocument") },
+    { id: "csv", label: t("reports.csvFile") },
   ];
 
   const pageSizes = [
-    { id: "a4", label: "A4 (210 × 297 mm)", width: 210, height: 297 },
-    { id: "letter", label: "Letter (8.5 × 11 in)", width: 216, height: 279 },
-    { id: "legal", label: "Legal (8.5 × 14 in)", width: 216, height: 356 },
+    { id: "a4", label: t("reports.a4Size"), width: 210, height: 297 },
+    { id: "letter", label: t("reports.letterSize"), width: 216, height: 279 },
+    { id: "legal", label: t("reports.legalSize"), width: 216, height: 356 },
   ];
 
   useEffect(() => {
@@ -425,7 +427,7 @@ function ReportsGeneration() {
         pdf.save(
           `Siargao_Loops_Report_${reportSummary.municipality}_${new Date().toISOString().split("T")[0]}.pdf`,
         );
-        toast.success(`PDF report generated for ${reportSummary.municipality}`);
+        toast.success(`${t("reports.reportGenerated")} ${reportSummary.municipality}`);
       } else {
         // CSV generation
         const csvContent = [
@@ -445,10 +447,10 @@ function ReportsGeneration() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success(`CSV report generated for ${reportSummary.municipality}`);
+        toast.success(`${t("reports.csvReportGenerated")} ${reportSummary.municipality}`);
       }
     } catch (error: any) {
-      toast.error(`Failed to generate report: ${error.message}`);
+      toast.error(`${t("reports.failedToGenerate")}: ${error.message}`);
     } finally {
       setGenerating(false);
     }
@@ -585,9 +587,9 @@ function ReportsGeneration() {
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-primary" />
-          <h2 className="mt-3 font-display text-2xl font-semibold">LGU access only</h2>
+          <h2 className="mt-3 font-display text-2xl font-semibold">{t("reports.lguAccessOnly")}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            This dashboard is reserved for verified Local Government Unit accounts.
+            {t("reports.lguAccessDescription")}
           </p>
         </Card>
       </Container>
@@ -597,8 +599,8 @@ function ReportsGeneration() {
   return (
     <>
       <PremiumHero
-        title="LGU Reports"
-        sub="Generate municipality-scoped reports for circular economy activity and member engagement."
+        title={t("reports.title")}
+        sub={t("reports.subtitle")}
       />
       <Container className="py-12 relative">
         <style>{`
@@ -655,7 +657,7 @@ function ReportsGeneration() {
         {/* SECTION 1 - Report Type Selection */}
         <Card className="p-8 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
           <h2 className="font-display text-2xl font-bold text-slate-900 mb-6">
-            Select Report Type
+            {t("reports.selectReportType")}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
             {reportTypes.map((type) => {
@@ -713,7 +715,7 @@ function ReportsGeneration() {
         <Card className="p-6 mb-8 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[180px]">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Date Range</label>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">{t("reports.dateRange")}</label>
               <Select value={dateRange} onValueChange={setDateRange}>
                 <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
                   <SelectValue />
@@ -728,7 +730,7 @@ function ReportsGeneration() {
               </Select>
             </div>
             <div className="flex-1 min-w-[180px]">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Output Format</label>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">{t("reports.outputFormat")}</label>
               <Select value={format} onValueChange={setFormat}>
                 <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
                   <SelectValue />
@@ -743,7 +745,7 @@ function ReportsGeneration() {
               </Select>
             </div>
             <div className="flex-1 min-w-[180px]">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Paper Size</label>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">{t("reports.paperSize")}</label>
               <Select value={pageSize} onValueChange={setPageSize}>
                 <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500">
                   <SelectValue />
@@ -766,12 +768,12 @@ function ReportsGeneration() {
                 {generating ? (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    {t("reports.generating")}
                   </>
                 ) : (
                   <>
                     <FileText className="mr-2 h-4 w-4" />
-                    Generate Report
+                    {t("reports.generateReport")}
                   </>
                 )}
               </Button>
@@ -781,7 +783,7 @@ function ReportsGeneration() {
                 className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
               >
                 <Download className="mr-2 h-4 w-4" />
-                Download
+                {t("reports.download")}
               </Button>
               <Button
                 onClick={handlePrint}
@@ -789,7 +791,7 @@ function ReportsGeneration() {
                 className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50"
               >
                 <Printer className="mr-2 h-4 w-4" />
-                Print
+                {t("reports.print")}
               </Button>
             </div>
           </div>
@@ -806,7 +808,7 @@ function ReportsGeneration() {
             <div className="font-display text-2xl font-bold text-slate-900 mb-1">
               {reportSummary.members}
             </div>
-            <div className="text-sm text-slate-600 font-medium">Total Members</div>
+            <div className="text-sm text-slate-600 font-medium">{t("reports.totalMembers")}</div>
           </Card>
           <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
@@ -817,7 +819,7 @@ function ReportsGeneration() {
             <div className="font-display text-2xl font-bold text-slate-900 mb-1">
               {reportSummary.wasteCollected} kg
             </div>
-            <div className="text-sm text-slate-600 font-medium">Waste Collected</div>
+            <div className="text-sm text-slate-600 font-medium">{t("reports.wasteCollected")}</div>
           </Card>
           <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
@@ -828,7 +830,7 @@ function ReportsGeneration() {
             <div className="font-display text-2xl font-bold text-slate-900 mb-1">
               ₱{reportSummary.freshProduceSales.toLocaleString()}
             </div>
-            <div className="text-sm text-slate-600 font-medium">Produce Sold</div>
+            <div className="text-sm text-slate-600 font-medium">{t("reports.produceSold")}</div>
           </Card>
           <Card className="p-6 rounded-2xl border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
@@ -839,7 +841,7 @@ function ReportsGeneration() {
             <div className="font-display text-2xl font-bold text-slate-900 mb-1">
               ₱{(reportSummary.freshProduceSales + reportSummary.compostSales).toLocaleString()}
             </div>
-            <div className="text-sm text-slate-600 font-medium">Revenue Generated</div>
+            <div className="text-sm text-slate-600 font-medium">{t("reports.revenueGenerated")}</div>
           </Card>
         </div>
 
@@ -848,9 +850,9 @@ function ReportsGeneration() {
           {/* Preview Toolbar */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
             <div>
-              <h3 className="font-display text-lg font-bold text-slate-900">Report Preview</h3>
+              <h3 className="font-display text-lg font-bold text-slate-900">{t("reports.reportPreview")}</h3>
               <p className="text-xs text-slate-500 mt-1">
-                Last Generated: {new Date().toLocaleString()}
+                {t("reports.lastGenerated")} {new Date().toLocaleString()}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -920,12 +922,12 @@ function ReportsGeneration() {
               <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
                 <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                  Report Configuration
+                  {t("reports.reportConfiguration")}
                 </h4>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                      Report Type
+                      {t("reports.reportType")}
                     </span>
                     <p className="font-semibold text-slate-900 text-lg">
                       {reportTypes.find((type) => type.id === reportType)?.label}
@@ -933,7 +935,7 @@ function ReportsGeneration() {
                   </div>
                   <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                      Date Range
+                      {t("reports.dateRange")}
                     </span>
                     <p className="font-semibold text-slate-900 text-lg">
                       {dateRanges.find((range) => range.id === dateRange)?.label}
@@ -941,7 +943,7 @@ function ReportsGeneration() {
                   </div>
                   <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                      Page Size
+                      {t("reports.paperSize")}
                     </span>
                     <p className="font-semibold text-slate-900 text-lg">
                       {pageSizes.find((size) => size.id === pageSize)?.label}
@@ -949,7 +951,7 @@ function ReportsGeneration() {
                   </div>
                   <div className="bg-white p-4 rounded border border-slate-100 shadow-sm">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                      Format
+                      {t("reports.outputFormat")}
                     </span>
                     <p className="font-semibold text-slate-900 text-lg">
                       {formats.find((fmt) => fmt.id === format)?.label}
@@ -962,14 +964,14 @@ function ReportsGeneration() {
               <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
                 <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                  Municipality Statistics
+                  {t("reports.municipalityStatistics")}
                 </h4>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-lg border-2 border-emerald-200 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                       <Users className="h-6 w-6 text-emerald-700" />
                       <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                        Total Members
+                        {t("reports.totalMembers")}
                       </span>
                     </div>
                     <p className="text-4xl font-bold text-emerald-900">{reportSummary.members}</p>
@@ -978,7 +980,7 @@ function ReportsGeneration() {
                     <div className="flex items-center gap-3 mb-2">
                       <FileText className="h-6 w-6 text-blue-700" />
                       <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
-                        Active Listings
+                        {t("reports.activeListings")}
                       </span>
                     </div>
                     <p className="text-4xl font-bold text-blue-900">{reportSummary.listings}</p>
@@ -990,7 +992,7 @@ function ReportsGeneration() {
               <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
                 <h4 className="text-sm font-bold uppercase tracking-widest mb-5 text-emerald-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-                  Economic Activity
+                  {t("reports.economicActivity")}
                 </h4>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-5 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg border-2 border-emerald-300 shadow-sm">
@@ -999,7 +1001,7 @@ function ReportsGeneration() {
                         <Leaf className="h-5 w-5 text-white" />
                       </div>
                       <span className="text-slate-800 font-semibold text-lg">
-                        Fresh Produce Sales
+                        {t("reports.freshProduceSales")}
                       </span>
                     </div>
                     <span className="text-2xl font-bold text-emerald-900">
@@ -1012,7 +1014,7 @@ function ReportsGeneration() {
                         <Recycle className="h-5 w-5 text-white" />
                       </div>
                       <span className="text-slate-800 font-semibold text-lg">
-                        Organic Fertilizer Sales
+                        {t("reports.organicFertilizerSales")}
                       </span>
                     </div>
                     <span className="text-2xl font-bold text-yellow-900">
@@ -1025,7 +1027,7 @@ function ReportsGeneration() {
                         <Trash2 className="h-5 w-5 text-white" />
                       </div>
                       <span className="text-slate-800 font-semibold text-lg">
-                        Food Waste Collected
+                        {t("reports.foodWasteCollected")}
                       </span>
                     </div>
                     <span className="text-2xl font-bold text-blue-900">
@@ -1038,10 +1040,10 @@ function ReportsGeneration() {
               {/* Footer */}
               <div className="mt-8 pt-6 border-t-2 border-slate-300 text-center">
                 <p className="text-sm text-slate-600">
-                  This report is generated by Farm2Food Cycle - Circular Food Economy Platform
+                  {t("reports.generatedBy")}
                 </p>
                 <p className="text-xs text-slate-500 mt-2">
-                  Report ID: {Date.now()} | Generated on {new Date().toLocaleString()}
+                  {t("reports.reportId")}: {Date.now()} | {t("reports.generatedOn")} {new Date().toLocaleString()}
                 </p>
               </div>
             </div>

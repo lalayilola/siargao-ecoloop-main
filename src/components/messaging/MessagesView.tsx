@@ -54,6 +54,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { useAuth } from "@/hooks/use-auth";
 
+import { useLanguage } from "@/hooks/use-language";
+
 import type { Database } from "@/integrations/supabase/types";
 
 import { formatDistanceToNow } from "date-fns";
@@ -80,6 +82,7 @@ interface ConversationWithLastMessage extends Conversation {
 
 export function MessagesView() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [conversations, setConversations] = useState<ConversationWithLastMessage[]>([]);
 
@@ -711,8 +714,8 @@ export function MessagesView() {
   return (
     <>
       <PremiumHero
-        title="Messages"
-        sub="Chat with other Farm2Food Cycle members about trades, purchases, and more."
+        title={t("messages.title")}
+        sub={t("messages.subtitle")}
       />
 
       <Container className="py-10">
@@ -726,7 +729,7 @@ export function MessagesView() {
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search conversations..."
+                  placeholder={t("messages.searchPlaceholder")}
                   className="h-14 pl-12 pr-4 text-base rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
                 />
               </div>
@@ -750,8 +753,8 @@ export function MessagesView() {
                   <MessageCircle className="mx-auto h-12 w-12 text-slate-300 mb-4" />
                   <p className="text-slate-600 font-medium">
                     {searchQuery
-                      ? "No conversations found"
-                      : "No conversations yet. Start chatting!"}
+                      ? t("messages.noConversations")
+                      : t("messages.noConversationsYet")}
                   </p>
                 </div>
               ) : (
@@ -810,11 +813,11 @@ export function MessagesView() {
                                   (conv.last_message as any)?.image_urls.length > 0
                                   ? (conv.last_message as any)?.content
                                     ? `${(conv.last_message as any).content} 📷`
-                                    : "📷 Photos"
+                                    : t("messages.photos")
                                   : conv.last_message.content
                                     ? conv.last_message.content
-                                    : "No messages yet"
-                                : "No messages yet"}
+                                    : t("messages.noMessagesYet")
+                                : t("messages.noMessagesYet")}
                             </p>
 
                             {conv.unread_count > 0 && (
@@ -870,17 +873,17 @@ export function MessagesView() {
                       <p className="text-xs text-slate-500 flex items-center gap-1">
                         {(selectedConversation.other_user as any)?.is_online ? (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-green-500" /> Online
+                            <span className="w-2 h-2 rounded-full bg-green-500" /> {t("messages.online")}
                           </>
                         ) : (
                           <>
-                            Last seen{" "}
+                            {t("messages.lastSeen")}{" "}
                             {(selectedConversation.other_user as any)?.last_seen
                               ? formatDistanceToNow(
                                   new Date((selectedConversation.other_user as any).last_seen),
                                   { addSuffix: true },
                                 )
-                              : "recently"}
+                              : t("messages.recently")}
                           </>
                         )}
                       </p>
@@ -926,11 +929,10 @@ export function MessagesView() {
                           <MessageCircle className="h-12 w-12 text-emerald-600" />
                         </div>
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                          Start the conversation
+                          {t("messages.startConversation")}
                         </h3>
                         <p className="text-slate-500 text-center max-w-sm">
-                          Send a message to {selectedConversation.other_user?.full_name} to begin
-                          chatting about trades, purchases, and more.
+                          {t("messages.startConversationDescription").replace("{name}", selectedConversation.other_user?.full_name || "")}
                         </p>
                       </div>
                     ) : (
@@ -1030,20 +1032,20 @@ export function MessagesView() {
 
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete message?</AlertDialogTitle>
+                                    <AlertDialogTitle>{t("messages.deleteMessage")}</AlertDialogTitle>
 
                                     <AlertDialogDescription>
-                                      This action cannot be undone.
+                                      {t("messages.deleteMessageDescription")}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
 
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel>{t("messages.cancel")}</AlertDialogCancel>
 
                                     <AlertDialogAction
                                       onClick={() => handleDeleteMessage(message.id)}
                                     >
-                                      {isDeletingId === message.id ? "Deleting..." : "Delete"}
+                                      {isDeletingId === message.id ? t("messages.deleting") : t("messages.delete")}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -1108,7 +1110,7 @@ export function MessagesView() {
                       <Input
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message..."
+                        placeholder={t("messages.typeMessage")}
                         className="h-12 rounded-full border-slate-300 bg-white focus:border-emerald-500 focus:ring-emerald-500/20 transition-all shadow-sm"
                         disabled={sending || uploadingImage}
                       />
@@ -1150,11 +1152,10 @@ export function MessagesView() {
                     <MessageCircle className="h-16 w-16 text-emerald-600" />
                   </div>
                   <h3 className="text-2xl font-semibold text-slate-900 mb-3">
-                    Select a conversation
+                    {t("messages.selectConversation")}
                   </h3>
                   <p className="text-slate-500 max-w-sm mx-auto">
-                    Choose a conversation from the list to start chatting about trades, purchases,
-                    and more with Farm2Food Cycle members.
+                    {t("messages.selectConversationDescription")}
                   </p>
                 </div>
               </div>
@@ -1166,22 +1167,22 @@ export function MessagesView() {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Message</DialogTitle>
+            <DialogTitle>{t("messages.editMessage")}</DialogTitle>
           </DialogHeader>
 
           <Textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            placeholder="Edit your message..."
+            placeholder={t("messages.editYourMessage")}
             className="border-primary/30 focus:border-primary focus:ring-primary/50"
           />
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
-              Cancel
+              {t("messages.cancel")}
             </Button>
 
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
+            <Button onClick={handleSaveEdit}>{t("messages.saveChanges")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

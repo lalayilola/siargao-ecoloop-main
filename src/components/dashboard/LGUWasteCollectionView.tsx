@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, Calendar, Trash2, CheckCircle, Clock, Truck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -24,6 +25,7 @@ type WasteCollectionInsert = Database["public"]["Tables"]["waste_collections"]["
 
 export function LGUWasteCollectionView() {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const [reports, setReports] = useState<WasteReport[]>([]);
   const [collections, setCollections] = useState<Record<string, WasteCollection>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -184,9 +186,9 @@ export function LGUWasteCollectionView() {
       <Container className="py-12">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <Truck className="mx-auto h-12 w-12 text-primary mb-4" />
-          <h2 className="text-2xl font-semibold text-primary">Waste Collection Management</h2>
+          <h2 className="text-2xl font-semibold text-primary">{t("lguDashboard.title")}</h2>
           <p className="text-slate-600 mt-2">
-            This page is for LGU administrators to manage waste collection schedules.
+            {t("lguDashboard.onlyForLGU")}
           </p>
         </Card>
       </Container>
@@ -197,24 +199,24 @@ export function LGUWasteCollectionView() {
     <Container className="py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">
-          Waste Collection Management
+          {t("lguDashboard.title")}
         </h1>
         <p className="text-slate-600">
-          Schedule and track food waste collection from hotels and restaurants.
+          {t("lguDashboard.description")}
         </p>
       </div>
 
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Schedule Collection</DialogTitle>
+            <DialogTitle>{t("lguDashboard.scheduleCollection")}</DialogTitle>
             <DialogDescription>
-              Schedule pickup for {selectedReport?.restaurant_name} - {selectedReport?.waste_type}
+              {t("lguDashboard.scheduleDialogDescription")} {selectedReport?.restaurant_name} - {selectedReport?.waste_type}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="scheduled-date">Collection Date</Label>
+              <Label htmlFor="scheduled-date">{t("lguDashboard.collectionDate")}</Label>
               <Input
                 id="scheduled-date"
                 type="date"
@@ -224,17 +226,17 @@ export function LGUWasteCollectionView() {
               />
             </div>
             <div className="text-sm text-slate-600">
-              <p>Waste Type: {selectedReport?.waste_type}</p>
-              <p>Quantity: {selectedReport?.quantity_kg} kg</p>
-              <p>Address: {selectedReport?.collection_address}</p>
+              <p>{t("lguDashboard.wasteType")}: {selectedReport?.waste_type}</p>
+              <p>{t("lguDashboard.quantity")}: {selectedReport?.quantity_kg} kg</p>
+              <p>{t("lguDashboard.address")}: {selectedReport?.collection_address}</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>
-              Cancel
+              {t("lguDashboard.cancel")}
             </Button>
             <Button onClick={handleScheduleCollection} disabled={isScheduling}>
-              {isScheduling ? "Scheduling..." : "Schedule Collection"}
+              {isScheduling ? t("lguDashboard.scheduling") : t("lguDashboard.scheduleCollection")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -242,13 +244,13 @@ export function LGUWasteCollectionView() {
 
       {isLoading ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-600">Loading waste reports...</p>
+          <p className="text-slate-600">{t("lguDashboard.loading")}</p>
         </Card>
       ) : reports.length === 0 ? (
         <Card className="p-12 text-center border-2 border-primary/20">
           <Trash2 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">No pending waste reports</h2>
-          <p className="text-slate-600">No food waste reports awaiting collection.</p>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">{t("lguDashboard.noPendingReports")}</h2>
+          <p className="text-slate-600">{t("lguDashboard.noReportsDescription")}</p>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -275,7 +277,7 @@ export function LGUWasteCollectionView() {
                       </span>
                       <span className="inline-flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        Preferred: {new Date(report.collection_date).toLocaleDateString()}
+                        {t("lguDashboard.preferred")}: {new Date(report.collection_date).toLocaleDateString()}
                       </span>
                       <span>{report.quantity_kg} kg</span>
                       <span
@@ -288,7 +290,7 @@ export function LGUWasteCollectionView() {
                       <div className="text-sm text-slate-600">
                         <span className="inline-flex items-center gap-2">
                           <Clock className="h-4 w-4" />
-                          Scheduled: {new Date(collection.scheduled_date).toLocaleDateString()}
+                          {t("lguDashboard.scheduled")}: {new Date(collection.scheduled_date).toLocaleDateString()}
                         </span>
                         <span
                           className={`ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(collection.status)}`}
@@ -307,18 +309,18 @@ export function LGUWasteCollectionView() {
                           setShowScheduleDialog(true);
                         }}
                       >
-                        <Calendar className="h-4 w-4" /> Schedule Collection
+                        <Calendar className="h-4 w-4" /> {t("lguDashboard.scheduleCollection")}
                       </Button>
                     ) : collection.status === "scheduled" ? (
                       <Button
                         className="bg-green-600 hover:bg-green-700 text-white gap-2"
                         onClick={() => handleCompleteCollection(collection)}
                       >
-                        <CheckCircle className="h-4 w-4" /> Mark Complete
+                        <CheckCircle className="h-4 w-4" /> {t("lguDashboard.markComplete")}
                       </Button>
                     ) : (
                       <Button disabled className="gap-2">
-                        <CheckCircle className="h-4 w-4" /> Completed
+                        <CheckCircle className="h-4 w-4" /> {t("lguDashboard.completed")}
                       </Button>
                     )}
                   </div>

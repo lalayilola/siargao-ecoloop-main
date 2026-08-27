@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +99,7 @@ interface ProjectedWaste {
 
 export function PlanningForecastDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [harvestForecasts, setHarvestForecasts] = useState<HarvestForecast[]>([]);
   const [lguDistributions, setLguDistributions] = useState<LGUDistribution[]>([]);
@@ -869,16 +871,16 @@ export function PlanningForecastDashboard() {
   return (
     <>
       <PremiumHero
-        title="Planning & Forecast"
-        sub="Coordinate future harvests, distributions, and waste management with role-based forecasting tools."
+        title={t("planning.pageTitle")}
+        sub={t("planning.subtitle")}
       />
       <Container className="py-12">
         {authLoading || loading ? (
-          <div className="text-center py-12">Loading...</div>
+          <div className="text-center py-12">{t("planning.loading")}</div>
         ) : loadError ? (
           <Card className="mx-auto max-w-xl p-8 text-center">
             <AlertCircle className="mx-auto h-10 w-10 text-amber-500" />
-            <h2 className="mt-4 text-xl font-semibold">Unable to load planning data</h2>
+            <h2 className="mt-4 text-xl font-semibold">{t("planning.unableToLoad")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{loadError}</p>
             <Button
               className="mt-6"
@@ -890,7 +892,7 @@ export function PlanningForecastDashboard() {
                 }
               }}
             >
-              Try Again
+              {t("planning.tryAgain")}
             </Button>
           </Card>
         ) : (
@@ -907,20 +909,20 @@ export function PlanningForecastDashboard() {
                 profile?.primary_role === "restaurant") && (
                 <TabsTrigger value="lgu-harvests">
                   <BarChart3 className="mr-2 h-4 w-4" />
-                  Harvest Forecast
+                  {t("planning.harvestForecast")}
                 </TabsTrigger>
               )}
               {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin") && (
                 <TabsTrigger value="distributions">
                   <Truck className="mr-2 h-4 w-4" />
-                  LGU Distributions
+                  {t("planning.lguDistributions")}
                 </TabsTrigger>
               )}
               {(profile?.primary_role === "lgu_admin" ||
                 profile?.primary_role === "restaurant") && (
                 <TabsTrigger value="waste">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Projected Waste
+                  {t("planning.projectedWaste")}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -933,13 +935,13 @@ export function PlanningForecastDashboard() {
                 <div className="flex justify-between items-center">
                   <h2 className="text-2xl font-bold">
                     {isLGUAdmin || profile?.primary_role === "restaurant"
-                      ? "Farmers' Harvest Forecast"
-                      : "My Harvest Forecasts"}
+                      ? t("planning.farmersHarvestForecast")
+                      : t("planning.myHarvestForecasts")}
                   </h2>
                   {canCreateHarvest && (
                     <Button onClick={() => setShowHarvestDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Forecast
+                      {t("planning.addForecast")}
                     </Button>
                   )}
                 </div>
@@ -952,7 +954,7 @@ export function PlanningForecastDashboard() {
                         <Sprout className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Total Forecasts</p>
+                        <p className="text-sm text-muted-foreground">{t("planning.totalForecasts")}</p>
                         <p className="text-2xl font-bold text-green-900">
                           {harvestStats.totalForecasts}
                         </p>
@@ -965,7 +967,7 @@ export function PlanningForecastDashboard() {
                         <Package className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Total Quantity</p>
+                        <p className="text-sm text-muted-foreground">{t("planning.totalQuantity")}</p>
                         <p className="text-2xl font-bold text-blue-900">
                           {harvestStats.totalQuantity.toLocaleString()} kg
                         </p>
@@ -978,7 +980,7 @@ export function PlanningForecastDashboard() {
                         <Calendar className="h-6 w-6 text-amber-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">This Month</p>
+                        <p className="text-sm text-muted-foreground">{t("planning.thisMonth")}</p>
                         <p className="text-2xl font-bold text-amber-900">
                           {harvestStats.upcomingThisMonth}
                         </p>
@@ -991,7 +993,7 @@ export function PlanningForecastDashboard() {
                         <TrendingUp className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Municipalities</p>
+                        <p className="text-sm text-muted-foreground">{t("planning.municipalities")}</p>
                         <p className="text-2xl font-bold text-purple-900">
                           {Object.keys(harvestStats.byMunicipality).length}
                         </p>
@@ -1004,17 +1006,17 @@ export function PlanningForecastDashboard() {
                 <Card className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Filter className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-semibold">Filter Harvests</h3>
+                    <h3 className="font-semibold">{t("planning.filterHarvests")}</h3>
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
-                      <Label htmlFor="filter-municipality">Municipality</Label>
+                      <Label htmlFor="filter-municipality">{t("planning.municipality")}</Label>
                       <Select value={filterMunicipality} onValueChange={setFilterMunicipality}>
                         <SelectTrigger id="filter-municipality">
-                          <SelectValue placeholder="All municipalities" />
+                          <SelectValue placeholder={t("planning.allMunicipalities")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Municipalities</SelectItem>
+                          <SelectItem value="all">{t("planning.allMunicipalities")}</SelectItem>
                           {municipalities.map((m) => (
                             <SelectItem key={m} value={m}>
                               {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -1024,13 +1026,13 @@ export function PlanningForecastDashboard() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="filter-crop">Crop Type</Label>
+                      <Label htmlFor="filter-crop">{t("planning.cropType")}</Label>
                       <Select value={filterCropType} onValueChange={setFilterCropType}>
                         <SelectTrigger id="filter-crop">
-                          <SelectValue placeholder="All crops" />
+                          <SelectValue placeholder={t("planning.allCrops")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Crops</SelectItem>
+                          <SelectItem value="all">{t("planning.allCrops")}</SelectItem>
                           {uniqueCropTypes.map((crop) => (
                             <SelectItem key={crop} value={crop}>
                               {crop}
@@ -1040,13 +1042,13 @@ export function PlanningForecastDashboard() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="filter-status">Status</Label>
+                      <Label htmlFor="filter-status">{t("planning.status")}</Label>
                       <Select value={filterStatus} onValueChange={setFilterStatus}>
                         <SelectTrigger id="filter-status">
-                          <SelectValue placeholder="All statuses" />
+                          <SelectValue placeholder={t("planning.allStatuses")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="all">{t("planning.allStatuses")}</SelectItem>
                           <SelectItem value="active">Active</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -1060,7 +1062,7 @@ export function PlanningForecastDashboard() {
                 <Card className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <BarChart3 className="h-5 w-5 text-green-600" />
-                    <h3 className="text-lg font-bold">Harvest by Municipality</h3>
+                    <h3 className="text-lg font-bold">{t("planning.harvestByMunicipality")}</h3>
                   </div>
                   <div className="space-y-3">
                     {Object.entries(harvestStats.byMunicipality).map(([municipality, quantity]) => (
@@ -1083,10 +1085,10 @@ export function PlanningForecastDashboard() {
                 </Card>
 
                 {/* Filtered Harvest Forecast Cards */}
-                <h3 className="text-xl font-bold">Upcoming Harvests</h3>
+                <h3 className="text-xl font-bold">{t("planning.upcomingHarvests")}</h3>
                 {filteredHarvestForecasts.length === 0 ? (
                   <Card className="p-8 text-center text-muted-foreground">
-                    No harvest forecasts found
+                    {t("planning.noHarvestForecasts")}
                   </Card>
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -1135,21 +1137,21 @@ export function PlanningForecastDashboard() {
                         <div className="p-4 space-y-3">
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Quantity:</span>
+                            <span className="text-muted-foreground">{t("planning.quantity")}:</span>
                             <span className="font-semibold">
                               {forecast.estimated_quantity_kg} kg
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Harvest Date:</span>
+                            <span className="text-muted-foreground">{t("planning.harvestDate")}:</span>
                             <span className="font-semibold">
                               {new Date(forecast.projected_harvest_date).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Location:</span>
+                            <span className="text-muted-foreground">{t("planning.location")}:</span>
                             <span className="font-semibold">
                               {forecast.barangay}, {forecast.municipality}
                             </span>
@@ -1167,7 +1169,7 @@ export function PlanningForecastDashboard() {
                                 onClick={() => handleEditHarvest(forecast)}
                               >
                                 <Edit className="h-4 w-4 mr-1" />
-                                Edit
+                                {t("planning.edit")}
                               </Button>
                               <Button
                                 size="sm"
@@ -1175,7 +1177,7 @@ export function PlanningForecastDashboard() {
                                 onClick={() => handleDeleteHarvestForecast(forecast.id)}
                               >
                                 <Trash className="h-4 w-4 mr-1" />
-                                Delete
+                                {t("planning.delete")}
                               </Button>
                             </div>
                           )}
@@ -1191,11 +1193,11 @@ export function PlanningForecastDashboard() {
             {(profile?.primary_role === "farmer" || profile?.primary_role === "lgu_admin") && (
               <TabsContent value="distributions" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">LGU Distributions</h2>
+                  <h2 className="text-2xl font-bold">{t("planning.lguDistributions")}</h2>
                   {canCreateDistribution && (
                     <Button onClick={() => setShowDistributionDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Distribution
+                      {t("planning.addDistribution")}
                     </Button>
                   )}
                 </div>
@@ -1211,7 +1213,7 @@ export function PlanningForecastDashboard() {
                             <Truck className="h-6 w-6 text-blue-600" />
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Total Distributions</p>
+                            <p className="text-sm text-muted-foreground">{t("planning.totalReports")}</p>
                             <p className="text-2xl font-bold text-blue-900">
                               {distributionStats.totalDistributions}
                             </p>
@@ -1224,7 +1226,7 @@ export function PlanningForecastDashboard() {
                             <Package className="h-6 w-6 text-green-600" />
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Total Quantity</p>
+                            <p className="text-sm text-muted-foreground">{t("planning.totalQuantity")}</p>
                             <p className="text-2xl font-bold text-green-900">
                               {distributionStats.totalQuantity.toLocaleString()} units
                             </p>
@@ -1237,7 +1239,7 @@ export function PlanningForecastDashboard() {
                             <Calendar className="h-6 w-6 text-amber-600" />
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">This Month</p>
+                            <p className="text-sm text-muted-foreground">{t("planning.thisMonth")}</p>
                             <p className="text-2xl font-bold text-amber-900">
                               {distributionStats.upcomingThisMonth}
                             </p>
@@ -1250,7 +1252,7 @@ export function PlanningForecastDashboard() {
                             <TrendingUp className="h-6 w-6 text-purple-600" />
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Municipalities</p>
+                            <p className="text-sm text-muted-foreground">{t("planning.municipalities")}</p>
                             <p className="text-2xl font-bold text-purple-900">
                               {Object.keys(distributionStats.byMunicipality).length}
                             </p>
@@ -1263,20 +1265,20 @@ export function PlanningForecastDashboard() {
                     <Card className="p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Filter className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="font-semibold">Filter Distributions</h3>
+                        <h3 className="font-semibold">{t("planning.filterDistributions")}</h3>
                       </div>
                       <div className="grid gap-4 md:grid-cols-3">
                         <div>
-                          <Label htmlFor="filter-dist-municipality">Municipality</Label>
+                          <Label htmlFor="filter-dist-municipality">{t("planning.municipality")}</Label>
                           <Select
                             value={filterDistributionMunicipality}
                             onValueChange={setFilterDistributionMunicipality}
                           >
                             <SelectTrigger id="filter-dist-municipality">
-                              <SelectValue placeholder="All municipalities" />
+                              <SelectValue placeholder={t("planning.allMunicipalities")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="all">All Municipalities</SelectItem>
+                              <SelectItem value="all">{t("planning.allMunicipalities")}</SelectItem>
                               {municipalities.map((m) => (
                                 <SelectItem key={m} value={m}>
                                   {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -1286,16 +1288,16 @@ export function PlanningForecastDashboard() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="filter-dist-type">Distribution Type</Label>
+                          <Label htmlFor="filter-dist-type">{t("planning.distributionType")}</Label>
                           <Select
                             value={filterDistributionType}
                             onValueChange={setFilterDistributionType}
                           >
                             <SelectTrigger id="filter-dist-type">
-                              <SelectValue placeholder="All types" />
+                              <SelectValue placeholder={t("planning.allTypes")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="all">All Types</SelectItem>
+                              <SelectItem value="all">{t("planning.allTypes")}</SelectItem>
                               {uniqueDistributionTypes.map((type) => (
                                 <SelectItem key={type} value={type}>
                                   {type}
@@ -1305,16 +1307,16 @@ export function PlanningForecastDashboard() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="filter-dist-status">Status</Label>
+                          <Label htmlFor="filter-dist-status">{t("planning.status")}</Label>
                           <Select
                             value={filterDistributionStatus}
                             onValueChange={setFilterDistributionStatus}
                           >
                             <SelectTrigger id="filter-dist-status">
-                              <SelectValue placeholder="All statuses" />
+                              <SelectValue placeholder={t("planning.allStatuses")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="all">All Statuses</SelectItem>
+                              <SelectItem value="all">{t("planning.allStatuses")}</SelectItem>
                               <SelectItem value="upcoming">Upcoming</SelectItem>
                               <SelectItem value="distributed">Distributed</SelectItem>
                               <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -1328,7 +1330,7 @@ export function PlanningForecastDashboard() {
                     <Card className="p-6">
                       <div className="flex items-center gap-2 mb-4">
                         <BarChart3 className="h-5 w-5 text-blue-600" />
-                        <h3 className="text-lg font-bold">Distributions by Municipality</h3>
+                        <h3 className="text-lg font-bold">{t("planning.distributionsByMunicipality")}</h3>
                       </div>
                       <div className="space-y-3">
                         {Object.entries(distributionStats.byMunicipality).map(
@@ -1359,10 +1361,10 @@ export function PlanningForecastDashboard() {
                 )}
 
                 {/* Distribution Cards */}
-                <h3 className="text-xl font-bold">Upcoming Distributions</h3>
+                <h3 className="text-xl font-bold">{t("planning.upcomingDistributions")}</h3>
                 {filteredDistributions.length === 0 ? (
                   <Card className="p-8 text-center text-muted-foreground">
-                    No distributions found
+                    {t("planning.noDistributions")}
                   </Card>
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2">
@@ -1394,7 +1396,7 @@ export function PlanningForecastDashboard() {
                                   search={{ userId: dist.user_id }}
                                   className="text-sm text-muted-foreground hover:text-primary hover:underline"
                                 >
-                                  by {dist.lgu_name}
+                                  {t("planning.by")} {dist.lgu_name}
                                 </Link>
                               </div>
                             </div>
@@ -1414,28 +1416,28 @@ export function PlanningForecastDashboard() {
                         <div className="p-4 space-y-3">
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Type:</span>
+                            <span className="text-muted-foreground">{t("planning.type")}:</span>
                             <span className="font-semibold capitalize">
                               {dist.distribution_type}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Date:</span>
+                            <span className="text-muted-foreground">{t("planning.date")}:</span>
                             <span className="font-semibold">
                               {new Date(dist.distribution_date).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Location:</span>
+                            <span className="text-muted-foreground">{t("planning.location")}:</span>
                             <span className="font-semibold">{dist.location}</span>
                           </div>
                           {dist.quantity_available && (
                             <div className="flex items-center gap-2 text-sm">
                               <Package className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">Available:</span>
-                              <span className="font-semibold">{dist.quantity_available} units</span>
+                              <span className="text-muted-foreground">{t("planning.available")}:</span>
+                              <span className="font-semibold">{dist.quantity_available} {t("planning.units")}</span>
                             </div>
                           )}
                           <p className="text-sm text-muted-foreground italic border-t pt-3 mt-3">
@@ -1449,7 +1451,7 @@ export function PlanningForecastDashboard() {
                               onClick={() => handleMessageClick(dist.user_id, dist.lgu_name)}
                             >
                               <MessageCircle className="mr-2 h-4 w-4" />
-                              Message LGU
+                              {t("planning.messageLgu")}
                             </Button>
                           </div>
                         )}
@@ -1464,7 +1466,7 @@ export function PlanningForecastDashboard() {
                               }}
                             >
                               <Edit className="h-4 w-4 mr-1" />
-                              Edit
+                              {t("planning.edit")}
                             </Button>
                             <Button
                               size="sm"
@@ -1475,7 +1477,7 @@ export function PlanningForecastDashboard() {
                               }}
                             >
                               <Trash className="h-4 w-4 mr-1" />
-                              Delete
+                              {t("planning.delete")}
                             </Button>
                           </div>
                         )}
@@ -1490,11 +1492,11 @@ export function PlanningForecastDashboard() {
             {(profile?.primary_role === "lgu_admin" || profile?.primary_role === "restaurant") && (
               <TabsContent value="waste" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">Projected Food Waste</h2>
+                  <h2 className="text-2xl font-bold">{t("planning.projectedFoodWaste")}</h2>
                   {canCreateWaste && (
                     <Button onClick={() => setShowWasteDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Waste Projection
+                      {t("planning.addWasteProjection")}
                     </Button>
                   )}
                 </div>
@@ -1509,7 +1511,7 @@ export function PlanningForecastDashboard() {
                           <Package className="h-6 w-6 text-red-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Total Reports</p>
+                          <p className="text-sm text-muted-foreground">{t("planning.totalReports")}</p>
                           <p className="text-2xl font-bold text-red-900">
                             {wasteStats.totalReports}
                           </p>
@@ -1522,7 +1524,7 @@ export function PlanningForecastDashboard() {
                           <Scale className="h-6 w-6 text-orange-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Total Quantity</p>
+                          <p className="text-sm text-muted-foreground">{t("planning.totalQuantity")}</p>
                           <p className="text-2xl font-bold text-orange-900">
                             {wasteStats.totalQuantity.toLocaleString()} kg
                           </p>
@@ -1535,7 +1537,7 @@ export function PlanningForecastDashboard() {
                           <Calendar className="h-6 w-6 text-yellow-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">This Month</p>
+                          <p className="text-sm text-muted-foreground">{t("planning.thisMonth")}</p>
                           <p className="text-2xl font-bold text-yellow-900">
                             {wasteStats.upcomingThisMonth}
                           </p>
@@ -1548,7 +1550,7 @@ export function PlanningForecastDashboard() {
                           <TrendingUp className="h-6 w-6 text-purple-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Municipalities</p>
+                          <p className="text-sm text-muted-foreground">{t("planning.municipalities")}</p>
                           <p className="text-2xl font-bold text-purple-900">
                             {Object.keys(wasteStats.byMunicipality).length}
                           </p>
@@ -1561,20 +1563,20 @@ export function PlanningForecastDashboard() {
                   <Card className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Filter className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="font-semibold">Filter Waste Reports</h3>
+                      <h3 className="font-semibold">{t("planning.filterWasteReports")}</h3>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <Label htmlFor="filter-waste-municipality">Municipality</Label>
+                        <Label htmlFor="filter-waste-municipality">{t("planning.municipality")}</Label>
                         <Select
                           value={filterWasteMunicipality}
                           onValueChange={setFilterWasteMunicipality}
                         >
                           <SelectTrigger id="filter-waste-municipality">
-                            <SelectValue placeholder="All municipalities" />
+                            <SelectValue placeholder={t("planning.allMunicipalities")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all">All Municipalities</SelectItem>
+                            <SelectItem value="all">{t("planning.allMunicipalities")}</SelectItem>
                             {municipalities.map((m) => (
                               <SelectItem key={m} value={m}>
                                 {m.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -1604,10 +1606,10 @@ export function PlanningForecastDashboard() {
                 </div>
 
                 {/* Waste Report Cards */}
-                <h3 className="text-xl font-bold">Waste Projections</h3>
+                <h3 className="text-xl font-bold">{t("planning.wasteProjections")}</h3>
                 {filteredWaste.length === 0 ? (
                   <Card className="p-8 text-center text-muted-foreground">
-                    No waste reports found
+                    {t("planning.noWasteReports")}
                   </Card>
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2">
@@ -1643,24 +1645,24 @@ export function PlanningForecastDashboard() {
                         <div className="p-4 space-y-3">
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Estimated:</span>
+                            <span className="text-muted-foreground">{t("planning.estimated")}:</span>
                             <span className="font-semibold">{waste.estimated_quantity_kg} kg</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Date:</span>
+                            <span className="text-muted-foreground">{t("planning.date")}:</span>
                             <span className="font-semibold">
                               {new Date(waste.projected_date).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Type:</span>
+                            <span className="text-muted-foreground">{t("planning.type")}:</span>
                             <span className="font-semibold capitalize">{waste.waste_type}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Location:</span>
+                            <span className="text-muted-foreground">{t("planning.location")}:</span>
                             <span className="font-semibold">
                               {waste.barangay}, {waste.municipality}
                             </span>
@@ -1682,7 +1684,7 @@ export function PlanningForecastDashboard() {
                               }}
                             >
                               <Edit className="h-4 w-4 mr-1" />
-                              Edit
+                              {t("planning.edit")}
                             </Button>
                             <Button
                               size="sm"
@@ -1693,7 +1695,7 @@ export function PlanningForecastDashboard() {
                               }}
                             >
                               <Trash className="h-4 w-4 mr-1" />
-                              Delete
+                              {t("planning.delete")}
                             </Button>
                           </div>
                         )}
@@ -1729,26 +1731,26 @@ export function PlanningForecastDashboard() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingHarvest ? "Edit Harvest Forecast" : "Add Harvest Forecast"}
+              {editingHarvest ? t("planning.editHarvestForecast") : t("planning.addHarvestForecast")}
             </DialogTitle>
             <DialogDescription>
               {editingHarvest
-                ? "Update your harvest forecast details"
-                : "Post your expected harvest to help buyers plan ahead"}
+                ? t("planning.updateHarvestForecastDetails")
+                : t("planning.postExpectedHarvest")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <Label htmlFor="crop_type">Crop Type</Label>
+              <Label htmlFor="crop_type">{t("planning.cropType")}</Label>
               <Input
                 id="crop_type"
                 value={harvestForm.crop_type}
                 onChange={(e) => setHarvestForm({ ...harvestForm, crop_type: e.target.value })}
-                placeholder="e.g., Rice, Corn, Vegetables"
+                placeholder={t("planning.cropPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="quantity">Estimated Quantity (kg)</Label>
+              <Label htmlFor="quantity">{t("planning.estimatedQuantity")}</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -1756,11 +1758,11 @@ export function PlanningForecastDashboard() {
                 onChange={(e) =>
                   setHarvestForm({ ...harvestForm, estimated_quantity_kg: e.target.value })
                 }
-                placeholder="e.g., 500"
+                placeholder={t("planning.quantityPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="harvest_date">Projected Harvest Date</Label>
+              <Label htmlFor="harvest_date">{t("planning.projectedHarvestDate")}</Label>
               <Input
                 id="harvest_date"
                 type="date"
@@ -1789,16 +1791,16 @@ export function PlanningForecastDashboard() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="barangay">Barangay</Label>
+              <Label htmlFor="barangay">{t("planning.barangay")}</Label>
               <Input
                 id="barangay"
                 value={harvestForm.barangay}
                 onChange={(e) => setHarvestForm({ ...harvestForm, barangay: e.target.value })}
-                placeholder="e.g., Barangay 1"
+                placeholder={t("planning.barangayPlaceholder")}
               />
             </div>
             <div className="col-span-2">
-              <Label htmlFor="images">Images (optional)</Label>
+              <Label htmlFor="images">{t("planning.imagesOptional")}</Label>
               <input
                 type="file"
                 id="images"
@@ -1812,28 +1814,28 @@ export function PlanningForecastDashboard() {
               />
             </div>
             <div>
-              <Label htmlFor="notes">Notes (optional)</Label>
+              <Label htmlFor="notes">{t("planning.notesOptional")}</Label>
               <Textarea
                 id="notes"
                 value={harvestForm.notes}
                 onChange={(e) => setHarvestForm({ ...harvestForm, notes: e.target.value })}
-                placeholder="Additional details about your harvest"
+                placeholder={t("planning.harvestNotesPlaceholder")}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowHarvestDialog(false)}>
-              Cancel
+              {t("planning.cancel")}
             </Button>
             <Button
               onClick={editingHarvest ? handleUpdateHarvestForecast : handleCreateHarvestForecast}
               disabled={uploading}
             >
               {uploading
-                ? "Uploading images..."
+                ? t("planning.uploadingImages")
                 : editingHarvest
-                  ? "Update Forecast"
-                  : "Create Forecast"}
+                  ? t("planning.updateForecast")
+                  : t("planning.createForecast")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1864,17 +1866,17 @@ export function PlanningForecastDashboard() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {editingDistribution ? "Edit LGU Distribution" : "Add LGU Distribution"}
+              {editingDistribution ? t("planning.editLguDistribution") : t("planning.addLguDistribution")}
             </DialogTitle>
             <DialogDescription>
               {editingDistribution
-                ? "Update your distribution details"
-                : "Post upcoming fertilizer distributions or agricultural assistance programs"}
+                ? t("planning.updateDistributionDetails")
+                : t("planning.postDistributionProgram")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="distribution_type">Distribution Type</Label>
+              <Label htmlFor="distribution_type">{t("planning.distributionType")}</Label>
               <Select
                 value={distributionForm.distribution_type}
                 onValueChange={(v) =>
@@ -1893,29 +1895,29 @@ export function PlanningForecastDashboard() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">{t("planning.distributionTitle")}</Label>
               <Input
                 id="title"
                 value={distributionForm.title}
                 onChange={(e) =>
                   setDistributionForm({ ...distributionForm, title: e.target.value })
                 }
-                placeholder="e.g., Free Fertilizer Distribution Program"
+                placeholder={t("planning.titlePlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t("planning.description")}</Label>
               <Textarea
                 id="description"
                 value={distributionForm.description}
                 onChange={(e) =>
                   setDistributionForm({ ...distributionForm, description: e.target.value })
                 }
-                placeholder="Describe the distribution program"
+                placeholder={t("planning.descriptionPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="distribution_date">Distribution Date</Label>
+              <Label htmlFor="distribution_date">{t("planning.distributionDate")}</Label>
               <Input
                 id="distribution_date"
                 type="date"
@@ -1926,18 +1928,18 @@ export function PlanningForecastDashboard() {
               />
             </div>
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">{t("planning.location")}</Label>
               <Input
                 id="location"
                 value={distributionForm.location}
                 onChange={(e) =>
                   setDistributionForm({ ...distributionForm, location: e.target.value })
                 }
-                placeholder="e.g., Municipal Hall"
+                placeholder={t("planning.locationPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="quantity">Quantity Available (optional)</Label>
+              <Label htmlFor="quantity">{t("planning.quantityAvailable")}</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -1945,11 +1947,11 @@ export function PlanningForecastDashboard() {
                 onChange={(e) =>
                   setDistributionForm({ ...distributionForm, quantity_available: e.target.value })
                 }
-                placeholder="e.g., 100"
+                placeholder={t("planning.quantityPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="municipality">Municipality</Label>
+              <Label htmlFor="municipality">{t("planning.municipality")}</Label>
               <Select
                 value={distributionForm.municipality}
                 onValueChange={(v) => setDistributionForm({ ...distributionForm, municipality: v })}
@@ -1967,7 +1969,7 @@ export function PlanningForecastDashboard() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="distribution_images">Images (optional)</Label>
+              <Label htmlFor="distribution_images">{t("planning.imagesOptional")}</Label>
               <div className="relative">
                 <input
                   type="file"
@@ -1996,33 +1998,32 @@ export function PlanningForecastDashboard() {
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      <p className="text-sm">Click to upload images</p>
-                      <p className="text-xs mt-1">or drag and drop (multiple allowed)</p>
+                      <p className="text-sm">{t("planning.clickToUploadImages")}</p>
+                      <p className="text-xs mt-1">{t("planning.dragAndDrop")}</p>
                     </div>
                   </div>
                 )}
               </div>
               {distributionImages.length > 0 && (
                 <div className="mt-2 text-sm text-primary/70 font-medium">
-                  {distributionImages.length} image{distributionImages.length !== 1 ? "s" : ""}{" "}
-                  selected
+                  {distributionImages.length} {t("planning.image")}{distributionImages.length !== 1 ? t("planning.s") : ""} {t("planning.selected")}
                 </div>
               )}
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDistributionDialog(false)}>
-              Cancel
+              {t("planning.cancel")}
             </Button>
             <Button
               onClick={editingDistribution ? handleUpdateDistribution : handleCreateDistribution}
               disabled={uploading}
             >
               {uploading
-                ? "Uploading images..."
+                ? t("planning.uploadingImages")
                 : editingDistribution
-                  ? "Update Distribution"
-                  : "Create Distribution"}
+                  ? t("planning.updateDistribution")
+                  : t("planning.createDistribution")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2050,17 +2051,17 @@ export function PlanningForecastDashboard() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingWaste ? "Edit Projected Waste Report" : "Add Projected Waste Report"}
+              {editingWaste ? t("planning.editProjectedWasteReport") : t("planning.addProjectedWasteReport")}
             </DialogTitle>
             <DialogDescription>
               {editingWaste
-                ? "Update your waste projection details"
-                : "Report expected food waste to help LGU plan for recovery and management"}
+                ? t("planning.updateWasteProjectionDetails")
+                : t("planning.reportExpectedFoodWaste")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="waste_quantity">Estimated Quantity (kg)</Label>
+              <Label htmlFor="waste_quantity">{t("planning.estimatedQuantity")}</Label>
               <Input
                 id="waste_quantity"
                 type="number"
@@ -2068,11 +2069,11 @@ export function PlanningForecastDashboard() {
                 onChange={(e) =>
                   setWasteForm({ ...wasteForm, estimated_quantity_kg: e.target.value })
                 }
-                placeholder="e.g., 50"
+                placeholder={t("planning.quantityPlaceholder")}
               />
             </div>
             <div>
-              <Label htmlFor="projected_date">Projected Date</Label>
+              <Label htmlFor="projected_date">{t("planning.projectedDate")}</Label>
               <Input
                 id="projected_date"
                 type="date"
@@ -2081,7 +2082,7 @@ export function PlanningForecastDashboard() {
               />
             </div>
             <div>
-              <Label htmlFor="waste_type">Waste Type</Label>
+              <Label htmlFor="waste_type">{t("planning.wasteType")}</Label>
               <Select
                 value={wasteForm.waste_type}
                 onValueChange={(v) => setWasteForm({ ...wasteForm, waste_type: v })}
@@ -2090,14 +2091,14 @@ export function PlanningForecastDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="food">Food Waste</SelectItem>
-                  <SelectItem value="organic">Organic Waste</SelectItem>
-                  <SelectItem value="mixed">Mixed Waste</SelectItem>
+                  <SelectItem value="food">{t("planning.foodWaste")}</SelectItem>
+                  <SelectItem value="organic">{t("planning.organicWaste")}</SelectItem>
+                  <SelectItem value="mixed">{t("planning.mixedWaste")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="waste_municipality">Municipality</Label>
+              <Label htmlFor="waste_municipality">{t("planning.municipality")}</Label>
               <Select
                 value={wasteForm.municipality}
                 onValueChange={(v) => setWasteForm({ ...wasteForm, municipality: v })}
@@ -2115,16 +2116,16 @@ export function PlanningForecastDashboard() {
               </Select>
             </div>
             <div className="col-span-2">
-              <Label htmlFor="waste_barangay">Barangay</Label>
+              <Label htmlFor="waste_barangay">{t("planning.barangay")}</Label>
               <Input
                 id="waste_barangay"
                 value={wasteForm.barangay}
                 onChange={(e) => setWasteForm({ ...wasteForm, barangay: e.target.value })}
-                placeholder="e.g., Barangay 1"
+                placeholder={t("planning.barangayPlaceholder")}
               />
             </div>
             <div className="col-span-2">
-              <Label htmlFor="waste_images">Images (optional)</Label>
+              <Label htmlFor="waste_images">{t("planning.imagesOptional")}</Label>
               <input
                 type="file"
                 id="waste_images"
@@ -2138,24 +2139,24 @@ export function PlanningForecastDashboard() {
               />
             </div>
             <div>
-              <Label htmlFor="waste_notes">Notes (optional)</Label>
+              <Label htmlFor="waste_notes">{t("planning.notesOptional")}</Label>
               <Textarea
                 id="waste_notes"
                 value={wasteForm.notes}
                 onChange={(e) => setWasteForm({ ...wasteForm, notes: e.target.value })}
-                placeholder="Additional details about the projected waste"
+                placeholder={t("planning.wasteNotesPlaceholder")}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowWasteDialog(false)}>
-              Cancel
+              {t("planning.cancel")}
             </Button>
             <Button
               onClick={editingWaste ? handleUpdateProjectedWaste : handleCreateProjectedWaste}
               disabled={uploading}
             >
-              {uploading ? "Uploading images..." : editingWaste ? "Update Report" : "Submit Report"}
+              {uploading ? t("planning.uploadingImages") : editingWaste ? t("planning.updateReport") : t("planning.submitReport")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2174,7 +2175,7 @@ export function PlanningForecastDashboard() {
                     search={{ userId: selectedHarvest.user_id }}
                     className="text-primary hover:underline"
                   >
-                    by {selectedHarvest.farmer_name}
+                    {t("planning.by")} {selectedHarvest.farmer_name}
                   </Link>
                 </DialogDescription>
               </DialogHeader>
@@ -2253,29 +2254,29 @@ export function PlanningForecastDashboard() {
               <div className="grid gap-6 md:grid-cols-2 mt-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Harvest Details</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t("planning.harvestDetails")}</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Quantity:</span>
+                        <span className="text-muted-foreground">{t("planning.quantity")}:</span>
                         <span className="font-medium">
                           {selectedHarvest.estimated_quantity_kg} kg
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Harvest Date:</span>
+                        <span className="text-muted-foreground">{t("planning.harvestDate")}:</span>
                         <span className="font-medium">
                           {new Date(selectedHarvest.projected_harvest_date).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Location:</span>
+                        <span className="text-muted-foreground">{t("planning.location")}:</span>
                         <span className="font-medium">
                           {selectedHarvest.barangay},{" "}
                           {selectedHarvest.municipality.replace("_", " ")}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Status:</span>
+                        <span className="text-muted-foreground">{t("planning.status")}:</span>
                         <span
                           className={`font-medium capitalize ${selectedHarvest.status === "active" ? "text-green-600" : "text-gray-600"}`}
                         >
@@ -2303,7 +2304,7 @@ export function PlanningForecastDashboard() {
                       }}
                     >
                       <MessageCircle className="mr-2 h-4 w-4" />
-                      Message Farmer
+                      {t("planning.messageFarmer")}
                     </Button>
                   )}
                 </div>
@@ -2326,7 +2327,7 @@ export function PlanningForecastDashboard() {
                     search={{ userId: selectedDistribution.user_id }}
                     className="text-primary hover:underline"
                   >
-                    by {selectedDistribution.lgu_name}
+                    {t("planning.by")} {selectedDistribution.lgu_name}
                   </Link>
                 </DialogDescription>
               </DialogHeader>
@@ -2405,34 +2406,34 @@ export function PlanningForecastDashboard() {
               <div className="grid gap-6 md:grid-cols-2 mt-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Distribution Details</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t("planning.distributionDetails")}</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Type:</span>
+                        <span className="text-muted-foreground">{t("planning.type")}:</span>
                         <span className="font-medium capitalize">
                           {selectedDistribution.distribution_type}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Date:</span>
+                        <span className="text-muted-foreground">{t("planning.date")}:</span>
                         <span className="font-medium">
                           {new Date(selectedDistribution.distribution_date).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Location:</span>
+                        <span className="text-muted-foreground">{t("planning.location")}:</span>
                         <span className="font-medium">{selectedDistribution.location}</span>
                       </div>
                       {selectedDistribution.quantity_available && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Available:</span>
+                          <span className="text-muted-foreground">{t("planning.available")}:</span>
                           <span className="font-medium">
-                            {selectedDistribution.quantity_available} units
+                            {selectedDistribution.quantity_available} {t("planning.units")}
                           </span>
                         </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Status:</span>
+                        <span className="text-muted-foreground">{t("planning.status")}:</span>
                         <span
                           className={`font-medium capitalize ${
                             selectedDistribution.status === "upcoming"
@@ -2451,7 +2452,7 @@ export function PlanningForecastDashboard() {
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Description</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t("planning.description")}</h3>
                     <p className="text-sm text-muted-foreground">
                       {selectedDistribution.description}
                     </p>
@@ -2469,7 +2470,7 @@ export function PlanningForecastDashboard() {
                       }}
                     >
                       <MessageCircle className="mr-2 h-4 w-4" />
-                      Message LGU
+                      {t("planning.messageLgu")}
                     </Button>
                   )}
                 </div>
@@ -2569,26 +2570,26 @@ export function PlanningForecastDashboard() {
               <div className="grid gap-6 md:grid-cols-2 mt-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Waste Details</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t("planning.wasteDetails")}</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Estimated:</span>
+                        <span className="text-muted-foreground">{t("planning.estimated")}:</span>
                         <span className="font-medium">
                           {selectedWaste.estimated_quantity_kg} kg
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Date:</span>
+                        <span className="text-muted-foreground">{t("planning.date")}:</span>
                         <span className="font-medium">
                           {new Date(selectedWaste.projected_date).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Type:</span>
+                        <span className="text-muted-foreground">{t("planning.type")}:</span>
                         <span className="font-medium capitalize">{selectedWaste.waste_type}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Location:</span>
+                        <span className="text-muted-foreground">{t("planning.location")}:</span>
                         <span className="font-medium">
                           {selectedWaste.barangay}, {selectedWaste.municipality.replace("_", " ")}
                         </span>
@@ -2600,7 +2601,7 @@ export function PlanningForecastDashboard() {
                 <div className="space-y-4">
                   {selectedWaste.notes && (
                     <div>
-                      <h3 className="font-semibold text-lg mb-2">Notes</h3>
+                      <h3 className="font-semibold text-lg mb-2">{t("planning.notes")}</h3>
                       <p className="text-sm text-muted-foreground">{selectedWaste.notes}</p>
                     </div>
                   )}
