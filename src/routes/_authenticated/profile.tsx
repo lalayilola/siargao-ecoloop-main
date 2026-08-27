@@ -69,6 +69,9 @@ function ProfilePage() {
     Database["public"]["Tables"]["marketplace_listings"]["Row"][]
   >([]);
   const [loadingListings, setLoadingListings] = useState(false);
+  const [totalSales, setTotalSales] = useState<number>(0);
+  const [salesPerDay, setSalesPerDay] = useState<number>(0);
+  const [loadingSales, setLoadingSales] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -171,6 +174,63 @@ function ProfilePage() {
     };
 
     loadUserListings();
+  }, [otherUserId, user?.id]);
+
+  useEffect(() => {
+    const targetUserId = otherUserId || user?.id;
+    if (!targetUserId) {
+      setTotalSales(0);
+      setSalesPerDay(0);
+      return;
+    }
+
+    const loadSalesData = async () => {
+      setLoadingSales(true);
+      try {
+        // Get all completed purchase requests for the user's listings
+        const { data: purchaseData, error: purchaseError } = await supabase
+          .from("purchase_requests")
+          .select("quantity_kg, created_at, marketplace_listings!inner(user_id)")
+          .eq("marketplace_listings.user_id", targetUserId)
+          .eq("status", "completed");
+
+        if (purchaseError) {
+          console.error("Error loading sales data:", purchaseError);
+          setTotalSales(0);
+          setSalesPerDay(0);
+        } else {
+          // Calculate total sales (sum of quantity_kg)
+          const total = purchaseData?.reduce((sum, purchase) => {
+            return sum + (purchase.quantity_kg || 0);
+          }, 0) || 0;
+
+          setTotalSales(total);
+
+          // Calculate sales per day
+          if (purchaseData && purchaseData.length > 0) {
+            // Find the earliest sale date
+            const earliestSale = purchaseData.reduce((earliest, purchase) => {
+              const saleDate = new Date(purchase.created_at);
+              return saleDate < earliest ? saleDate : earliest;
+            }, new Date(purchaseData[0].created_at));
+
+            const now = new Date();
+            const daysSinceFirstSale = Math.max(1, Math.ceil((now.getTime() - earliestSale.getTime()) / (1000 * 60 * 60 * 24)));
+            setSalesPerDay(Math.round(total / daysSinceFirstSale));
+          } else {
+            setSalesPerDay(0);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading sales data:", err);
+        setTotalSales(0);
+        setSalesPerDay(0);
+      } finally {
+        setLoadingSales(false);
+      }
+    };
+
+    loadSalesData();
   }, [otherUserId, user?.id]);
 
   const handleProfilePictureUpload = async () => {
@@ -459,7 +519,7 @@ function ProfilePage() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
                   <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -473,6 +533,36 @@ function ProfilePage() {
                       </div>
                     </div>
                   </Card>
+                  {displayProfile?.primary_role === "farmer" && (
+                    <>
+                      <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                            <span className="text-xl">💰</span>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-emerald-700">
+                              {loadingSales ? "..." : `${totalSales.toFixed(1)} kg`}
+                            </div>
+                            <div className="text-sm text-gray-600">Total Sales</div>
+                          </div>
+                        </div>
+                      </Card>
+                      <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                            <span className="text-xl">📊</span>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-emerald-700">
+                              {loadingSales ? "..." : `${salesPerDay.toFixed(1)} kg`}
+                            </div>
+                            <div className="text-sm text-gray-600">Sales/Day</div>
+                          </div>
+                        </div>
+                      </Card>
+                    </>
+                  )}
                   {displayProfile?.primary_role !== "lgu_admin" && (
                     <Card className="bg-white border-2 border-[#D8F3DC] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-3">
